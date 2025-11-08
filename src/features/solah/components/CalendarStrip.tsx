@@ -1,9 +1,13 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 
 import { colors, borderRadius } from "@/shared/styles";
 
-export const CalendarStrip = () => {
+type CalendarStripProps = {
+  setSelectedDate: (date: Date) => void;
+};
+
+export const CalendarStrip = ({ setSelectedDate }: CalendarStripProps) => {
   const [referenceDate, setReferenceDate] = useState(new Date()); // controls the visible week
   const [today, setToday] = useState(new Date()); // tracks the real current date
 
@@ -92,14 +96,18 @@ export const CalendarStrip = () => {
         {weekDays.map((date) => {
           const isToday = isSameDay(date, today);
           return (
-            <View
+            <Pressable
               key={date.toISOString()}
-              style={[styles.dayContainer, isToday && styles.selectedDayContainer]}
+              onPress={() => setSelectedDate(date)} // only update SolahTimes display
+              style={[
+                styles.dayContainer,
+                isToday && styles.selectedDayContainer, // highlight only today
+              ]}
             >
               <Text style={[styles.dayText, isToday && styles.selectedDayText]}>
                 {date.getDate()}
               </Text>
-            </View>
+            </Pressable>
           );
         })}
       </View>
