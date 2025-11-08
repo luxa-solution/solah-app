@@ -99,14 +99,25 @@ export const CalendarStrip = ({ setSelectedDate }: CalendarStripProps) => {
             <Pressable
               key={date.toISOString()}
               onPress={() => setSelectedDate(date)} // only update SolahTimes display
-              style={[
+              style={({ pressed }) => [
                 styles.dayContainer,
-                isToday && styles.selectedDayContainer, // highlight only today
+                isToday && styles.selectedDayContainer, // highlight today
+                pressed && styles.pressedDayContainer, // temporary highlight
               ]}
             >
-              <Text style={[styles.dayText, isToday && styles.selectedDayText]}>
-                {date.getDate()}
-              </Text>
+              {(
+                { pressed } // 👈 this gives access to `pressed` for inner elements too
+              ) => (
+                <Text
+                  style={[
+                    styles.dayText,
+                    isToday && styles.selectedDayText,
+                    pressed && styles.pressedDayText,
+                  ]}
+                >
+                  {date.getDate()}
+                </Text>
+              )}
             </Pressable>
           );
         })}
@@ -168,7 +179,15 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   selectedDayText: {
-    color: "#fff",
+    color: colors.context.brand.inverted,
+    fontWeight: "700",
+  },
+  pressedDayContainer: {
+    backgroundColor: colors.background.brand.primary, // brand color highlight
+    borderRadius: borderRadius[2],
+  },
+  pressedDayText: {
+    color: colors.context.brand.inverted,
     fontWeight: "700",
   },
 });
