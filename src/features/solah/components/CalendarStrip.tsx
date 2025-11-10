@@ -172,14 +172,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   selectedDayContainer: {
-    backgroundColor: colors.background.brand.primary,
+    borderColor: colors.background.brand.primary,
+    borderWidth: borderRadius[1],
   },
   dayText: {
     fontSize: 14,
     fontWeight: "500",
   },
   selectedDayText: {
-    color: colors.context.brand.inverted,
     fontWeight: "700",
   },
   pressedDayContainer: {
