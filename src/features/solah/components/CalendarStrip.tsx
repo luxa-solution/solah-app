@@ -10,8 +10,9 @@ type CalendarStripProps = {
 export const CalendarStrip = ({ setSelectedDate }: CalendarStripProps) => {
   const [referenceDate, setReferenceDate] = useState(new Date()); // controls the visible week
   const [today, setToday] = useState(new Date()); // tracks the real current date
+  const [selectedDate, setLocalSelectedDate] = useState<Date | null>(null); // selected state
 
-  // 🕒 Auto-update at midnight
+  // Auto-update at midnight
   useEffect(() => {
     const scheduleNextUpdate = () => {
       const now = new Date();
@@ -28,7 +29,7 @@ export const CalendarStrip = ({ setSelectedDate }: CalendarStripProps) => {
     return () => clearTimeout(timeout);
   }, []);
 
-  // --- Generate the 7 days of the current reference week (Sunday → Saturday) ---
+  // Generate the 7 days of the current reference week (Sunday → Saturday)
   const weekDays = useMemo(() => {
     const startOfWeek = new Date(referenceDate);
     const dayOfWeek = startOfWeek.getDay(); // 0 = Sunday
@@ -64,12 +65,29 @@ export const CalendarStrip = ({ setSelectedDate }: CalendarStripProps) => {
     });
   };
 
+  const updateSolahTime = (date: Date) => {
+    setSelectedDate(date);
+  };
+
+  const handleDatePress = (date: Date) => {
+    if (selectedDate && isSameDay(selectedDate, date)) {
+      // ✅ deselect
+      setLocalSelectedDate(null);
+      updateSolahTime(today); // revert back to today's Solah time
+      return;
+    }
+
+    // ✅ select new date
+    setLocalSelectedDate(date);
+    updateSolahTime(date);
+  };
+
   const displayMonth = referenceDate.toLocaleString("default", { month: "long" });
   const displayYear = referenceDate.getFullYear();
 
   return (
     <View style={styles.container}>
-      {/* --- Header with chevrons --- */}
+      {/* Header */}
       <View style={styles.header}>
         <Pressable onPress={handlePrev}>
           <Text style={styles.chevron}>‹</Text>
@@ -82,7 +100,7 @@ export const CalendarStrip = ({ setSelectedDate }: CalendarStripProps) => {
         </Pressable>
       </View>
 
-      {/* --- Fixed Weekday Header --- */}
+      {/* Weekday headings */}
       <View style={styles.weekdayRow}>
         {["S", "M", "T", "W", "T", "F", "S"].map((letter, i) => (
           <Text key={i} style={styles.weekdayText}>
@@ -91,33 +109,29 @@ export const CalendarStrip = ({ setSelectedDate }: CalendarStripProps) => {
         ))}
       </View>
 
-      {/* --- Dates Row --- */}
+      {/* Dates */}
       <View style={styles.datesRow}>
         {weekDays.map((date) => {
           const isToday = isSameDay(date, today);
+          const isSelected = selectedDate && isSameDay(selectedDate, date);
+
           return (
             <Pressable
               key={date.toISOString()}
-              onPress={() => setSelectedDate(date)} // only update SolahTimes display
-              style={({ pressed }) => [
+              onPress={() => handleDatePress(date)}
+              style={({}) => [
                 styles.dayContainer,
-                isToday && styles.selectedDayContainer, // highlight today
-                pressed && styles.pressedDayContainer, // temporary highlight
+
+                // ✅ show border when today is NOT selected
+                isToday && !isSelected && styles.todayBorder,
+
+                // ✅ brand background when selected (today or other)
+                isSelected && styles.selectedBackground,
               ]}
             >
-              {(
-                { pressed } // 👈 this gives access to `pressed` for inner elements too
-              ) => (
-                <Text
-                  style={[
-                    styles.dayText,
-                    isToday && styles.selectedDayText,
-                    pressed && styles.pressedDayText,
-                  ]}
-                >
-                  {date.getDate()}
-                </Text>
-              )}
+              <Text style={[styles.dayText, isSelected && styles.selectedText]}>
+                {date.getDate()}
+              </Text>
             </Pressable>
           );
         })}
@@ -171,22 +185,24 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  selectedDayContainer: {
+
+  // ✅ unchanged today border
+  todayBorder: {
     borderColor: colors.background.brand.primary,
-    borderWidth: borderRadius[1],
+    borderWidth: 2,
   },
+
+  // ✅ background when selected
+  selectedBackground: {
+    backgroundColor: colors.background.brand.primary,
+  },
+
   dayText: {
     fontSize: 14,
     fontWeight: "500",
   },
-  selectedDayText: {
-    fontWeight: "700",
-  },
-  pressedDayContainer: {
-    backgroundColor: colors.background.brand.primary, // brand color highlight
-    borderRadius: borderRadius[2],
-  },
-  pressedDayText: {
+
+  selectedText: {
     color: colors.context.brand.inverted,
     fontWeight: "700",
   },
