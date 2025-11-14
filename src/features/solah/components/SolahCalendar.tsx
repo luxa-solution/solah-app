@@ -10,11 +10,7 @@ interface SolahCalendarProps {
 
 export function SolahCalendar({ setSelectedDate }: SolahCalendarProps) {
   return (
-    <View style={{ padding: 4 }}>
-      {/* <Text>Solah Calendar</Text>
-      <Pressable onPress={() => setSelectedDate(new Date())}>
-        <Text>Select Today</Text>
-      </Pressable> */}
+    <View>
       <CalendarStrip setSelectedDate={setSelectedDate} />
     </View>
   );

@@ -2,12 +2,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
-import { SolahTime } from "../types";
+import { SolahTime } from "@/features-solah/types";
 
 type SolahStore = {
-  lastKnownDate?: string; // YYYY-MM-DD
+  lastKnownDate?: Date;
   lastKnownTimes: SolahTime[];
-  setLastKnownTimes: (times: SolahTime[], date?: string) => void;
+  setLastKnownTimes: (times: SolahTime[], date?: Date) => void;
   clearLastKnownTimes: () => void;
 };
 
@@ -16,17 +16,15 @@ export const useSolahStore = create<SolahStore>()(
     (set) => ({
       lastKnownDate: undefined,
       lastKnownTimes: [],
-      setLastKnownTimes: (times: SolahTime[], date?: string) =>
+      setLastKnownTimes: (times: SolahTime[], date?: Date) =>
         set(() => ({
           lastKnownTimes: times,
-          lastKnownDate: date ?? new Date().toISOString().slice(0, 10),
+          lastKnownDate: date ?? new Date(),
         })),
       clearLastKnownTimes: () => set(() => ({ lastKnownTimes: [], lastKnownDate: undefined })),
     }),
     {
       name: "solah-store-v1",
-      // Use zustand's createJSONStorage wrapper so values are stringified
-      // before being passed to AsyncStorage (avoids the runtime warning).
       storage: createJSONStorage(() => AsyncStorage),
     }
   )

@@ -1,140 +1,99 @@
 // useSolahTimes.ts
-import { Coordinates, CalculationMethod, PrayerTimes } from "adhan";
-import { useState, useEffect } from "react";
+import { PrayerTimes, Coordinates, CalculationMethod } from "adhan";
+import { useState, useEffect, useMemo } from "react";
 
 import { useCurrentLocation } from "@/features-solah/hooks/useCurrentLocation";
-import { useSolahStore } from "@/features-solah/store/solahStore";
-import { SolahTime, TimeFormat, CalculationMethodName } from "@/features-solah/types";
+import { useSolahStore } from "@/features-solah/store";
+import { SolahTime, TimeFormat, CalculationMethodTypes } from "@/features-solah/types";
 import { formatTime } from "@/features-solah/utils";
 
 // Compute and provide prayer times. Uses adhan when coords are available,
 export function useSolahTimes(
   date?: Date,
   timeFormat: TimeFormat = "24hr",
-  methodName: CalculationMethodName = CalculationMethodName.MoonsightingCommittee
+  methodName: CalculationMethodTypes = "MoonsightingCommittee"
 ) {
-  const locationResult = useCurrentLocation() as any;
-  const coords = locationResult?.coords ?? null;
-  const locLoading = locationResult?.loading ?? false;
-
+  const { location, loading: locLoading } = useCurrentLocation();
   const { lastKnownTimes, setLastKnownTimes } = useSolahStore();
 
-  // Start with persisted last-known times (final fallback). If store is
-  // empty, use an empty array and let callers render accordingly.
-  const [times, setTimes] = useState<SolahTime[]>(lastKnownTimes ?? []);
-  const [loading, setLoading] = useState<boolean>(true);
+  const effectiveDate = useMemo(() => date ?? new Date(), [date]);
 
-  // Make the date stable for effect dependencies. If caller doesn't provide
-  // a date, compute it once per render but use its ISO date string as the
-  // dependency so the effect only runs when the day changes.
-  const effectiveDate = date ?? new Date();
+  const adhanTimes = useMemo(() => {
+    if (!location?.latitude || !location?.longitude) {
+      return null;
+    }
+    try {
+      const coords = new Coordinates(location.latitude, location.longitude);
+      const params = getAdhanParams(methodName);
+      return new PrayerTimes(coords, effectiveDate, params);
+    } catch {
+      return null;
+    }
+  }, [location, effectiveDate, methodName]);
 
-  const effectiveDateKey = effectiveDate.toISOString().slice(0, 10);
+  const formattedTimes = useMemo(() => {
+    if (!adhanTimes) return null;
+
+    return [
+      {
+        title: "Subhi",
+        time: formatTime(adhanTimes.fajr, timeFormat),
+      },
+      {
+        title: "Dhuhr",
+        time: formatTime(adhanTimes.dhuhr, timeFormat),
+      },
+      {
+        title: "Asr",
+        time: formatTime(adhanTimes.asr, timeFormat),
+      },
+      {
+        title: "Maghrib",
+        time: formatTime(adhanTimes.maghrib, timeFormat),
+      },
+      {
+        title: "Isha",
+        time: formatTime(adhanTimes.isha, timeFormat),
+      },
+    ] as SolahTime[];
+  }, [adhanTimes, timeFormat]);
 
   useEffect(() => {
-    let mounted = true;
-
-    (async () => {
-      setLoading(true);
-
-      // If we have coordinates, compute using adhan
-      if (coords) {
-        try {
-          const { latitude, longitude } = coords;
-          const coordsObj = new Coordinates(latitude, longitude);
-          const getAdhanParams = (m: CalculationMethodName) => {
-            switch (m) {
-              case CalculationMethodName.MuslimWorldLeague:
-                return CalculationMethod.MuslimWorldLeague();
-              case CalculationMethodName.Egyptian:
-                return CalculationMethod.Egyptian();
-              case CalculationMethodName.Karachi:
-                return CalculationMethod.Karachi();
-              case CalculationMethodName.UmmAlQura:
-                return CalculationMethod.UmmAlQura();
-              case CalculationMethodName.Dubai:
-                return CalculationMethod.Dubai();
-              case CalculationMethodName.Qatar:
-                return CalculationMethod.Qatar();
-              case CalculationMethodName.Kuwait:
-                return CalculationMethod.Kuwait();
-              case CalculationMethodName.MoonsightingCommittee:
-                return CalculationMethod.MoonsightingCommittee();
-              case CalculationMethodName.Singapore:
-                return CalculationMethod.Singapore();
-              case CalculationMethodName.Turkey:
-                return CalculationMethod.Turkey();
-              case CalculationMethodName.Tehran:
-                return CalculationMethod.Tehran();
-              case CalculationMethodName.NorthAmerica:
-                return CalculationMethod.NorthAmerica();
-              default:
-                return CalculationMethod.MoonsightingCommittee();
-            }
-          };
-          const params = getAdhanParams(methodName);
-          // Reconstruct a Date from the stable date key so we don't depend on
-          // the Date object identity in the effect dependency array.
-          const effDate = new Date(effectiveDateKey);
-          const prayerTimes = new PrayerTimes(coordsObj, effDate, params);
-
-          const computed: SolahTime[] = [
-            {
-              title: "Subhi",
-              time: formatTime(prayerTimes.fajr, timeFormat),
-              dateIso: prayerTimes.fajr.toISOString(),
-            },
-            {
-              title: "Dhuhr",
-              time: formatTime(prayerTimes.dhuhr, timeFormat),
-              dateIso: prayerTimes.dhuhr.toISOString(),
-            },
-            {
-              title: "Asr",
-              time: formatTime(prayerTimes.asr, timeFormat),
-              dateIso: prayerTimes.asr.toISOString(),
-            },
-            {
-              title: "Maghrib",
-              time: formatTime(prayerTimes.maghrib, timeFormat),
-              dateIso: prayerTimes.maghrib.toISOString(),
-            },
-            {
-              title: "Isha",
-              time: formatTime(prayerTimes.isha, timeFormat),
-              dateIso: prayerTimes.isha.toISOString(),
-            },
-          ];
-
-          if (!mounted) return;
-          setTimes(computed);
-          // persist last-known times for offline/fallback use
-          try {
-            setLastKnownTimes(computed, effectiveDateKey);
-          } catch {
-            // ignore persistence errors
-          }
-          setLoading(false);
-          return;
-        } catch {
-          // fall through to fallback behavior
-        }
+    if (formattedTimes) {
+      try {
+        setLastKnownTimes(formattedTimes, effectiveDate);
+      } catch {
+        // ignore persistence errors
       }
+    }
+  }, [formattedTimes, effectiveDate, setLastKnownTimes]);
 
-      // final fallback: use persisted last-known times or hardcoded constant
-      setTimes(lastKnownTimes ?? []);
-      setLoading(false);
-    })();
-
-    return () => {
-      mounted = false;
-    };
-  }, [coords, effectiveDateKey, timeFormat, lastKnownTimes, setLastKnownTimes, methodName]);
+  const times = formattedTimes ?? lastKnownTimes;
+  const loading = locLoading || !times;
 
   return { times, loading, locLoading };
 }
 
-// Helper utilities exported for other hooks (current/next)
+export function useCurrentSolah() {
+  const { times } = useSolahTimes();
+  useMinuteTick();
+
+  const currentSolah = useMemo(() => getCurrentAndNextSolah(times).current.title, [times]);
+
+  return { currentSolah };
+}
+
+export function useNextSolah() {
+  const { times } = useSolahTimes();
+  useMinuteTick();
+
+  const nextSolah = useMemo<SolahTime>(() => getCurrentAndNextSolah(times).next, [times]);
+
+  return { nextSolah };
+}
+
+// Helper hook
+
 export const useMinuteTick = () => {
   // Small local hook to force re-render on minute boundaries
   const [, setTick] = useState(0);
@@ -150,7 +109,9 @@ export const useMinuteTick = () => {
   }, []);
 };
 
-export const parseTimeToMinutes = (time: string): number => {
+// Helper Functions
+
+const parseTimeToMinutes = (time: string): number => {
   const t = time.trim().toUpperCase();
   const match = /^(\d{1,2}):(\d{2})(?:\s*(AM|PM))?$/.exec(t);
   if (!match) return 0;
@@ -166,14 +127,17 @@ export const parseTimeToMinutes = (time: string): number => {
   return h * 60 + m;
 };
 
-export const getCurrentMinutes = (): number => {
+const getCurrentMinutes = (): number => {
   const d = new Date();
   return d.getHours() * 60 + d.getMinutes();
 };
 
-export const getCurrentAndNextSolah = (times: SolahTime[]) => {
+const getCurrentAndNextSolah = (times: SolahTime[]) => {
   if (!times || times.length === 0) {
-    const fallback: SolahTime = { title: "Subhi", time: "00:00", dateIso: null };
+    const fallback: SolahTime = {
+      title: "Subhi",
+      time: "00:00",
+    };
     return { current: fallback, next: fallback };
   }
 
@@ -188,4 +152,36 @@ export const getCurrentAndNextSolah = (times: SolahTime[]) => {
     return { current: times[mins.length - 1], next: times[0] };
   }
   return { current: times[futureIdx - 1], next: times[futureIdx] };
+};
+
+// Adhan Helper
+const getAdhanParams = (m: CalculationMethodTypes) => {
+  switch (m) {
+    case "MuslimWorldLeague":
+      return CalculationMethod.MuslimWorldLeague();
+    case "Egyptian":
+      return CalculationMethod.Egyptian();
+    case "Karachi":
+      return CalculationMethod.Karachi();
+    case "UmmAlQura":
+      return CalculationMethod.UmmAlQura();
+    case "Dubai":
+      return CalculationMethod.Dubai();
+    case "Qatar":
+      return CalculationMethod.Qatar();
+    case "Kuwait":
+      return CalculationMethod.Kuwait();
+    case "MoonsightingCommittee":
+      return CalculationMethod.MoonsightingCommittee();
+    case "Singapore":
+      return CalculationMethod.Singapore();
+    case "Turkey":
+      return CalculationMethod.Turkey();
+    case "Tehran":
+      return CalculationMethod.Tehran();
+    case "NorthAmerica":
+      return CalculationMethod.NorthAmerica();
+    default:
+      return CalculationMethod.MoonsightingCommittee();
+  }
 };

@@ -10,7 +10,7 @@ interface CurrentSolahTimesProps {
 }
 
 export function CurrentSolahTimes({ selectedDate }: CurrentSolahTimesProps) {
-  const { times } = useSolahTimes();
+  const { times } = useSolahTimes(selectedDate);
   const { location } = useCurrentLocation();
   const { currentSolah } = useCurrentSolah();
 
@@ -27,7 +27,7 @@ export function CurrentSolahTimes({ selectedDate }: CurrentSolahTimesProps) {
         <Text style={styles.dateText}>
           {dayName} • {formatDate(selectedDate, calendarFormat, locale, "collapse")}
         </Text>
-        <Text style={styles.locationText}>{location}</Text>
+        <Text style={styles.locationText}>{location?.country}</Text>
       </View>
 
       {/* Solah Times List */}

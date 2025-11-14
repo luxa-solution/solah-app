@@ -26,7 +26,7 @@ export const PrayerTimesCard = ({ homePage = false, style }: PrayerTimeCardProps
     >
       <View style={styles.subContainer}>
         <NextSolahTime />
-        <CurrentLocation />
+        <CurrentLocation type="chevron" />
       </View>
 
       <CurrentDateAndTime />
@@ -50,7 +50,6 @@ const styles = StyleSheet.create({
     padding: ds(12),
     borderRadius: ds(8),
     overflow: "hidden",
-    marginBottom: ds(24),
     backgroundColor: colors.background.brand.primary,
   },
   image: {
