@@ -11,6 +11,7 @@
       "@/features-home/*": ["./src/features/home/*"],
       "@/features-onboarding/*": ["./src/features/onboarding/*"],
       "@/features-solah/*": ["./src/features/solah/*"],
+      "@/features-settings/*": ["./src/features/settings/*"],
       "@/app/*": ["./src/app/*"],
       "@/screens/*": ["./src/screens/*"],
       "@/features/*": ["./src/features/*"],
