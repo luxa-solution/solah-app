@@ -119,7 +119,7 @@ export const CalendarStrip = ({ setSelectedDate }: CalendarStripProps) => {
             <Pressable
               key={date.toISOString()}
               onPress={() => handleDatePress(date)}
-              style={({}) => [
+              style={() => [
                 styles.dayContainer,
 
                 // ✅ show border when today is NOT selected
