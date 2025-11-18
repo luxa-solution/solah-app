@@ -19,6 +19,7 @@ export function SettingsHome() {
     calculationMethod,
     calendarFormat,
     language,
+    location,
     solahTimeNotification,
     sound,
     timeFormat,
