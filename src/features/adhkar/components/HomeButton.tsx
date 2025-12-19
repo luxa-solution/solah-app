@@ -11,6 +11,7 @@ interface Props {
   adhkarCount?: number;
   image: any;
   backgroundColor?: string;
+  href?: string;
 }
 
 export function HomeButton({
@@ -19,13 +20,14 @@ export function HomeButton({
   adhkarCount = 20,
   image,
   backgroundColor = background.brand.primary,
+  href = "/",
 }: Props) {
   const router = useRouter();
 
   return (
     <TouchableOpacity
       style={[styles.card, { backgroundColor }]}
-      onPress={() => router.push("/")} // temporary as requested
+      onPress={() => router.push(href)}
       activeOpacity={0.9}
     >
       <View style={styles.textContainer}>
@@ -76,8 +78,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   textContainer: {
-    width: 228,
-    height: 61,
+    flex: 1,
     justifyContent: "center",
   },
 });

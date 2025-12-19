@@ -34,18 +34,21 @@ export function AdhkarHome() {
         category={AdhkarCategory.BEFORE_PRAYER}
         image={require("@/assets/images/solah_illustrations/BeforePrayer.png")}
         backgroundColor={background.brand.primary}
+        href="/adhkar/before"
       />
 
       <HomeButton
         category={AdhkarCategory.DURING_PRAYER}
         image={require("@/assets/images/solah_illustrations/DuringPrayer.png")}
         backgroundColor={background.brand.secondary}
+        href="/adhkar/during"
       />
 
       <HomeButton
         category={AdhkarCategory.AFTER_PRAYER}
         image={require("@/assets/images/solah_illustrations/AfterPrayer.png")}
         backgroundColor={background.brand.tertiary}
+        href="/adhkar/after"
       />
     </View>
   );
