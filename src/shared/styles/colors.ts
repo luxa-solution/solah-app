@@ -112,4 +112,5 @@ export const colors = {
   background,
   context,
   border,
+  palette,
 } as const;

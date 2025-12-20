@@ -1,5 +1,5 @@
 export { useDateAndTime } from "./useDateAndTime";
 export { useCurrentLocation } from "./useCurrentLocation";
 export { useSolahTimes, useCurrentSolah, useNextSolah } from "./useSolahTimes";
-// export { useCurrentSolah } from "./useCurrentSolah";
-// export { useNextSolah } from "./useNextSolah";
+export { useQiblaParams } from "./useQiblaParams"; // export { useNextSolah } from "./useNextSolah";
+export { useQiblaHeading } from "./useQiblaHeading";
