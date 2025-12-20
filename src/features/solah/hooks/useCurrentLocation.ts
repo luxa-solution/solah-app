@@ -17,11 +17,20 @@ export function useCurrentLocation() {
       try {
         setLoading(true);
 
-        // Ask for permission
-        const { status } = await Location.requestForegroundPermissionsAsync();
+        // Check existing foreground permission
+        const existing = await Location.getForegroundPermissionsAsync();
+
+        let status = existing.status;
+
+        // Request permission only if needed
         if (status !== "granted") {
-          setLoading(false);
-          return;
+          const request = await Location.requestForegroundPermissionsAsync();
+          status = request.status;
+        }
+
+        // Abort if permission still not granted
+        if (status !== "granted") {
+          throw new Error("Location permission not granted");
         }
 
         // Get user coordinates
