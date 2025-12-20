@@ -15,7 +15,7 @@ type AllModalContentsProps = {
   settings_type: SettingsType;
 };
 
-export function AllModalContents({ settings_type }: AllModalContentsProps) {
+export function ModalContents({ settings_type }: AllModalContentsProps) {
   switch (settings_type) {
     case "calmethod":
       return <CalculationMethod />;

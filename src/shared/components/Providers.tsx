@@ -1,5 +1,10 @@
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  return <SafeAreaProvider>{children}</SafeAreaProvider>;
+  return (
+    <GestureHandlerRootView>
+      <SafeAreaProvider>{children}</SafeAreaProvider>
+    </GestureHandlerRootView>
+  );
 }

@@ -15,5 +15,5 @@ const titles: Record<SettingsType, string> = {
 };
 
 export function TitleBar({ settings_type }: { settings_type: SettingsType }) {
-  return <AppTitleBar title={titles[settings_type]} />;
+  return <AppTitleBar title={titles[settings_type]} showBack={false} />;
 }
