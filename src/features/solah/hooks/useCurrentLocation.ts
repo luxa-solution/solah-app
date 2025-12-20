@@ -8,36 +8,55 @@ export function useCurrentLocation() {
   // Temporary static value (to be replaced later)
   const [loading, setLoading] = useState(false);
   const [location, setLocation] = useState<LocationData | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    (async () => {
-      // Ask for permission
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        setLoading(false);
-        return;
-      }
+    let isMounted = true;
 
-      // Get user coordinates
-      const loc = await Location.getCurrentPositionAsync({});
-      const [place] = await Location.reverseGeocodeAsync(loc.coords);
-      if (!place.city || !place.region || !place.country) {
+    async function fetchCurrentLocation() {
+      try {
+        setLoading(true);
+
+        // Ask for permission
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          setLoading(false);
+          return;
+        }
+
+        // Get user coordinates
+        const loc = await Location.getCurrentPositionAsync({});
+        const [place] = await Location.reverseGeocodeAsync(loc.coords);
+
+        if (!isMounted) return;
+
+        if (!place) {
+          throw new Error("Unable to resolve location name");
+        }
+
+        // Set formatted location
+        setLocation({
+          latitude: loc.coords.latitude,
+          longitude: loc.coords.longitude,
+          city: place.city ?? "",
+          region: place.region ?? "",
+          country: place.country ?? "",
+        });
+      } catch (err) {
+        if (!isMounted) return;
+        setError(err instanceof Error ? err.message : "Unable to get current location");
         setLocation(null);
+      } finally {
+        if (isMounted) setLoading(false);
       }
+    }
 
-      // Set formatted location
-      setLocation({
-        longitude: loc.coords.longitude,
-        latitude: loc.coords.latitude,
-        city: place.city,
-        region: place.region,
-        country: place.country,
-      });
+    fetchCurrentLocation();
 
-      // Stop loading
-      setLoading(false);
-    })();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  return { loading, location };
+  return { loading, location, error };
 }
