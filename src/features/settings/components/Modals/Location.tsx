@@ -1,4 +1,3 @@
-// src/features/settings/components/Modals/Location.tsx
 import React from "react";
 import { View, Text, Pressable, FlatList, Image } from "react-native";
 
@@ -36,10 +35,7 @@ export function Location({ onClose }: LocationProps) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerText}>Location</Text>
-      </View>
-
+      {/* REMOVED THE HEADER SECTION */}
       <FlatList
         data={locations}
         keyExtractor={(item) => `${item.city}-${item.country}`}

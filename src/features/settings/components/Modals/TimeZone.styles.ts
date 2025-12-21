@@ -1,4 +1,3 @@
-// src/features/settings/components/Modals/TimeZone.styles.ts
 import { colors, font, spacing } from "@/shared/styles";
 
 export const styles = {
@@ -7,17 +6,7 @@ export const styles = {
     borderTopLeftRadius: spacing.lg,
     borderTopRightRadius: spacing.lg,
     paddingBottom: spacing.xl,
-  },
-  header: {
-    paddingVertical: spacing.lg,
-    paddingHorizontal: spacing.lg,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.default.tertiary,
-  },
-  headerText: {
-    ...font.heading.small,
-    color: colors.context.default.primary,
-    textAlign: "center" as const,
+    paddingTop: spacing.lg,
   },
   option: {
     flexDirection: "row" as const,
@@ -25,9 +14,11 @@ export const styles = {
     alignItems: "center" as const,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.lg,
+    borderRadius: spacing.sm, // Add base borderRadius to all options
   },
   selectedOption: {
-    backgroundColor: colors.background.brand.primary,
+    backgroundColor: colors.background.brand.primary, // Warm brown color
+    borderRadius: spacing.sm, // Add borderRadius for selected state
   },
   optionText: {
     ...font.body.medium,

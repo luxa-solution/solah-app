@@ -1,4 +1,3 @@
-// src/features/settings/components/Modals/TimeZone.tsx
 import React from "react";
 import { View, Text, Pressable, FlatList, Image } from "react-native";
 
@@ -23,10 +22,7 @@ export function TimeZone() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerText}>Time Zone</Text>
-      </View>
-
+      {/* REMOVED THE HEADER SECTION */}
       <FlatList
         data={timezones}
         keyExtractor={(item) => item}

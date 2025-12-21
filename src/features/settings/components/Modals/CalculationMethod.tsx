@@ -1,4 +1,3 @@
-// src/features/settings/components/Modals/CalculationMethod.tsx
 import React from "react";
 import { View, Text, Pressable, FlatList, Image } from "react-native";
 
@@ -23,10 +22,7 @@ export function CalculationMethod() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerText}>Calculation method</Text>
-      </View>
-
+      {/* REMOVED THE HEADER SECTION */}
       <FlatList
         data={methods}
         keyExtractor={(item) => item}
