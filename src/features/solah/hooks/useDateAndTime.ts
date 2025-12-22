@@ -1,8 +1,9 @@
 // features/solah/hooks/useDateAndTime.ts
 import { useEffect, useMemo, useState } from "react";
 
+import { useSettingsStore } from "@/features/settings/store/settingsStore"; // ADD THIS
 import { CalendarFormat, TimeFormat } from "@/features-solah/types";
-import { formatDate, formatTime } from "@/features-solah/utils";
+import { formatDate, formatTime, getTimezoneOffsetForCity } from "@/features-solah/utils";
 
 export interface DateAndTime {
   date: string;
@@ -30,6 +31,10 @@ export const useDateAndTime = ({
   locale = "en-US",
 }: UseDateAndTimeOptions = {}): DateAndTime => {
   const [current, setCurrent] = useState<Date>(new Date());
+  const { location, timeFormat: settingsTimeFormat } = useSettingsStore(); // GET SETTINGS
+
+  // Use settings timeFormat if not overridden
+  const effectiveTimeFormat = timeFormat || settingsTimeFormat;
 
   // ---- Update aligned to minute boundary ----
   useEffect(() => {
@@ -53,10 +58,17 @@ export const useDateAndTime = ({
       if (timeoutId) clearTimeout(timeoutId);
       if (intervalId) clearInterval(intervalId);
     };
-  }, [timeFormat, calendar, locale]);
+  }, [effectiveTimeFormat, calendar, locale]);
 
-  const time = useMemo(() => formatTime(current), [current]);
-  const date = useMemo(() => formatDate(current), [current]);
+  // Get timezone offset for current location
+  const timezoneOffset = getTimezoneOffsetForCity(location?.city || "Ilorin");
+
+  const time = useMemo(
+    () => formatTime(current, effectiveTimeFormat, timezoneOffset), // ADD TIMEZONE
+    [current, effectiveTimeFormat, timezoneOffset]
+  );
+
+  const date = useMemo(() => formatDate(current, calendar, locale), [current, calendar, locale]);
 
   return { date, time };
 };

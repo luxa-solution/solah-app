@@ -1,19 +1,30 @@
 import { CalendarFormat, TimeFormat } from "../types";
 
-// ---- Format Time ----
-export const formatTime = (d: Date, timeFormat: TimeFormat = "24hr"): string => {
-  const minutes = d.getMinutes().toString().padStart(2, "0");
+// ---- Format Time with Timezone ----
+export const formatTime = (
+  d: Date,
+  timeFormat: TimeFormat = "24hr",
+  targetTimezoneOffset: number = 0
+): string => {
+  // Convert the date to target timezone
+  const utcTime = d.getTime();
+  const targetTime = new Date(utcTime + targetTimezoneOffset * 60 * 60 * 1000);
+
+  // Use UTC methods to avoid local timezone contamination
+  let hours = targetTime.getUTCHours();
+  const minutes = targetTime.getUTCMinutes();
+
+  const formattedMinutes = minutes.toString().padStart(2, "0");
 
   if (timeFormat === "24hr") {
-    const hours = d.getHours().toString().padStart(2, "0");
-    return `${hours}:${minutes}`;
+    const formattedHours = hours.toString().padStart(2, "0");
+    return `${formattedHours}:${formattedMinutes}`;
   }
 
-  const hours24 = d.getHours();
-  const period = hours24 >= 12 ? "PM" : "AM";
-  let hours12 = hours24 % 12;
-  if (hours12 === 0) hours12 = 12;
-  return `${hours12}:${minutes} ${period}`;
+  const period = hours >= 12 ? "PM" : "AM";
+  hours = hours % 12;
+  if (hours === 0) hours = 12;
+  return `${hours}:${formattedMinutes} ${period}`;
 };
 
 // ---- Format Date ----
@@ -43,4 +54,33 @@ export const formatDate = (
   return output === "full"
     ? `${day} ${month}, ${year}` // e.g., "4 Rajab, 1447"
     : `${day}/${month}/${year}`; // e.g., "4/7/1447"
+};
+
+// ---- Get timezone offset for cities ----
+export const getTimezoneOffsetForCity = (city: string): number => {
+  switch (city) {
+    case "Ilorin":
+    case "Nigeria":
+      return 1; // GMT+1
+    case "Islamabad":
+    case "Pakistan":
+      return 5; // GMT+5
+    case "Rabat":
+    case "Morocco":
+      return 0; // GMT+0
+    case "New York":
+    case "United States":
+      return -5; // GMT-5 (EST)
+    case "Riyadh":
+    case "Saudi Arabia":
+      return 3; // GMT+3
+    case "Sana'a":
+    case "Yemen":
+      return 3; // GMT+3
+    case "Buenos Aires":
+    case "Argentina":
+      return -3; // GMT-3
+    default:
+      return 1; // Default to Nigeria time
+  }
 };

@@ -1,22 +1,24 @@
-// useSolahTimes.ts
 import { PrayerTimes, Coordinates, CalculationMethod } from "adhan";
 import { useState, useEffect, useMemo } from "react";
 
+import { useSettingsStore } from "@/features/settings/store/settingsStore";
 import { useCurrentLocation } from "@/features-solah/hooks/useCurrentLocation";
 import { useSolahStore } from "@/features-solah/store";
-import { SolahTime, TimeFormat, CalculationMethodTypes } from "@/features-solah/types";
-import { formatTime } from "@/features-solah/utils";
+import { SolahTime, CalculationMethodTypes } from "@/features-solah/types";
+import { formatTime, getTimezoneOffsetForCity } from "@/features-solah/utils";
 
 // Compute and provide prayer times. Uses adhan when coords are available,
-export function useSolahTimes(
-  date?: Date,
-  timeFormat: TimeFormat = "24hr",
-  methodName: CalculationMethodTypes = "MoonsightingCommittee"
-) {
-  const { location, loading: locLoading } = useCurrentLocation();
+export function useSolahTimes(date?: Date) {
+  const { calculationMethod, timeFormat, location: settingsLocation } = useSettingsStore();
+
+  const { location: gpsLocation, loading: locLoading } = useCurrentLocation();
   const { lastKnownTimes, setLastKnownTimes } = useSolahStore();
 
   const effectiveDate = useMemo(() => date ?? new Date(), [date]);
+
+  const location = useMemo(() => {
+    return settingsLocation && settingsLocation.latitude !== 0 ? settingsLocation : gpsLocation;
+  }, [settingsLocation, gpsLocation]);
 
   const adhanTimes = useMemo(() => {
     if (!location?.latitude || !location?.longitude) {
@@ -24,39 +26,42 @@ export function useSolahTimes(
     }
     try {
       const coords = new Coordinates(location.latitude, location.longitude);
-      const params = getAdhanParams(methodName);
+      const params = getAdhanParams(calculationMethod);
       return new PrayerTimes(coords, effectiveDate, params);
     } catch {
       return null;
     }
-  }, [location, effectiveDate, methodName]);
+  }, [location, effectiveDate, calculationMethod]);
 
   const formattedTimes = useMemo(() => {
     if (!adhanTimes) return null;
 
+    // Get timezone offset for the selected city (with null check)
+    const timezoneOffset = getTimezoneOffsetForCity(location?.city || "Ilorin");
+
     return [
       {
         title: "Subhi",
-        time: formatTime(adhanTimes.fajr, timeFormat),
+        time: formatTime(adhanTimes.fajr, timeFormat, timezoneOffset),
       },
       {
         title: "Dhuhr",
-        time: formatTime(adhanTimes.dhuhr, timeFormat),
+        time: formatTime(adhanTimes.dhuhr, timeFormat, timezoneOffset),
       },
       {
         title: "Asr",
-        time: formatTime(adhanTimes.asr, timeFormat),
+        time: formatTime(adhanTimes.asr, timeFormat, timezoneOffset),
       },
       {
         title: "Maghrib",
-        time: formatTime(adhanTimes.maghrib, timeFormat),
+        time: formatTime(adhanTimes.maghrib, timeFormat, timezoneOffset),
       },
       {
         title: "Isha",
-        time: formatTime(adhanTimes.isha, timeFormat),
+        time: formatTime(adhanTimes.isha, timeFormat, timezoneOffset),
       },
     ] as SolahTime[];
-  }, [adhanTimes, timeFormat]);
+  }, [adhanTimes, timeFormat, location?.city]); // Use optional chaining
 
   useEffect(() => {
     if (formattedTimes) {
@@ -93,9 +98,7 @@ export function useNextSolah() {
 }
 
 // Helper hook
-
 export const useMinuteTick = () => {
-  // Small local hook to force re-render on minute boundaries
   const [, setTick] = useState(0);
   useEffect(() => {
     const bump = () => setTick((x) => x + 1);
@@ -110,7 +113,6 @@ export const useMinuteTick = () => {
 };
 
 // Helper Functions
-
 const parseTimeToMinutes = (time: string): number => {
   const t = time.trim().toUpperCase();
   const match = /^(\d{1,2}):(\d{2})(?:\s*(AM|PM))?$/.exec(t);

@@ -1,5 +1,5 @@
 export { SolahIcons } from "./SolahIcons";
-export { formatTime, formatDate } from "./formatDateAndTime";
+export { formatTime, formatDate, getTimezoneOffsetForCity } from "./formatDateAndTime";
 export {
   magnetometerToHeading,
   calculateQiblaOffset,
