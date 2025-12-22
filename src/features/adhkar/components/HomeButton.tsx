@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     height: "100%",
     resizeMode: "contain",
     alignSelf: "stretch",
-    marginLeft: 12,
+    marginRight: -50,
     borderRadius: 12,
   },
   textContainer: {
