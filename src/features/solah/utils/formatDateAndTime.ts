@@ -4,13 +4,12 @@ import { CalendarFormat, TimeFormat } from "../types";
 export const formatTime = (
   d: Date,
   timeFormat: TimeFormat = "24hr",
-  targetTimezoneOffset: number = 0
+  targetTimezoneOffset: number = 1 // Default to Nigeria GMT+1
 ): string => {
-  // Convert the date to target timezone
+  // Convert to target timezone
   const utcTime = d.getTime();
   const targetTime = new Date(utcTime + targetTimezoneOffset * 60 * 60 * 1000);
 
-  // Use UTC methods to avoid local timezone contamination
   let hours = targetTime.getUTCHours();
   const minutes = targetTime.getUTCMinutes();
 
@@ -59,28 +58,60 @@ export const formatDate = (
 // ---- Get timezone offset for cities ----
 export const getTimezoneOffsetForCity = (city: string): number => {
   switch (city) {
+    // Africa
     case "Ilorin":
     case "Nigeria":
-      return 1; // GMT+1
-    case "Islamabad":
-    case "Pakistan":
-      return 5; // GMT+5
+      return 1; // GMT+1 (WAT)
+
     case "Rabat":
     case "Morocco":
-      return 0; // GMT+0
+      return 0; // GMT+0 (WET)
+
+    // Asia
+    case "Islamabad":
+    case "Pakistan":
+      return 5; // GMT+5 (PKT)
+
+    case "Riyadh":
+    case "Saudi Arabia":
+      return 3; // GMT+3 (AST)
+
+    case "Sana'a":
+    case "Yemen":
+      return 3; // GMT+3 (AST)
+
+    // Americas
     case "New York":
     case "United States":
       return -5; // GMT-5 (EST)
-    case "Riyadh":
-    case "Saudi Arabia":
-      return 3; // GMT+3
-    case "Sana'a":
-    case "Yemen":
-      return 3; // GMT+3
+
     case "Buenos Aires":
     case "Argentina":
-      return -3; // GMT-3
+      return -3; // GMT-3 (ART)
+
     default:
       return 1; // Default to Nigeria time
+  }
+};
+
+// ---- Get timezone offset from label ----
+export const getTimezoneOffsetFromLabel = (timezoneLabel: string): number => {
+  switch (timezoneLabel) {
+    case "UTC-12:00 International Date Line West":
+      return 1; // Nigeria GMT+1 ✓
+
+    case "GMT+1 Central African Time":
+      return -5;
+    case "UTC-12:00 The Gulf Region":
+      return 0; // GMT+0
+
+    case "UTC-12:00 Hawaii":
+      return 2;
+
+    case "GMT+1 South Africa":
+      return 2;
+
+    default:
+      return 1;
   }
 };

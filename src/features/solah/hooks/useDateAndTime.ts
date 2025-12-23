@@ -1,9 +1,9 @@
 // features/solah/hooks/useDateAndTime.ts
 import { useEffect, useMemo, useState } from "react";
 
-import { useSettingsStore } from "@/features/settings/store/settingsStore"; // ADD THIS
+import { useSettingsStore } from "@/features/settings/store/settingsStore";
 import { CalendarFormat, TimeFormat } from "@/features-solah/types";
-import { formatDate, formatTime, getTimezoneOffsetForCity } from "@/features-solah/utils";
+import { formatDate, formatTime, getTimezoneOffsetFromLabel } from "@/features-solah/utils";
 
 export interface DateAndTime {
   date: string;
@@ -31,9 +31,8 @@ export const useDateAndTime = ({
   locale = "en-US",
 }: UseDateAndTimeOptions = {}): DateAndTime => {
   const [current, setCurrent] = useState<Date>(new Date());
-  const { location, timeFormat: settingsTimeFormat } = useSettingsStore(); // GET SETTINGS
+  const { timeFormat: settingsTimeFormat, timezone } = useSettingsStore();
 
-  // Use settings timeFormat if not overridden
   const effectiveTimeFormat = timeFormat || settingsTimeFormat;
 
   // ---- Update aligned to minute boundary ----
@@ -43,7 +42,6 @@ export const useDateAndTime = ({
 
     const tick = () => setCurrent(new Date());
 
-    // initial sync immediately
     setCurrent(new Date());
 
     const nowDt = new Date();
@@ -58,13 +56,13 @@ export const useDateAndTime = ({
       if (timeoutId) clearTimeout(timeoutId);
       if (intervalId) clearInterval(intervalId);
     };
-  }, [effectiveTimeFormat, calendar, locale]);
+  }, [effectiveTimeFormat, calendar, locale, timezone]);
 
-  // Get timezone offset for current location
-  const timezoneOffset = getTimezoneOffsetForCity(location?.city || "Ilorin");
+  // Get timezone offset for current time display
+  const timezoneOffset = getTimezoneOffsetFromLabel(timezone);
 
   const time = useMemo(
-    () => formatTime(current, effectiveTimeFormat, timezoneOffset), // ADD TIMEZONE
+    () => formatTime(current, effectiveTimeFormat, timezoneOffset), // APPLY TIMEZONE
     [current, effectiveTimeFormat, timezoneOffset]
   );
 
