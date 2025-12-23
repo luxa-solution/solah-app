@@ -1,6 +1,7 @@
 // features/solah/hooks/useDateAndTime.ts
 import { useEffect, useMemo, useState } from "react";
 
+import { useSettingsStore } from "@/features/settings/store/settingsStore";
 import { CalendarFormat, TimeFormat } from "@/features-solah/types";
 import { formatDate, formatTime } from "@/features-solah/utils";
 
@@ -15,21 +16,12 @@ interface UseDateAndTimeOptions {
   locale?: string;
 }
 
-/**
- * useDateAndTime
- *
- * - Default: timeFormat = '24hr', calendar = 'hijri', locale = 'en-US'
- * - Time shows hours and minutes only (no seconds).
- * - Supports 12hr/24hr formats.
- * - Supports Hijri and Miladi (Gregorian) date formatting; Hijri default.
- * - Efficient: updates aligned to the next minute, then every minute.
- */
 export const useDateAndTime = ({
-  timeFormat = "24hr",
   calendar = "hijri",
   locale = "en-US",
 }: UseDateAndTimeOptions = {}): DateAndTime => {
   const [current, setCurrent] = useState<Date>(new Date());
+  const { timeFormat, timezone } = useSettingsStore();
 
   // ---- Update aligned to minute boundary ----
   useEffect(() => {
@@ -38,7 +30,6 @@ export const useDateAndTime = ({
 
     const tick = () => setCurrent(new Date());
 
-    // initial sync immediately
     setCurrent(new Date());
 
     const nowDt = new Date();
@@ -53,10 +44,14 @@ export const useDateAndTime = ({
       if (timeoutId) clearTimeout(timeoutId);
       if (intervalId) clearInterval(intervalId);
     };
-  }, [timeFormat, calendar, locale]);
+  }, []);
 
-  const time = useMemo(() => formatTime(current), [current]);
-  const date = useMemo(() => formatDate(current), [current]);
+  const time = useMemo(
+    () => formatTime(current, timezone, timeFormat), // APPLY TIMEZONE
+    [current, timeFormat, timezone]
+  );
+
+  const date = useMemo(() => formatDate(current, calendar, locale), [current, calendar, locale]);
 
   return { date, time };
 };

@@ -1,19 +1,32 @@
+import { TimeZone } from "@/features-settings/types";
+
 import { CalendarFormat, TimeFormat } from "../types";
 
-// ---- Format Time ----
-export const formatTime = (d: Date, timeFormat: TimeFormat = "24hr"): string => {
-  const minutes = d.getMinutes().toString().padStart(2, "0");
+// ---- Format Time with Timezone ----
+export const formatTime = (
+  d: Date,
+  timezone: TimeZone,
+  timeFormat: TimeFormat = "24hr"
+): string => {
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: timezone,
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: timeFormat === "12hr",
+  });
+
+  // This is SAFE — no Date parsing
+  const parts = formatter.formatToParts(d);
+
+  const hour = parts.find((p) => p.type === "hour")?.value ?? "00";
+  const minute = parts.find((p) => p.type === "minute")?.value ?? "00";
+  const dayPeriod = parts.find((p) => p.type === "dayPeriod")?.value;
 
   if (timeFormat === "24hr") {
-    const hours = d.getHours().toString().padStart(2, "0");
-    return `${hours}:${minutes}`;
+    return `${hour}:${minute}`;
   }
 
-  const hours24 = d.getHours();
-  const period = hours24 >= 12 ? "PM" : "AM";
-  let hours12 = hours24 % 12;
-  if (hours12 === 0) hours12 = 12;
-  return `${hours12}:${minutes} ${period}`;
+  return `${hour}:${minute} ${dayPeriod}`;
 };
 
 // ---- Format Date ----

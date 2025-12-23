@@ -1,19 +1,15 @@
-// useSolahTimes.ts
 import { PrayerTimes, Coordinates, CalculationMethod } from "adhan";
 import { useState, useEffect, useMemo } from "react";
 
-import { useCurrentLocation } from "@/features-solah/hooks/useCurrentLocation";
+import { useSettingsStore } from "@/features-settings/store";
+import { TimeZone } from "@/features-settings/types";
 import { useSolahStore } from "@/features-solah/store";
-import { SolahTime, TimeFormat, CalculationMethodTypes } from "@/features-solah/types";
+import { SolahTime, CalculationMethodTypes } from "@/features-solah/types";
 import { formatTime } from "@/features-solah/utils";
 
-// Compute and provide prayer times. Uses adhan when coords are available,
-export function useSolahTimes(
-  date?: Date,
-  timeFormat: TimeFormat = "24hr",
-  methodName: CalculationMethodTypes = "MoonsightingCommittee"
-) {
-  const { location, loading: locLoading } = useCurrentLocation();
+export function useSolahTimes(date?: Date) {
+  const { calculationMethod: methodName, timeFormat, location, timezone } = useSettingsStore();
+
   const { lastKnownTimes, setLastKnownTimes } = useSolahStore();
 
   const effectiveDate = useMemo(() => date ?? new Date(), [date]);
@@ -37,26 +33,26 @@ export function useSolahTimes(
     return [
       {
         title: "Subhi",
-        time: formatTime(adhanTimes.fajr, timeFormat),
+        time: formatTime(adhanTimes.fajr, timezone, timeFormat),
       },
       {
         title: "Dhuhr",
-        time: formatTime(adhanTimes.dhuhr, timeFormat),
+        time: formatTime(adhanTimes.dhuhr, timezone, timeFormat),
       },
       {
         title: "Asr",
-        time: formatTime(adhanTimes.asr, timeFormat),
+        time: formatTime(adhanTimes.asr, timezone, timeFormat),
       },
       {
         title: "Maghrib",
-        time: formatTime(adhanTimes.maghrib, timeFormat),
+        time: formatTime(adhanTimes.maghrib, timezone, timeFormat),
       },
       {
         title: "Isha",
-        time: formatTime(adhanTimes.isha, timeFormat),
+        time: formatTime(adhanTimes.isha, timezone, timeFormat),
       },
     ] as SolahTime[];
-  }, [adhanTimes, timeFormat]);
+  }, [adhanTimes, timeFormat, timezone]);
 
   useEffect(() => {
     if (formattedTimes) {
@@ -69,25 +65,31 @@ export function useSolahTimes(
   }, [formattedTimes, effectiveDate, setLastKnownTimes]);
 
   const times = formattedTimes ?? lastKnownTimes;
-  const loading = locLoading || !times;
+  const loading = !times;
 
-  return { times, loading, locLoading };
+  return { times, loading };
 }
 
 export function useCurrentSolah() {
   const { times } = useSolahTimes();
+  const { timezone } = useSettingsStore();
   useMinuteTick();
 
-  const currentSolah = useMemo(() => getCurrentAndNextSolah(times).current.title, [times]);
+  const currentSolah = useMemo(
+    () => getCurrentAndNextSolah(times, timezone).current.title,
+    [times]
+  );
 
   return { currentSolah };
 }
 
 export function useNextSolah() {
   const { times } = useSolahTimes();
+  const { timezone } = useSettingsStore();
+
   useMinuteTick();
 
-  const nextSolah = useMemo<SolahTime>(() => getCurrentAndNextSolah(times).next, [times]);
+  const nextSolah = useMemo<SolahTime>(() => getCurrentAndNextSolah(times, timezone).next, [times]);
 
   return { nextSolah };
 }
@@ -127,12 +129,23 @@ const parseTimeToMinutes = (time: string): number => {
   return h * 60 + m;
 };
 
-const getCurrentMinutes = (): number => {
-  const d = new Date();
-  return d.getHours() * 60 + d.getMinutes();
+const getCurrentMinutes = (timezone: TimeZone): number => {
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: timezone as string,
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+
+  const parts = formatter.formatToParts(new Date());
+
+  const hour = Number(parts.find((p) => p.type === "hour")?.value ?? 0);
+  const minute = Number(parts.find((p) => p.type === "minute")?.value ?? 0);
+
+  return hour * 60 + minute;
 };
 
-const getCurrentAndNextSolah = (times: SolahTime[]) => {
+const getCurrentAndNextSolah = (times: SolahTime[], timezone: TimeZone) => {
   if (!times || times.length === 0) {
     const fallback: SolahTime = {
       title: "Subhi",
@@ -141,7 +154,7 @@ const getCurrentAndNextSolah = (times: SolahTime[]) => {
     return { current: fallback, next: fallback };
   }
 
-  const now = getCurrentMinutes();
+  const now = getCurrentMinutes(timezone);
   const mins = times.map((t) => parseTimeToMinutes(t.time));
   const futureIdx = mins.findIndex((v) => now < v);
 
