@@ -45,10 +45,9 @@ export function HomeButton({
 const styles = StyleSheet.create({
   card: {
     backgroundColor: background.brand.primary, // will be overridden per category
-    padding: 16,
-    height: 110,
+    paddingLeft: 16,
     borderRadius: 14,
-    marginBottom: 14,
+    height: 85,
     flexDirection: "row",
     justifyContent: "space-between",
     overflow: "hidden",
@@ -58,24 +57,21 @@ const styles = StyleSheet.create({
     fontFamily: "Figtree_700Bold",
     fontWeight: "700",
     fontSize: 36,
-    lineHeight: 43, // 120% of 36px
+    lineHeight: 43,
   },
   subtitle: {
     color: "white",
     fontFamily: "Figtree_600SemiBold",
     fontWeight: "600",
     fontSize: 10,
-    lineHeight: 14, // 140% of 10px
+    lineHeight: 14,
     marginTop: 4,
     opacity: 0.85,
   },
   image: {
-    width: "50%",
     height: "100%",
     resizeMode: "contain",
     alignSelf: "stretch",
-    marginRight: -50,
-    borderRadius: 12,
   },
   textContainer: {
     flex: 1,

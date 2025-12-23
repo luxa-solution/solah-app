@@ -30,26 +30,28 @@ export function AdhkarHome() {
       <TopNav />
 
       {/* Content Cards */}
-      <HomeButton
-        category={AdhkarCategory.BEFORE_PRAYER}
-        image={require("@/assets/images/solah_illustrations/BeforePrayer.png")}
-        backgroundColor={background.brand.primary}
-        href="/adhkar/before"
-      />
+      <View style={styles.buttonGroup}>
+        <HomeButton
+          category={AdhkarCategory.BEFORE_PRAYER}
+          image={require("@/assets/images/solah_illustrations/BeforePrayer.png")}
+          backgroundColor={background.brand.primary}
+          href="/adhkar/before"
+        />
 
-      <HomeButton
-        category={AdhkarCategory.DURING_PRAYER}
-        image={require("@/assets/images/solah_illustrations/DuringPrayer.png")}
-        backgroundColor={background.brand.secondary}
-        href="/adhkar/during"
-      />
+        <HomeButton
+          category={AdhkarCategory.DURING_PRAYER}
+          image={require("@/assets/images/solah_illustrations/DuringPrayer.png")}
+          backgroundColor={background.brand.secondary}
+          href="/adhkar/during"
+        />
 
-      <HomeButton
-        category={AdhkarCategory.AFTER_PRAYER}
-        image={require("@/assets/images/solah_illustrations/AfterPrayer.png")}
-        backgroundColor={background.brand.tertiary}
-        href="/adhkar/after"
-      />
+        <HomeButton
+          category={AdhkarCategory.AFTER_PRAYER}
+          image={require("@/assets/images/solah_illustrations/AfterPrayer.png")}
+          backgroundColor={background.brand.tertiary}
+          href="/adhkar/after"
+        />
+      </View>
     </View>
   );
 }
@@ -74,5 +76,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "600",
     marginLeft: 12,
+  },
+  buttonGroup: {
+    gap: 16,
   },
 });
