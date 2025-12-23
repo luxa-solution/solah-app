@@ -2,19 +2,12 @@ import React from "react";
 import { View, Text, Pressable, FlatList, Image } from "react-native";
 
 import { useSettingsStore } from "@/features/settings/store/settingsStore";
+import { timezones } from "@/features-settings/constants";
 
 import { styles } from "./TimeZone.styles";
 
 export function TimeZone() {
   const { timezone, setTimeZone } = useSettingsStore();
-
-  const timezones = [
-    "GMT+1 Central African Time",
-    "UTC-12:00 International Date Line West",
-    "UTC-12:00 The Gulf Region",
-    "UTC-12:00 Hawaii",
-    "GMT+1 South Africa",
-  ];
 
   const handleSelectTimezone = (selectedTimezone: string) => {
     setTimeZone(selectedTimezone as any);
@@ -25,16 +18,18 @@ export function TimeZone() {
       {/* REMOVED THE HEADER SECTION */}
       <FlatList
         data={timezones}
-        keyExtractor={(item) => item}
+        keyExtractor={(item) => item.name}
         renderItem={({ item }) => (
           <Pressable
-            onPress={() => handleSelectTimezone(item)}
-            style={[styles.option, timezone === item && styles.selectedOption]}
+            onPress={() => handleSelectTimezone(item.timezone)}
+            style={[styles.option, timezone === item.timezone && styles.selectedOption]}
           >
-            <Text style={[styles.optionText, timezone === item && styles.selectedOptionText]}>
-              {item}
+            <Text
+              style={[styles.optionText, timezone === item.timezone && styles.selectedOptionText]}
+            >
+              {item.name}
             </Text>
-            {timezone === item && (
+            {timezone === item.timezone && (
               <Image
                 source={require("@/assets/adhkar-icons/verified-check.png")}
                 style={styles.checkIcon}

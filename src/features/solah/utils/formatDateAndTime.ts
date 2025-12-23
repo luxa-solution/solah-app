@@ -1,29 +1,32 @@
+import { TimeZone } from "@/features-settings/types";
+
 import { CalendarFormat, TimeFormat } from "../types";
 
 // ---- Format Time with Timezone ----
 export const formatTime = (
   d: Date,
-  timeFormat: TimeFormat = "24hr",
-  targetTimezoneOffset: number = 1 // Default to Nigeria GMT+1
+  timezone: TimeZone,
+  timeFormat: TimeFormat = "24hr"
 ): string => {
-  // Convert to target timezone
-  const utcTime = d.getTime();
-  const targetTime = new Date(utcTime + targetTimezoneOffset * 60 * 60 * 1000);
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: timezone,
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: timeFormat === "12hr",
+  });
 
-  let hours = targetTime.getUTCHours();
-  const minutes = targetTime.getUTCMinutes();
+  // This is SAFE — no Date parsing
+  const parts = formatter.formatToParts(d);
 
-  const formattedMinutes = minutes.toString().padStart(2, "0");
+  const hour = parts.find((p) => p.type === "hour")?.value ?? "00";
+  const minute = parts.find((p) => p.type === "minute")?.value ?? "00";
+  const dayPeriod = parts.find((p) => p.type === "dayPeriod")?.value;
 
   if (timeFormat === "24hr") {
-    const formattedHours = hours.toString().padStart(2, "0");
-    return `${formattedHours}:${formattedMinutes}`;
+    return `${hour}:${minute}`;
   }
 
-  const period = hours >= 12 ? "PM" : "AM";
-  hours = hours % 12;
-  if (hours === 0) hours = 12;
-  return `${hours}:${formattedMinutes} ${period}`;
+  return `${hour}:${minute} ${dayPeriod}`;
 };
 
 // ---- Format Date ----
@@ -53,65 +56,4 @@ export const formatDate = (
   return output === "full"
     ? `${day} ${month}, ${year}` // e.g., "4 Rajab, 1447"
     : `${day}/${month}/${year}`; // e.g., "4/7/1447"
-};
-
-// ---- Get timezone offset for cities ----
-export const getTimezoneOffsetForCity = (city: string): number => {
-  switch (city) {
-    // Africa
-    case "Ilorin":
-    case "Nigeria":
-      return 1; // GMT+1 (WAT)
-
-    case "Rabat":
-    case "Morocco":
-      return 0; // GMT+0 (WET)
-
-    // Asia
-    case "Islamabad":
-    case "Pakistan":
-      return 5; // GMT+5 (PKT)
-
-    case "Riyadh":
-    case "Saudi Arabia":
-      return 3; // GMT+3 (AST)
-
-    case "Sana'a":
-    case "Yemen":
-      return 3; // GMT+3 (AST)
-
-    // Americas
-    case "New York":
-    case "United States":
-      return -5; // GMT-5 (EST)
-
-    case "Buenos Aires":
-    case "Argentina":
-      return -3; // GMT-3 (ART)
-
-    default:
-      return 1; // Default to Nigeria time
-  }
-};
-
-// ---- Get timezone offset from label ----
-export const getTimezoneOffsetFromLabel = (timezoneLabel: string): number => {
-  switch (timezoneLabel) {
-    case "UTC-12:00 International Date Line West":
-      return 1; // Nigeria GMT+1 ✓
-
-    case "GMT+1 Central African Time":
-      return -5;
-    case "UTC-12:00 The Gulf Region":
-      return 0; // GMT+0
-
-    case "UTC-12:00 Hawaii":
-      return 2;
-
-    case "GMT+1 South Africa":
-      return 2;
-
-    default:
-      return 1;
-  }
 };

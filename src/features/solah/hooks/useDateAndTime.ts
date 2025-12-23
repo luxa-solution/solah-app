@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { useSettingsStore } from "@/features/settings/store/settingsStore";
 import { CalendarFormat, TimeFormat } from "@/features-solah/types";
-import { formatDate, formatTime, getTimezoneOffsetFromLabel } from "@/features-solah/utils";
+import { formatDate, formatTime } from "@/features-solah/utils";
 
 export interface DateAndTime {
   date: string;
@@ -16,24 +16,12 @@ interface UseDateAndTimeOptions {
   locale?: string;
 }
 
-/**
- * useDateAndTime
- *
- * - Default: timeFormat = '24hr', calendar = 'hijri', locale = 'en-US'
- * - Time shows hours and minutes only (no seconds).
- * - Supports 12hr/24hr formats.
- * - Supports Hijri and Miladi (Gregorian) date formatting; Hijri default.
- * - Efficient: updates aligned to the next minute, then every minute.
- */
 export const useDateAndTime = ({
-  timeFormat = "24hr",
   calendar = "hijri",
   locale = "en-US",
 }: UseDateAndTimeOptions = {}): DateAndTime => {
   const [current, setCurrent] = useState<Date>(new Date());
-  const { timeFormat: settingsTimeFormat, timezone } = useSettingsStore();
-
-  const effectiveTimeFormat = timeFormat || settingsTimeFormat;
+  const { timeFormat, timezone } = useSettingsStore();
 
   // ---- Update aligned to minute boundary ----
   useEffect(() => {
@@ -56,14 +44,11 @@ export const useDateAndTime = ({
       if (timeoutId) clearTimeout(timeoutId);
       if (intervalId) clearInterval(intervalId);
     };
-  }, [effectiveTimeFormat, calendar, locale, timezone]);
-
-  // Get timezone offset for current time display
-  const timezoneOffset = getTimezoneOffsetFromLabel(timezone);
+  }, []);
 
   const time = useMemo(
-    () => formatTime(current, effectiveTimeFormat, timezoneOffset), // APPLY TIMEZONE
-    [current, effectiveTimeFormat, timezoneOffset]
+    () => formatTime(current, timezone, timeFormat), // APPLY TIMEZONE
+    [current, timeFormat, timezone]
   );
 
   const date = useMemo(() => formatDate(current, calendar, locale), [current, calendar, locale]);

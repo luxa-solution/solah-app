@@ -16,7 +16,7 @@ import {
   TimeFormat,
 } from "@/features-solah/types";
 
-type OnboardingState = {
+type SettingsDataState = {
   calculationMethod: CalculationMethodTypes;
   timezone: TimeZone;
   location: LocationData;
@@ -39,13 +39,13 @@ type OnboardingState = {
   setTimeFormat: (timeFormat: TimeFormat) => void;
 };
 
-export const useSettingsStore = create<OnboardingState>()(
+export const useSettingsStore = create<SettingsDataState>()(
   subscribeWithSelector(
     persist(
       (set) => ({
         // App state
         calculationMethod: "MoonsightingCommittee",
-        timezone: "GMT+1",
+        timezone: "Asia/Riyadh",
         location: {
           longitude: 0,
           latitude: 0,

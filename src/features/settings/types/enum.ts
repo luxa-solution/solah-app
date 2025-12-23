@@ -1,3 +1,5 @@
+import { timezones } from "../constants/timeZone";
+
 export type SettingsType =
   | "calmethod"
   | "timezone"
@@ -10,7 +12,7 @@ export type SettingsType =
   | "calendarformat"
   | "timeformat";
 
-export type TimeZone = string;
+export type TimeZone = (typeof timezones)[number]["timezone"];
 export type ArabicFontSizeOptions = number;
 export type ArabicFontStyleOptions = string;
 export type SoundOptions = string;

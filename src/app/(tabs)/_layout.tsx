@@ -2,9 +2,13 @@ import { MaterialCommunityIcons, Feather } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import { BookOpenText, Bolt } from "lucide-react-native";
 
+import { useSyncDefaultLocation } from "@/features-settings/hooks";
 import { context } from "@/shared/styles";
 
 function Layout() {
+  // Loading Default States
+  useSyncDefaultLocation();
+
   return (
     <Tabs
       initialRouteName="home"
