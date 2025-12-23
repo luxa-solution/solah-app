@@ -45,6 +45,7 @@ function calculateDistanceKm(lat1: number, lon1: number, lat2: number, lon2: num
 }
 
 export function useQiblaParams() {
+  // This must be with current location and not the settings' location.
   const { location, loading } = useCurrentLocation();
 
   const params = useMemo(() => {

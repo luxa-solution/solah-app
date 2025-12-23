@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet } from "react-native";
 
-import { useCurrentLocation, useCurrentSolah, useSolahTimes } from "@/features-solah/hooks";
+import { useSettingsStore } from "@/features-settings/store";
+import { useCurrentSolah, useSolahTimes } from "@/features-solah/hooks";
 import { CalendarFormat } from "@/features-solah/types";
 import { formatDate, SolahIcons } from "@/features-solah/utils";
 import { colors, spacing, borderRadius, font, fontweight } from "@/shared/styles";
@@ -11,7 +12,7 @@ interface CurrentSolahTimesProps {
 
 export function CurrentSolahTimes({ selectedDate }: CurrentSolahTimesProps) {
   const { times } = useSolahTimes(selectedDate);
-  const { location } = useCurrentLocation();
+  const { location } = useSettingsStore();
   const { currentSolah } = useCurrentSolah();
 
   const calendarFormat: CalendarFormat = "hijri";
