@@ -1,7 +1,7 @@
 import { ChevronDown } from "lucide-react-native";
 import { ActivityIndicator, Pressable, Text, View, StyleSheet } from "react-native";
 
-import { useSettingsStore } from "@/features-settings/store";
+import { useDefaultStore, useSettingsStore } from "@/features-settings/store";
 import { LocationData } from "@/features-solah/types/index";
 import { borderRadius, colors, context, fontsize, fontweight, spacing } from "@/shared/styles";
 
@@ -11,9 +11,14 @@ type CurrentLocationProps = {
 
 export function CurrentLocation({ type }: CurrentLocationProps) {
   const location = useSettingsStore((s) => s.location);
+  const defaultLocation = useDefaultStore((s) => s.defaultLocation);
+
+  // This is used for Solah Times and it is based on selected location.
   if (type === "chevron")
     return <ChevronLocation country={location?.country || "No location data"} />;
-  if (type === "container") return <ContainerLocation location={location} />;
+
+  // This is used for Qibla Direction and it is based on Current Location
+  if (type === "container") return <ContainerLocation location={defaultLocation} />;
   return null;
 }
 
