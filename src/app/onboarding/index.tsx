@@ -1,4 +1,4 @@
-import { OnboardingScreen } from "@/screens/onboarding";
+import { OnboardingScreen } from "@/features-onboarding/screens";
 
 function Onboarding() {
   return <OnboardingScreen />;

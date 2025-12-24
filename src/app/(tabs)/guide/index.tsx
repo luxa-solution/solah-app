@@ -1,4 +1,4 @@
-import { GuideHome } from "@/screens/guide";
+import { GuideHome } from "@/features-guide/screens";
 
 function Guide() {
   return <GuideHome />;

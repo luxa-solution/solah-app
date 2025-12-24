@@ -1,4 +1,4 @@
-import { SolahTimeScreen } from "@/screens/solah";
+import { SolahTimeScreen } from "@/features-solah/screens";
 
 function SolahTime() {
   return <SolahTimeScreen />;

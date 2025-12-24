@@ -1,13 +1,11 @@
 import { useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
-import { FlatList, useWindowDimensions, View } from "react-native";
+import { FlatList, useWindowDimensions, View, StyleSheet } from "react-native";
 
-import { OnboardingContent } from "@/features/onboarding/components/OnboardingContent";
-import { onboardingData } from "@/features/onboarding/data/onboardingData";
+import { OnboardingContent } from "@/features-onboarding/components";
+import { onboardingData } from "@/features-onboarding/data";
 import { useOnboardingStore } from "@/features-onboarding/store";
 import { AppButton, ProgressBar } from "@/shared/components";
-
-import { styles } from "./OnboardingScreen.styles";
 
 export function OnboardingScreen() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -83,3 +81,26 @@ export function OnboardingScreen() {
     </View>
   );
 }
+
+export const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#FDFDFD",
+  },
+  progressBarContainer: {
+    paddingHorizontal: 20,
+    marginBottom: 20,
+  },
+  buttonsContainer: {
+    paddingHorizontal: 20,
+    paddingBottom: 30,
+    alignItems: "center",
+  },
+  continueButton: {
+    marginBottom: 12,
+    width: "100%",
+  },
+  skipButton: {
+    width: "100%",
+  },
+});

@@ -1,4 +1,4 @@
-import { QiblaDirectionScreen } from "@/screens/solah";
+import { QiblaDirectionScreen } from "@/features-solah/screens";
 
 function QiblaDirection() {
   return <QiblaDirectionScreen />;

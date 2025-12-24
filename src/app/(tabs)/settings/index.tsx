@@ -1,4 +1,4 @@
-import { SettingsHome } from "@/screens/settings";
+import { SettingsHome } from "@/features-settings/screens";
 
 function Settings() {
   return <SettingsHome />;

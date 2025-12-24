@@ -1,7 +1,7 @@
 import { useLocalSearchParams } from "expo-router";
 
 import { AdhkarType } from "@/features-adhkar/data";
-import { AdhkarList } from "@/screens/adhkar";
+import { AdhkarList } from "@/features-adhkar/screens";
 
 function Screen() {
   const { adhkar_type } = useLocalSearchParams();
