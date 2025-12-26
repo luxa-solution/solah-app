@@ -1,5 +1,6 @@
 import { AdhkarCard, PrayerGuideCard, PrayerTimesCard, TitleBar } from "@/features-home/components";
 import ScreenContainer, { edgesHorizontal } from "@/shared/components/screen-container";
+import { spacing } from "@/shared/styles";
 
 /**
  * HomeScreen component
@@ -18,7 +19,12 @@ import ScreenContainer, { edgesHorizontal } from "@/shared/components/screen-con
 
 export function HomeScreen() {
   return (
-    <ScreenContainer scrollable edges={["top", ...edgesHorizontal]} withPadding>
+    <ScreenContainer
+      scrollable
+      edges={["top", ...edgesHorizontal]}
+      withPadding
+      scrollViewProps={{ contentContainerStyle: { paddingBottom: spacing["2xl"] } }}
+    >
       <TitleBar />
       <PrayerTimesCard />
       <AdhkarCard />

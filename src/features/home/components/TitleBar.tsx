@@ -1,17 +1,20 @@
-import { Bell, Search } from "lucide-react-native";
+import { useRouter } from "expo-router";
+import { Compass, Search } from "lucide-react-native";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { fontsize } from "@/shared/styles";
 import { ds } from "@/shared/utils/responsive-dimensions";
 
 export const TitleBar = () => {
+  const router = useRouter();
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Solah Guide</Text>
 
       <View style={styles.ctaWrapper}>
-        <Pressable>
-          <Bell />
+        <Pressable onPress={() => router.push("/solah/qibla-direction")}>
+          <Compass />
         </Pressable>
         <Pressable>
           <Search />
