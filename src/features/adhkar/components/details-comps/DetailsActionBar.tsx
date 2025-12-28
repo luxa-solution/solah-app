@@ -5,9 +5,8 @@ import { AdhkarItem } from "@/features-adhkar/data";
 
 import { detailsActionBarStyles as styles } from "./DetailsActionBar.styles";
 
-const iconBookmarkFilled = require("@/assets/adhkar-icons/bookmark-filled.png");
-const iconBookmark = require("@/assets/adhkar-icons/bookmark.png");
 const iconPlay = require("@/assets/adhkar-icons/play.png");
+const iconShare = require("@/assets/adhkar-icons/share.png");
 const iconStar = require("@/assets/adhkar-icons/Star.png");
 const iconStarFilled = require("@/assets/adhkar-icons/StarFilled.png");
 
@@ -16,17 +15,10 @@ export type DetailsActionBarProps = {
 };
 
 export const DetailsActionBar = ({ item }: DetailsActionBarProps) => {
-  const { toggleFavourite, toggleBookmark, isFavourite, isBookmarked } = useAdhkarStore();
+  const { toggleFavourite, isFavourite } = useAdhkarStore();
   const isFav = isFavourite(item);
-  const isBook = isBookmarked(item);
 
-  const onBookmark = () => {
-    toggleBookmark(item);
-    Alert.alert(
-      isBook ? "Removed from Bookmarks" : "Added to Bookmarks",
-      `${item.title} ${isBook ? "removed from" : "added to"} bookmarks`
-    );
-  };
+  const onShare = () => Alert.alert("Share", `Share adhkar ${item.id} (to be implemented)`);
 
   const onFavorite = () => {
     toggleFavourite(item);
@@ -40,13 +32,15 @@ export const DetailsActionBar = ({ item }: DetailsActionBarProps) => {
 
   return (
     <View style={styles.container}>
+      <Pressable onPress={onShare} style={styles.iconButton} accessibilityLabel="share">
+        <Image source={iconShare} style={styles.iconImage} />
+      </Pressable>
+
       <Pressable onPress={onPlay} style={styles.iconButton} accessibilityLabel="play">
         <Image source={iconPlay} style={styles.iconImage} />
       </Pressable>
 
-      <Pressable onPress={onBookmark} style={styles.iconButton} accessibilityLabel="bookmark">
-        <Image source={isBook ? iconBookmarkFilled : iconBookmark} style={styles.iconImage} />
-      </Pressable>
+      {/* REMOVED BOOKMARK BUTTON - ONLY FOR GROUPS, NOT INDIVIDUAL DUAS */}
 
       <Pressable onPress={onFavorite} style={styles.iconButton} accessibilityLabel="favorite">
         <Image source={isFav ? iconStarFilled : iconStar} style={styles.iconImage} />

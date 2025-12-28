@@ -21,7 +21,7 @@ export function BookmarkAdhkar() {
       <View style={styles.emptyContainer}>
         <Ionicons name="bookmark-outline" size={64} color={colors.context.default.tertiary} />
         <Text style={styles.emptyTitle}>No bookmarks found</Text>
-        <Text style={styles.emptySubtitle}>Tap the bookmark icon ��� on any adhkar to save it</Text>
+        <Text style={styles.emptySubtitle}>Tap the bookmark icon on any adhkar to save it</Text>
       </View>
     );
   }
