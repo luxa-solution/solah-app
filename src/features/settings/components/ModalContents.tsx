@@ -13,9 +13,10 @@ import {
 
 type AllModalContentsProps = {
   settings_type: SettingsType;
+  onClose?: () => void;
 };
 
-export function ModalContents({ settings_type }: AllModalContentsProps) {
+export function ModalContents({ settings_type, onClose }: AllModalContentsProps) {
   switch (settings_type) {
     case "calmethod":
       return <CalculationMethod />;
@@ -30,7 +31,7 @@ export function ModalContents({ settings_type }: AllModalContentsProps) {
     case "solahtimenotif":
       return <SolahTimeNotification />;
     case "sound":
-      return <Sound />;
+      return <Sound onClose={onClose} />;
     case "language":
       return <Language />;
     default:
