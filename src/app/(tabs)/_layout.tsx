@@ -1,6 +1,6 @@
-import { MaterialCommunityIcons, Feather } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
-import { BookOpenText, Bolt } from "lucide-react-native";
+import { BookOpenText, Bolt, ShieldCheck } from "lucide-react-native";
 
 import { useSyncDefaultLocation } from "@/features-settings/hooks";
 import { context } from "@/shared/styles";
@@ -32,9 +32,7 @@ function Layout() {
         name="adhkar"
         options={{
           title: "Adhkar",
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="hands-pray" color={color} size={size} />
-          ),
+          tabBarIcon: ({ color, size }) => <ShieldCheck color={color} size={size} />,
         }}
       />
       <Tabs.Screen
