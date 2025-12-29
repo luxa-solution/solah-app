@@ -16,8 +16,8 @@ interface Props {
 
 export function HomeButton({
   category,
-  subCount = 3,
-  adhkarCount = 20,
+  subCount = 0, // CHANGED: Was 3, now 0 (will receive real counts)
+  adhkarCount = 0, // CHANGED: Was 20, now 0 (will receive real counts)
   image,
   backgroundColor = background.brand.primary,
   href = "/",
@@ -44,7 +44,7 @@ export function HomeButton({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: background.brand.primary, // will be overridden per category
+    backgroundColor: background.brand.primary,
     paddingLeft: 16,
     borderRadius: 14,
     height: 85,
