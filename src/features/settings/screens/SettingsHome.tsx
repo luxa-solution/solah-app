@@ -9,6 +9,8 @@ import { toText } from "@/features-settings/utils";
 import { BottomSheet, TitleBar } from "@/shared/components";
 import { screenStyle } from "@/shared/styles";
 
+import { NotificationItem } from "../components/NotificationItem";
+
 export function SettingsHome() {
   const { bottom } = useSafeAreaInsets();
 
@@ -21,8 +23,6 @@ export function SettingsHome() {
     calendarFormat,
     language,
     location,
-    solahTimeNotification,
-    sound,
     timeFormat,
     timezone,
   } = useSettingsStore();
@@ -57,7 +57,7 @@ export function SettingsHome() {
           />
         </Card>
 
-        {/* Notifications */}
+        {/* Fonts */}
         <Card title="Fonts">
           <Item
             label="Arabic font size"
@@ -72,18 +72,7 @@ export function SettingsHome() {
         </Card>
 
         {/* Notifications */}
-        <Card title="Notifications">
-          <Item
-            label="Solah time notification"
-            value={toText("solahtimenotif", solahTimeNotification)}
-            onPress={() => setActiveSheet("solahtimenotif")}
-          />
-          <Item
-            label="Sound"
-            value={toText("sound", sound)}
-            onPress={() => setActiveSheet("sound")}
-          />
-        </Card>
+        <NotificationItem setActiveSheet={setActiveSheet} />
 
         {/* General */}
         <Card title="General">
@@ -105,7 +94,9 @@ export function SettingsHome() {
         </Card>
       </ScrollView>
       <BottomSheet isOpen={activeSheet !== null} onClose={() => setActiveSheet(null)}>
-        {activeSheet && <SettingsModal settings_type={activeSheet} />}
+        {activeSheet && (
+          <SettingsModal settings_type={activeSheet} onClose={() => setActiveSheet(null)} />
+        )}
       </BottomSheet>
     </>
   );

@@ -8,9 +8,10 @@ import { TitleBar } from "./TitleBar";
 
 interface SettingsModalProps {
   settings_type: SettingsType;
+  onClose?: () => void;
 }
 
-export function SettingsModal({ settings_type }: SettingsModalProps) {
+export function SettingsModal({ settings_type, onClose }: SettingsModalProps) {
   return (
     <View
       style={{
@@ -19,7 +20,7 @@ export function SettingsModal({ settings_type }: SettingsModalProps) {
       }}
     >
       <TitleBar settings_type={settings_type} />
-      <ModalContents settings_type={settings_type} />
+      <ModalContents settings_type={settings_type} onClose={onClose} />
     </View>
   );
 }
