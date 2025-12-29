@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, Pressable, FlatList, Image } from "react-native";
 
-import { SOUND_OPTIONS } from "@/features-settings/constants/notificationsAndSound";
+import { SOUND_OPTIONS } from "@/features/settings/constants";
 import { useSettingsStore } from "@/features-settings/store";
 import { colors, font, spacing } from "@/shared/styles";
 
