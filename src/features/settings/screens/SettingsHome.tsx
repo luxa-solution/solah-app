@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ScrollView, StyleSheet, Switch, Text, View, Pressable } from "react-native";
+import { ScrollView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Card, Item, SettingsModal } from "@/features-settings/components";
@@ -7,7 +7,9 @@ import { useSettingsStore } from "@/features-settings/store";
 import { SettingsType } from "@/features-settings/types";
 import { toText } from "@/features-settings/utils";
 import { BottomSheet, TitleBar } from "@/shared/components";
-import { colors, font, screenStyle, spacing } from "@/shared/styles";
+import { screenStyle } from "@/shared/styles";
+
+import { NotificationItem } from "../components/NotificationItem";
 
 export function SettingsHome() {
   const { bottom } = useSafeAreaInsets();
@@ -21,11 +23,8 @@ export function SettingsHome() {
     calendarFormat,
     language,
     location,
-    solahTimeNotification,
-    sound,
     timeFormat,
     timezone,
-    setSolahTimeNotification,
   } = useSettingsStore();
 
   return (
@@ -58,7 +57,7 @@ export function SettingsHome() {
           />
         </Card>
 
-        {/* Notifications */}
+        {/* Fonts */}
         <Card title="Fonts">
           <Item
             label="Arabic font size"
@@ -73,32 +72,7 @@ export function SettingsHome() {
         </Card>
 
         {/* Notifications */}
-        <Card title="Notifications">
-          <Pressable
-            onPress={() => setSolahTimeNotification(!solahTimeNotification)}
-            style={({ pressed }) => [toggleStyles.row, pressed && toggleStyles.pressed]}
-          >
-            <View style={toggleStyles.left}>
-              <Text style={toggleStyles.label}>Prayer time notification</Text>
-              <Text style={toggleStyles.value}>{solahTimeNotification ? "On" : "Off"}</Text>
-            </View>
-            <Switch
-              value={solahTimeNotification}
-              onValueChange={setSolahTimeNotification}
-              trackColor={{
-                false: colors.background.default.secondary,
-                true: colors.background.brand.primary,
-              }}
-              thumbColor={colors.background.default.primary}
-              ios_backgroundColor={colors.background.default.secondary}
-            />
-          </Pressable>
-          <Item
-            label="Sound"
-            value={toText("sound", sound)}
-            onPress={() => setActiveSheet("sound")}
-          />
-        </Card>
+        <NotificationItem setActiveSheet={setActiveSheet} />
 
         {/* General */}
         <Card title="General">
@@ -127,30 +101,3 @@ export function SettingsHome() {
     </>
   );
 }
-
-const toggleStyles = StyleSheet.create({
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingVertical: spacing.xs,
-    paddingHorizontal: spacing.xs,
-  },
-  pressed: {
-    backgroundColor: colors.background.default.secondary,
-    borderRadius: 8,
-  },
-  left: {
-    flex: 1,
-    paddingRight: spacing.sm,
-  },
-  label: {
-    ...font.label.large,
-    color: colors.context.default.primary,
-  },
-  value: {
-    ...font.body.xsmall,
-    color: colors.context.default.secondary,
-    marginTop: 6,
-  },
-});
