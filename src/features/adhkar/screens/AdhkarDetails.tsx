@@ -21,7 +21,8 @@ export function AdhkarDetails({ adhkar_type, id }: AdhkarDetailsProps) {
         paddingBottom: bottom,
       }}
     >
-      <TitleBar adhkar_type={adhkar_type} />
+      {/* Show bookmark for individual dua screens */}
+      <TitleBar adhkar_type={adhkar_type} showBookmark={true} />
       <Details id={id} adhkar_type={adhkar_type} />
     </View>
   );
