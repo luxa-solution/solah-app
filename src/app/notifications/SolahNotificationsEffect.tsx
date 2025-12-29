@@ -2,7 +2,7 @@ import { useEffect } from "react";
 
 import { useSettingsStore } from "@/features-settings/store";
 
-import { syncSolahNotifications } from "./solahNotifications";
+import { syncSolahNotifications } from "./utils";
 
 export function SolahNotificationsEffect() {
   const enabled = useSettingsStore((s) => s.solahTimeNotification);
