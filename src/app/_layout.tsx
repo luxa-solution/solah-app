@@ -1,7 +1,7 @@
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 
-import { SolahNotificationsEffect } from "@/app/notifications/SolahNotificationsEffect";
+import { SolahNotificationsEffect } from "@/features/notifications/components/SolahNotificationsEffect";
 import { Providers } from "@/shared/components";
 
 export default function RootLayout() {
