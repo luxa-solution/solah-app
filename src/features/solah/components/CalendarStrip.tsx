@@ -10,7 +10,12 @@ type CalendarStripProps = {
 export const CalendarStrip = ({ setSelectedDate }: CalendarStripProps) => {
   const [referenceDate, setReferenceDate] = useState(new Date()); // controls the visible week
   const [today, setToday] = useState(new Date()); // tracks the real current date
-  const [selectedDate, setLocalSelectedDate] = useState<Date | null>(null); // selected state
+  const [selectedDate, setLocalSelectedDate] = useState<Date | null>(new Date()); // selected state - initialize to today
+
+  // Initialize parent with today's date on mount
+  useEffect(() => {
+    setSelectedDate(today);
+  }, []);
 
   // Auto-update at midnight
   useEffect(() => {
