@@ -1,11 +1,13 @@
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 
+import { SolahNotificationsEffect } from "@/app/notifications/SolahNotificationsEffect";
 import { Providers } from "@/shared/components";
 
 export default function RootLayout() {
   return (
     <Providers>
+      <SolahNotificationsEffect />
       <StatusBar style="dark" />
       <Stack
         screenOptions={{
