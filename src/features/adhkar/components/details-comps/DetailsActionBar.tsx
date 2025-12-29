@@ -1,4 +1,4 @@
-import { View, Pressable, Image, Alert } from "react-native";
+import { View, Pressable, Image, Share } from "react-native";
 
 import { useAdhkarStore } from "@/features/adhkar/store/adhkarStore";
 import { AdhkarItem } from "@/features-adhkar/data";
@@ -18,17 +18,35 @@ export const DetailsActionBar = ({ item }: DetailsActionBarProps) => {
   const { toggleFavourite, isFavourite } = useAdhkarStore();
   const isFav = isFavourite(item);
 
-  const onShare = () => Alert.alert("Share", `Share adhkar ${item.id} (to be implemented)`);
+  const onShare = async () => {
+    try {
+      const firstEntry = item.entries[0];
+
+      if (!firstEntry) {
+        await Share.share({
+          message: item.title,
+          title: item.title,
+        });
+        return;
+      }
+
+      const shareMessage = `${item.title}\n\n${firstEntry.arabicText}\n\n${firstEntry.transliteration}\n\n${firstEntry.translation.en}`;
+
+      await Share.share({
+        message: shareMessage,
+        title: item.title,
+      });
+    } catch {}
+  };
 
   const onFavorite = () => {
     toggleFavourite(item);
-    Alert.alert(
-      isFav ? "Removed from Favourites" : "Added to Favourites",
-      `${item.title} ${isFav ? "removed from" : "added to"} favourites`
-    );
   };
 
-  const onPlay = () => Alert.alert("Play", `Play adhkar ${item.id} (to be implemented)`);
+  const onPlay = () => {
+    // TODO: Implement audio playback when audio files are ready
+    // Placeholder for future audio implementation
+  };
 
   return (
     <View style={styles.container}>
@@ -39,8 +57,6 @@ export const DetailsActionBar = ({ item }: DetailsActionBarProps) => {
       <Pressable onPress={onPlay} style={styles.iconButton} accessibilityLabel="play">
         <Image source={iconPlay} style={styles.iconImage} />
       </Pressable>
-
-      {/* REMOVED BOOKMARK BUTTON - ONLY FOR GROUPS, NOT INDIVIDUAL DUAS */}
 
       <Pressable onPress={onFavorite} style={styles.iconButton} accessibilityLabel="favorite">
         <Image source={isFav ? iconStarFilled : iconStar} style={styles.iconImage} />
