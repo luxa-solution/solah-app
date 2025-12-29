@@ -1,5 +1,6 @@
 import { SettingsType } from "@/features-settings/types";
-import { TitleBar as AppTitleBar } from "@/shared/components";
+
+import { SettingsTitleBar } from "./SettingsTitleBar";
 
 const titles: Record<SettingsType, string> = {
   calmethod: "Calculation Method",
@@ -15,5 +16,5 @@ const titles: Record<SettingsType, string> = {
 };
 
 export function TitleBar({ settings_type }: { settings_type: SettingsType }) {
-  return <AppTitleBar title={titles[settings_type]} />;
+  return <SettingsTitleBar title={titles[settings_type]} />;
 }

@@ -1,4 +1,4 @@
 export { Card } from "./Card";
 export { Item } from "./Item";
-export { TitleBar } from "./TitleBar";
+export { SettingsTitleBar } from "./SettingsTitleBar";
 export { SettingsModal } from "./SettingsModal";

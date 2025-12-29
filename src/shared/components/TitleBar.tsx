@@ -1,34 +1,17 @@
-import React from "react";
-import { StyleSheet, Text, View } from "react-native";
-
-import { colors, font, spacing } from "@/shared/styles";
+import { useRouter } from "expo-router";
+import { Appbar } from "react-native-paper";
 
 interface TitleBarProps {
   title: string;
   showBack?: boolean;
-  flushTop?: boolean;
 }
 
-export const TitleBar = ({ title }: TitleBarProps) => {
+export const TitleBar = ({ title, showBack = true }: TitleBarProps) => {
+  const router = useRouter();
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{title}</Text>
-    </View>
+    <Appbar.Header style={{ paddingLeft: 0 }}>
+      {showBack && <Appbar.BackAction onPress={() => router.back()} />}
+      <Appbar.Content title={title} />
+    </Appbar.Header>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: colors.background.default.primary,
-    paddingTop: spacing.sm,
-    paddingBottom: spacing.xl,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  title: {
-    ...font.heading.xsmall,
-    fontWeight: "semibold",
-    color: colors.context.default.primary,
-    textAlign: "center",
-  },
-});
