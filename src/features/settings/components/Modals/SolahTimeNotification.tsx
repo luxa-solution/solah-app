@@ -32,7 +32,6 @@ export function SolahTimeNotification() {
             </Pressable>
           );
         }}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
     </View>
   );

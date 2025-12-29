@@ -37,7 +37,6 @@ export function Sound({ onClose }: { onClose?: () => void }) {
             </Pressable>
           );
         }}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
     </View>
   );
