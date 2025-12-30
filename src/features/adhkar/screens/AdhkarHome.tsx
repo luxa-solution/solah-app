@@ -32,6 +32,23 @@ export function AdhkarHome() {
     [favouriteIds, allAdhkarItems]
   );
 
+  // Calculate real counts from data
+  const beforeGroup = adhkarData.find((group) => group.type === "before");
+  const duringGroup = adhkarData.find((group) => group.type === "during");
+  const afterGroup = adhkarData.find((group) => group.type === "after");
+
+  const beforeSubCount = beforeGroup?.items.length || 0;
+  const beforeAdhkarCount =
+    beforeGroup?.items.reduce((total, item) => total + item.entries.length, 0) || 0;
+
+  const duringSubCount = duringGroup?.items.length || 0;
+  const duringAdhkarCount =
+    duringGroup?.items.reduce((total, item) => total + item.entries.length, 0) || 0;
+
+  const afterSubCount = afterGroup?.items.length || 0;
+  const afterAdhkarCount =
+    afterGroup?.items.reduce((total, item) => total + item.entries.length, 0) || 0;
+
   return (
     <View style={styles.container}>
       {/* Top Bar */}
@@ -57,6 +74,8 @@ export function AdhkarHome() {
         <View style={styles.buttonGroup}>
           <HomeButton
             category={AdhkarCategory.BEFORE_PRAYER}
+            subCount={beforeSubCount}
+            adhkarCount={beforeAdhkarCount}
             image={require("@/assets/images/solah_illustrations/BeforePrayer.png")}
             backgroundColor={colors.background.brand.primary}
             href="/adhkar/before"
@@ -64,6 +83,8 @@ export function AdhkarHome() {
 
           <HomeButton
             category={AdhkarCategory.DURING_PRAYER}
+            subCount={duringSubCount}
+            adhkarCount={duringAdhkarCount}
             image={require("@/assets/images/solah_illustrations/DuringPrayer.png")}
             backgroundColor={colors.background.brand.secondary}
             href="/adhkar/during"
@@ -71,6 +92,8 @@ export function AdhkarHome() {
 
           <HomeButton
             category={AdhkarCategory.AFTER_PRAYER}
+            subCount={afterSubCount}
+            adhkarCount={afterAdhkarCount}
             image={require("@/assets/images/solah_illustrations/AfterPrayer.png")}
             backgroundColor={colors.background.brand.tertiary}
             href="/adhkar/after"
