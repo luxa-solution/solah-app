@@ -1,4 +1,4 @@
-import { AdhkarType } from "@/features-adhkar/data";
+import { AdhkarType, AdhkarItem } from "@/features-adhkar/data";
 import { TitleBar as AppTitleBar } from "@/shared/components";
 
 import { useAdhkarStore } from "../store/adhkarStore";
@@ -11,24 +11,27 @@ const titles = {
 
 interface TitleBarProps {
   adhkar_type: AdhkarType;
+  adhkarItem?: AdhkarItem;
   showBookmark?: boolean;
 }
 
-export function TitleBar({ adhkar_type, showBookmark = false }: TitleBarProps) {
-  const { toggleGroupBookmark, isGroupBookmarked } = useAdhkarStore();
+export function TitleBar({ adhkar_type, adhkarItem, showBookmark = false }: TitleBarProps) {
+  const { toggleBookmark, isBookmarked } = useAdhkarStore();
 
   const handleBookmark = () => {
-    toggleGroupBookmark(adhkar_type);
+    if (adhkarItem) {
+      toggleBookmark(adhkarItem);
+    }
   };
 
-  const isBookmarked = isGroupBookmarked(adhkar_type);
+  const isBookmarkedItem = adhkarItem ? isBookmarked(adhkarItem) : false;
 
   return (
     <AppTitleBar
       title={titles[adhkar_type]}
-      showBookmark={showBookmark}
+      showBookmark={showBookmark && !!adhkarItem}
       onBookmark={handleBookmark}
-      isBookmarked={isBookmarked}
+      isBookmarked={isBookmarkedItem}
     />
   );
 }

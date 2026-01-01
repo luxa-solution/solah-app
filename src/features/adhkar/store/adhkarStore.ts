@@ -7,20 +7,20 @@ import { AdhkarItem, AdhkarType } from "@/features-adhkar/data";
 interface AdhkarStoreState {
   favouriteIds: string[];
   bookmarkIds: string[];
-  groupBookmarkIds: string[]; // NEW: For groups
+  groupBookmarkIds: string[];
 
   toggleFavourite: (adhkar: AdhkarItem) => void;
   toggleBookmark: (adhkar: AdhkarItem) => void;
-  toggleGroupBookmark: (adhkarType: AdhkarType) => void; // NEW
+  toggleGroupBookmark: (adhkarType: AdhkarType) => void;
   isFavourite: (adhkar: AdhkarItem) => boolean;
   isBookmarked: (adhkar: AdhkarItem) => boolean;
-  isGroupBookmarked: (adhkarType: AdhkarType) => boolean; // NEW
+  isGroupBookmarked: (adhkarType: AdhkarType) => boolean;
   getFavourites: () => string[];
   getBookmarks: () => string[];
-  getGroupBookmarks: () => string[]; // NEW
+  getGroupBookmarks: () => string[];
   clearFavourites: () => void;
   clearBookmarks: () => void;
-  clearGroupBookmarks: () => void; // NEW
+  clearGroupBookmarks: () => void;
 }
 
 export const useAdhkarStore = create<AdhkarStoreState>()(
@@ -29,7 +29,7 @@ export const useAdhkarStore = create<AdhkarStoreState>()(
       (set, get) => ({
         favouriteIds: [],
         bookmarkIds: [],
-        groupBookmarkIds: [], // Initialize group bookmarks
+        groupBookmarkIds: [],
 
         toggleFavourite: (adhkar: AdhkarItem) =>
           set((state) => {
@@ -53,7 +53,6 @@ export const useAdhkarStore = create<AdhkarStoreState>()(
             };
           }),
 
-        // NEW: Toggle group bookmark
         toggleGroupBookmark: (adhkarType: AdhkarType) =>
           set((state) => {
             const isCurrentlyBookmarked = state.groupBookmarkIds.includes(adhkarType);
@@ -74,17 +73,16 @@ export const useAdhkarStore = create<AdhkarStoreState>()(
           return get().bookmarkIds.includes(id);
         },
 
-        // NEW: Check if group is bookmarked
         isGroupBookmarked: (adhkarType: AdhkarType) => {
           return get().groupBookmarkIds.includes(adhkarType);
         },
 
         getFavourites: () => get().favouriteIds,
         getBookmarks: () => get().bookmarkIds,
-        getGroupBookmarks: () => get().groupBookmarkIds, // NEW
+        getGroupBookmarks: () => get().groupBookmarkIds,
         clearFavourites: () => set({ favouriteIds: [] }),
         clearBookmarks: () => set({ bookmarkIds: [] }),
-        clearGroupBookmarks: () => set({ groupBookmarkIds: [] }), // NEW
+        clearGroupBookmarks: () => set({ groupBookmarkIds: [] }),
       }),
       {
         name: "adhkar-store",
