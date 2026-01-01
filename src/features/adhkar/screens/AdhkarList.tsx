@@ -20,7 +20,8 @@ export function AdhkarList({ adhkar_type }: AdhkarListProps) {
         paddingBottom: bottom,
       }}
     >
-      <TitleBar adhkar_type={adhkar_type} />
+      {/* DON'T show bookmark for group list screens */}
+      <TitleBar adhkar_type={adhkar_type} showBookmark={false} />
       <List type={adhkar_type} />
     </View>
   );
