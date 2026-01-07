@@ -2,7 +2,7 @@ import { useRouter } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 
 import { Card } from "@/features-adhkar/components";
-import { context, fontsize } from "@/shared/styles";
+import { background, context, fontsize } from "@/shared/styles";
 import { ds } from "@/shared/utils/responsive-dimensions";
 
 export function AdhkarCard() {
@@ -23,7 +23,8 @@ export function AdhkarCard() {
             }}
             variant="large"
             height={268}
-            bgStyle="dark"
+            bgStyle="light"
+            backgroundColor={background.default.primary}
             illustration={require("@/assets/images/solah_illustrations/man-ablution.png")}
           />
         </View>
@@ -39,6 +40,7 @@ export function AdhkarCard() {
             variant="small"
             height={129}
             bgStyle="light"
+            backgroundColor={background.default.primary}
             illustration={require("@/assets/images/solah_illustrations/Prostration.png")}
           />
 
@@ -51,6 +53,7 @@ export function AdhkarCard() {
             variant="small"
             height={129}
             bgStyle="light"
+            backgroundColor={background.default.primary}
             illustration={require("@/assets/images/solah_illustrations/AfterSolah.png")}
           />
         </View>
@@ -63,7 +66,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: fontsize.xl,
     textAlign: "left",
-    marginBottom: ds(20),
+    marginBottom: ds(12),
     fontWeight: "bold",
     color: context.brand.primary,
   },

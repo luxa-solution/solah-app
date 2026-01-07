@@ -18,6 +18,7 @@ export type AdhkarCardProps = {
   height?: DimensionValue;
   bgStyle: "light" | "dark";
   illustration?: ImageSourcePropType;
+  backgroundColor?: string;
 };
 
 export const Card = ({
@@ -28,6 +29,7 @@ export const Card = ({
   height = 126,
   bgStyle = "light",
   illustration,
+  backgroundColor,
 }: AdhkarCardProps) => {
   const isLight = bgStyle === "light";
 
@@ -35,7 +37,8 @@ export const Card = ({
 
   const subtitleColor = isLight ? context.brand.primary : context.default.inverted;
 
-  const bgColor = isLight ? background.brand.inverted : background.brand.secondary;
+  const bgColor =
+    backgroundColor ?? (isLight ? background.brand.inverted : background.brand.secondary);
 
   return (
     <Pressable
@@ -81,11 +84,19 @@ export const Card = ({
 
 export const styles = StyleSheet.create({
   container: {
-    padding: 4,
+    padding: 20,
     borderRadius: 10,
     margin: 0,
     overflow: "hidden",
     width: "100%",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   textContainer: {
     width: "100%",
@@ -94,8 +105,8 @@ export const styles = StyleSheet.create({
   },
   textWrapper: {
     position: "absolute",
-    left: 10,
-    right: 10,
+    left: 14,
+    right: 14,
     zIndex: 2,
   },
   darkCardTextWrapper: {
@@ -110,7 +121,7 @@ export const styles = StyleSheet.create({
     fontWeight: "semibold",
   },
   lightCardsTextWrapper: {
-    top: 15,
+    top: 16,
   },
   title: {
     fontSize: 12,
