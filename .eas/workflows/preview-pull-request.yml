@@ -13,11 +13,11 @@ on:
 jobs:
 
   update:
-    name: Publish preview update (if build exists)
+    name: Publish preview update
     type: update
     environment: development
     params:
-      platform: android
+      platform: all
       channel: development
       message: "PR #${{ github.event.pull_request.number }}"
       

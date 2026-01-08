@@ -1,0 +1,27 @@
+version: 2
+updates:
+  - package-ecosystem: 'npm'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+    open-pull-requests-limit: 10
+    versioning-strategy: increase
+    groups:
+      react-native:
+        patterns:
+          - 'react-native*'
+          - '@react-native*'
+      expo:
+        patterns:
+          - 'expo*'
+          - '@expo*'
+      testing:
+        patterns:
+          - '@testing-library/*'
+          - 'jest*'
+      development:
+        dependency-type: 'development'
+        update-types:
+          - 'minor'
+          - 'patch'
