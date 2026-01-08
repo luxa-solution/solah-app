@@ -28,7 +28,7 @@ function TimingCard({ type, time }: TimingCardProps) {
 
 export function PrayerTimingCard() {
   const { nextSolah } = useNextSolah();
-  const adhanTime = nextSolah?.time ?? "00:00";
+  const adhanTime = nextSolah.time;
   const iqaamahTime = adhanTime; // TODO: Implement Iqamah Functionality
 
   return (
