@@ -15,14 +15,14 @@ export function AdhkarCard() {
       <View style={styles.mainCardWrapper}>
         {/* Left - Large Card */}
         <View style={styles.largeCardWrapper}>
-          <Card data={largeCard} variant="large" height={268} bgStyle="dark" />
+          <Card data={largeCard} variant="large" />
         </View>
 
         {/* Right - Two Small Cards Stacked */}
         <View style={styles.smallCardWrapper}>
-          <Card data={topSmallCard} variant="small" height={129} bgStyle="light" />
+          <Card data={topSmallCard} variant="small" />
 
-          <Card data={bottomSmallCard} variant="small" height={129} bgStyle="light" />
+          <Card data={bottomSmallCard} variant="small" />
         </View>
       </View>
     </>

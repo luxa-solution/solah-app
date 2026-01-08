@@ -2,21 +2,8 @@ import { Sun, Moon } from "lucide-react-native";
 import { View, Text, StyleSheet } from "react-native";
 
 import { useNextSolah } from "@/features-solah/hooks";
-import { background, borderRadius, spacing, context } from "@/shared/styles";
+import { background, borderRadius, spacing, context, font } from "@/shared/styles";
 import { ds } from "@/shared/utils/responsive-dimensions";
-
-// Helper function to add minutes to a time string (HH:MM format)
-const addMinutesToTime = (timeStr: string, minutes: number = 5): string => {
-  const [hours, mins] = timeStr.split(":").map(Number);
-  const date = new Date();
-  date.setHours(hours, mins + minutes);
-
-  return date.toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  });
-};
 
 interface TimingCardProps {
   type: "adhan" | "iqaamah";
@@ -30,7 +17,7 @@ function TimingCard({ type, time }: TimingCardProps) {
 
   return (
     <View style={styles.card}>
-      <Icon size={ds(36)} color={context.brand.primary} />
+      <Icon size={ds(32)} color={context.brand.primary} />
       <View style={styles.textContainer}>
         <Text style={styles.label}>{label}</Text>
         <Text style={styles.time}>{time}</Text>
@@ -42,7 +29,7 @@ function TimingCard({ type, time }: TimingCardProps) {
 export function PrayerTimingCard() {
   const { nextSolah } = useNextSolah();
   const adhanTime = nextSolah?.time ?? "00:00";
-  const iqaamahTime = addMinutesToTime(adhanTime, 5);
+  const iqaamahTime = adhanTime; // TODO: Implement Iqamah Functionality
 
   return (
     <View style={styles.container}>
@@ -55,13 +42,12 @@ export function PrayerTimingCard() {
 const styles = StyleSheet.create({
   container: {
     width: "100%",
-    gap: ds(12),
+    gap: spacing.xs,
     flexDirection: "row",
-    paddingVertical: ds(12),
+    marginVertical: spacing.sm,
   },
   card: {
     flex: 1,
-    height: ds(74),
     backgroundColor: background.brand.inverted,
     borderRadius: borderRadius[4],
     borderWidth: 1,
@@ -69,21 +55,20 @@ const styles = StyleSheet.create({
     padding: spacing.xs,
     flexDirection: "row",
     alignItems: "center",
-    gap: ds(8),
+    gap: spacing.xs,
   },
   textContainer: {
     flex: 1,
+    gap: spacing["3xs"],
   },
   label: {
-    fontSize: ds(12),
+    ...font.body.xsmall,
+    fontWeight: "400",
     color: context.brand.primary,
-    marginBottom: ds(4),
-    fontFamily: "Figtree_400Regular",
   },
   time: {
-    fontSize: ds(32),
-    fontWeight: "bold",
+    ...font.heading.medium,
+    fontWeight: "700",
     color: context.brand.primary,
-    fontFamily: "Figtree_700Bold",
   },
 });
