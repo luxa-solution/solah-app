@@ -23,7 +23,6 @@ export function Location({ onClose }: LocationProps) {
       setLocation(defaultLocation);
 
       // We need to implement a way to find and set default timezone.
-
       onClose?.();
       return;
     }

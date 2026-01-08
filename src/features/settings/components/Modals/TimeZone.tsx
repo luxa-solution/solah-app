@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, Pressable, FlatList } from "react-native";
 
-import { useSettingsStore } from "@/features/settings/store/settingsStore";
+import { useSettingsStore, useDefaultStore } from "@/features/settings/store";
 import { timezones } from "@/features-settings/constants";
 
 import { SelectedIcon } from "./SelectedIcon";
@@ -13,9 +13,17 @@ type Prop = {
 
 export function TimeZone({ onClose }: Prop) {
   const { timezone, setTimeZone } = useSettingsStore();
+  const { defaultTimezone } = useDefaultStore();
 
-  const handleSelectTimezone = (selectedTimezone: string) => {
-    setTimeZone(selectedTimezone as any);
+  const handlePress = (item: (typeof timezones)[number]) => {
+    if (item.isDefault) {
+      // Use device/app default
+      setTimeZone(defaultTimezone);
+      onClose?.();
+      return;
+    }
+
+    setTimeZone(item.timezone);
     onClose?.();
   };
 
@@ -25,19 +33,21 @@ export function TimeZone({ onClose }: Prop) {
         data={timezones}
         keyExtractor={(item) => item.name}
         showsVerticalScrollIndicator={false}
-        renderItem={({ item }) => (
-          <Pressable
-            onPress={() => handleSelectTimezone(item.timezone)}
-            style={[styles.option, timezone === item.timezone && styles.selectedOption]}
-          >
-            <Text
-              style={[styles.optionText, timezone === item.timezone && styles.selectedOptionText]}
+        renderItem={({ item }) => {
+          const selected = item.isDefault ? false : timezone === item.timezone;
+
+          return (
+            <Pressable
+              onPress={() => handlePress(item)}
+              style={[styles.option, selected && styles.selectedOption]}
             >
-              {item.name}
-            </Text>
-            {timezone === item.timezone && <SelectedIcon />}
-          </Pressable>
-        )}
+              <Text style={[styles.optionText, selected && styles.selectedOptionText]}>
+                {item.name}
+              </Text>
+              {selected && <SelectedIcon />}
+            </Pressable>
+          );
+        }}
       />
     </View>
   );
