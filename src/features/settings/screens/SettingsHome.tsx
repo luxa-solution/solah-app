@@ -9,7 +9,7 @@ import { toText } from "@/features-settings/utils";
 import { BottomSheet, TitleBar } from "@/shared/components";
 import { screenStyle } from "@/shared/styles";
 
-import { NotificationItem } from "../components/ui/NotificationItem";
+import { NotificationToggle } from "../components/ui/NotificationToggle";
 
 export function SettingsHome() {
   const { bottom } = useSafeAreaInsets();
@@ -25,6 +25,7 @@ export function SettingsHome() {
     location,
     timeFormat,
     timezone,
+    sound,
   } = useSettingsStore();
 
   const open = (type: SettingsType) => () => setActiveSheet(type);
@@ -66,7 +67,10 @@ export function SettingsHome() {
         </Card>
 
         {/* Notifications */}
-        <NotificationItem setActiveSheet={setActiveSheet} />
+        <Card title="Notifications">
+          <NotificationToggle />
+          <Item label="Sound" value={toText("sound", sound)} onPress={open("sound")} />
+        </Card>
 
         {/* General */}
         <Card title="General">
