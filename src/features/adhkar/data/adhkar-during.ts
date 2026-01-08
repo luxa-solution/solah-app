@@ -1,3 +1,4 @@
+import { adhkarImages } from "./adhkar-images";
 import type { AdhkarGroup } from "./types";
 
 export const adhkarDuring: AdhkarGroup = {
@@ -7,6 +8,8 @@ export const adhkarDuring: AdhkarGroup = {
       id: "1",
       type: "during",
       title: "Opening supplication (Du‘ā’ al-Istiftāḥ)",
+      illustration: adhkarImages.prostration,
+      tags: ["opening"],
       entries: [
         {
           arabicText:
@@ -23,6 +26,8 @@ export const adhkarDuring: AdhkarGroup = {
       id: "2",
       type: "during",
       title: "While bowing (Rukū‘)",
+      illustration: adhkarImages.prostration,
+      tags: ["ruku"],
       entries: [
         {
           arabicText: "سُبْحَانَ رَبِّيَ الْعَظِيمِ",
@@ -35,6 +40,8 @@ export const adhkarDuring: AdhkarGroup = {
       id: "3",
       type: "during",
       title: "When rising from Rukū‘",
+      illustration: adhkarImages.prostration,
+      tags: ["ruku"],
       entries: [
         {
           arabicText: "سَمِعَ اللَّهُ لِمَنْ حَمِدَهُ",
@@ -52,6 +59,8 @@ export const adhkarDuring: AdhkarGroup = {
       id: "4",
       type: "during",
       title: "While prostrating (Sujūd)",
+      illustration: adhkarImages.prostration,
+      tags: ["sujud"],
       entries: [
         {
           arabicText: "سُبْحَانَ رَبِّيَ الأَعْلَى",
@@ -64,6 +73,8 @@ export const adhkarDuring: AdhkarGroup = {
       id: "5",
       type: "during",
       title: "Between the two prostrations",
+      illustration: adhkarImages.prostration,
+      tags: ["between_sujud"],
       entries: [
         {
           arabicText:
@@ -80,6 +91,8 @@ export const adhkarDuring: AdhkarGroup = {
       id: "6",
       type: "during",
       title: "After Tashahhud (before Taslīm)",
+      illustration: adhkarImages.prostration,
+      tags: ["tashahhud"],
       entries: [
         {
           arabicText:

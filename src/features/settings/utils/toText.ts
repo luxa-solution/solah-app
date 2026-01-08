@@ -1,34 +1,31 @@
-import {
-  SettingsType,
-  ArabicFontSizeOptions,
-  ArabicFontStyleOptions,
-  SoundOptions,
-  LanguageOptions,
-  TimeZone,
-} from "@/features-settings/types";
-import {
-  CalculationMethodTypes,
-  CalendarFormat,
-  LocationData,
-  TimeFormat,
-} from "@/features-solah/types";
+import type {
+  CalculationMethodOptions,
+  TimeZoneOption,
+  LocationOption,
+  ArabicFontSizeOption,
+  ArabicFontStyleOption,
+  LanguageOption,
+  CalendarFormatOption,
+  TimeFormatOption,
+} from "@/features-settings/constants";
+import { SettingsType, SoundOptions } from "@/features-settings/types";
 
 export function toText(type: SettingsType, value: any): string {
   switch (type) {
     case "calmethod":
-      return processCalculationMethod(value as CalculationMethodTypes);
+      return processCalculationMethod(value as CalculationMethodOptions);
 
     case "timezone":
-      return processTimeZone(value as TimeZone);
+      return processTimeZone(value as TimeZoneOption);
 
     case "location":
-      return processLocation(value as LocationData);
+      return processLocation(value as LocationOption);
 
     case "arabicfontsize":
-      return processArabicFontSize(value as ArabicFontSizeOptions);
+      return processArabicFontSize(value as ArabicFontSizeOption);
 
     case "arabicfontstyle":
-      return processArabicFontStyle(value as ArabicFontStyleOptions);
+      return processArabicFontStyle(value as ArabicFontStyleOption);
 
     case "solahtimenotif":
       return processSolahTimeNotification(value as boolean);
@@ -37,40 +34,39 @@ export function toText(type: SettingsType, value: any): string {
       return processSound(value as SoundOptions);
 
     case "language":
-      return processLanguage(value as LanguageOptions);
+      return processLanguage(value as LanguageOption);
 
     case "calendarformat":
-      return processCalendarFormat(value as CalendarFormat);
+      return processCalendarFormat(value as CalendarFormatOption);
 
     case "timeformat":
-      return processTimeFormat(value as TimeFormat);
+      return processTimeFormat(value as TimeFormatOption);
 
     default:
-      // This ensures we catch any unhandled setting types
       return "";
   }
 }
 
 // HELPER FUNCTIONS
 
-function processCalculationMethod(value: CalculationMethodTypes) {
-  return value;
+function processCalculationMethod(option: CalculationMethodOptions) {
+  return option.name;
 }
 
-function processTimeZone(value: string) {
-  return value;
+function processTimeZone(option: TimeZoneOption) {
+  return option.name;
 }
 
-function processLocation(value: LocationData) {
-  return `${value.city}, ${value.country}`;
+function processLocation(option: LocationOption) {
+  return option.name;
 }
 
-function processArabicFontSize(value: ArabicFontSizeOptions) {
-  return String(value);
+function processArabicFontSize(option: ArabicFontSizeOption) {
+  return option.name;
 }
 
-function processArabicFontStyle(value: ArabicFontStyleOptions) {
-  return value;
+function processArabicFontStyle(option: ArabicFontStyleOption) {
+  return option.name;
 }
 
 function processSolahTimeNotification(value: boolean) {
@@ -81,18 +77,14 @@ function processSound(value: SoundOptions) {
   return value;
 }
 
-function processLanguage(value: LanguageOptions) {
-  return value;
+function processLanguage(option: LanguageOption) {
+  return option.name;
 }
 
-function processCalendarFormat(value: CalendarFormat) {
-  if (value === "hijri") return "Hijri mode";
-  if (value === "miladi") return "Gregorian mode";
-  return value;
+function processCalendarFormat(option: CalendarFormatOption) {
+  return option.name;
 }
 
-function processTimeFormat(value: TimeFormat) {
-  if (value === "12hr") return "12-hour";
-  if (value === "24hr") return "24-hour";
-  return "";
+function processTimeFormat(option: TimeFormatOption) {
+  return option.name;
 }

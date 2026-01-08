@@ -1,11 +1,11 @@
 import { LocationData } from "@/features-solah/types";
 
-import { TimeZone } from "../types";
+import { TimeZoneOption } from "./timeZone";
 
 export type LocationOption = {
   name: string;
   location: LocationData;
-  timezone: TimeZone;
+  timezone: TimeZoneOption;
   isDefault?: boolean;
 };
 
@@ -20,9 +20,14 @@ export const locations: LocationOption[] = [
       latitude: 8.4966,
       longitude: 4.5421,
     },
-    timezone: "Africa/Lagos",
+    timezone: {
+      name: "Default (System Timezone)",
+      timezone: "Asia/Riyadh",
+      isDefault: true,
+    },
     isDefault: true,
   },
+
   // 🇳🇬 West Africa
   {
     name: "Ilorin, Nigeria",
@@ -33,7 +38,10 @@ export const locations: LocationOption[] = [
       latitude: 8.4966,
       longitude: 4.5421,
     },
-    timezone: "Africa/Lagos",
+    timezone: {
+      name: "(UTC+01:00) West Central Africa (Lagos)",
+      timezone: "Africa/Lagos",
+    },
   },
   {
     name: "Kano, Nigeria",
@@ -44,7 +52,10 @@ export const locations: LocationOption[] = [
       latitude: 12.0022,
       longitude: 8.5919,
     },
-    timezone: "Africa/Lagos",
+    timezone: {
+      name: "(UTC+01:00) West Central Africa (Lagos)",
+      timezone: "Africa/Lagos",
+    },
   },
   {
     name: "Dakar, Senegal",
@@ -55,7 +66,10 @@ export const locations: LocationOption[] = [
       latitude: 14.7167,
       longitude: -17.4677,
     },
-    timezone: "Africa/Dakar",
+    timezone: {
+      name: "(UTC+00:00) Greenwich Mean Time (Dakar)",
+      timezone: "Africa/Dakar",
+    },
   },
   {
     name: "Bamako, Mali",
@@ -66,7 +80,10 @@ export const locations: LocationOption[] = [
       latitude: 12.6392,
       longitude: -8.0029,
     },
-    timezone: "Africa/Bamako",
+    timezone: {
+      name: "(UTC+00:00) Greenwich Mean Time (Bamako)",
+      timezone: "Africa/Bamako",
+    },
   },
 
   // 🇪🇬 North Africa
@@ -79,7 +96,10 @@ export const locations: LocationOption[] = [
       latitude: 30.0444,
       longitude: 31.2357,
     },
-    timezone: "Africa/Cairo",
+    timezone: {
+      name: "(UTC+02:00) Cairo",
+      timezone: "Africa/Cairo",
+    },
   },
   {
     name: "Alexandria, Egypt",
@@ -90,7 +110,10 @@ export const locations: LocationOption[] = [
       latitude: 31.2001,
       longitude: 29.9187,
     },
-    timezone: "Africa/Cairo",
+    timezone: {
+      name: "(UTC+02:00) Cairo",
+      timezone: "Africa/Cairo",
+    },
   },
   {
     name: "Rabat, Morocco",
@@ -101,7 +124,10 @@ export const locations: LocationOption[] = [
       latitude: 33.9716,
       longitude: -6.8498,
     },
-    timezone: "Africa/Casablanca",
+    timezone: {
+      name: "(UTC+00:00) Casablanca (Rabat)",
+      timezone: "Africa/Casablanca",
+    },
   },
   {
     name: "Tunis, Tunisia",
@@ -112,7 +138,10 @@ export const locations: LocationOption[] = [
       latitude: 36.8065,
       longitude: 10.1815,
     },
-    timezone: "Africa/Tunis",
+    timezone: {
+      name: "(UTC+01:00) Central European Time (Tunis)",
+      timezone: "Africa/Tunis",
+    },
   },
 
   // 🇸🇦 Gulf / Arabian Peninsula
@@ -125,7 +154,10 @@ export const locations: LocationOption[] = [
       latitude: 21.3891,
       longitude: 39.8579,
     },
-    timezone: "Asia/Riyadh",
+    timezone: {
+      name: "(UTC+03:00) Kuwait, Riyadh",
+      timezone: "Asia/Riyadh",
+    },
   },
   {
     name: "Madinah, Saudi Arabia",
@@ -136,7 +168,10 @@ export const locations: LocationOption[] = [
       latitude: 24.5247,
       longitude: 39.5692,
     },
-    timezone: "Asia/Riyadh",
+    timezone: {
+      name: "(UTC+03:00) Kuwait, Riyadh",
+      timezone: "Asia/Riyadh",
+    },
   },
   {
     name: "Riyadh, Saudi Arabia",
@@ -147,7 +182,10 @@ export const locations: LocationOption[] = [
       latitude: 24.7136,
       longitude: 46.6753,
     },
-    timezone: "Asia/Riyadh",
+    timezone: {
+      name: "(UTC+03:00) Kuwait, Riyadh",
+      timezone: "Asia/Riyadh",
+    },
   },
   {
     name: "Jeddah, Saudi Arabia",
@@ -158,7 +196,10 @@ export const locations: LocationOption[] = [
       latitude: 21.4858,
       longitude: 39.1925,
     },
-    timezone: "Asia/Riyadh",
+    timezone: {
+      name: "(UTC+03:00) Kuwait, Riyadh",
+      timezone: "Asia/Riyadh",
+    },
   },
   {
     name: "Dubai, UAE",
@@ -169,7 +210,10 @@ export const locations: LocationOption[] = [
       latitude: 25.2048,
       longitude: 55.2708,
     },
-    timezone: "Asia/Dubai",
+    timezone: {
+      name: "(UTC+04:00) Abu Dhabi, Muscat (Dubai)",
+      timezone: "Asia/Dubai",
+    },
   },
   {
     name: "Doha, Qatar",
@@ -180,7 +224,10 @@ export const locations: LocationOption[] = [
       latitude: 25.2854,
       longitude: 51.531,
     },
-    timezone: "Asia/Qatar",
+    timezone: {
+      name: "(UTC+03:00) Qatar (Doha)",
+      timezone: "Asia/Qatar",
+    },
   },
   {
     name: "Kuwait City, Kuwait",
@@ -191,7 +238,10 @@ export const locations: LocationOption[] = [
       latitude: 29.3759,
       longitude: 47.9774,
     },
-    timezone: "Asia/Kuwait",
+    timezone: {
+      name: "(UTC+03:00) Kuwait (Kuwait City)",
+      timezone: "Asia/Kuwait",
+    },
   },
   {
     name: "Muscat, Oman",
@@ -202,7 +252,10 @@ export const locations: LocationOption[] = [
       latitude: 23.588,
       longitude: 58.3829,
     },
-    timezone: "Asia/Muscat",
+    timezone: {
+      name: "(UTC+04:00) Abu Dhabi, Muscat (Muscat)",
+      timezone: "Asia/Muscat",
+    },
   },
 
   // 🇵🇰 South Asia
@@ -215,7 +268,10 @@ export const locations: LocationOption[] = [
       latitude: 24.8607,
       longitude: 67.0011,
     },
-    timezone: "Asia/Karachi",
+    timezone: {
+      name: "(UTC+05:00) Islamabad, Karachi",
+      timezone: "Asia/Karachi",
+    },
   },
   {
     name: "Lahore, Pakistan",
@@ -226,7 +282,10 @@ export const locations: LocationOption[] = [
       latitude: 31.5204,
       longitude: 74.3587,
     },
-    timezone: "Asia/Karachi",
+    timezone: {
+      name: "(UTC+05:00) Islamabad, Karachi",
+      timezone: "Asia/Karachi",
+    },
   },
   {
     name: "Islamabad, Pakistan",
@@ -237,7 +296,10 @@ export const locations: LocationOption[] = [
       latitude: 33.6844,
       longitude: 73.0479,
     },
-    timezone: "Asia/Karachi",
+    timezone: {
+      name: "(UTC+05:00) Islamabad, Karachi",
+      timezone: "Asia/Karachi",
+    },
   },
   {
     name: "Dhaka, Bangladesh",
@@ -248,7 +310,10 @@ export const locations: LocationOption[] = [
       latitude: 23.8103,
       longitude: 90.4125,
     },
-    timezone: "Asia/Dhaka",
+    timezone: {
+      name: "(UTC+06:00) Dhaka",
+      timezone: "Asia/Dhaka",
+    },
   },
 
   // 🇮🇩 Southeast Asia
@@ -261,7 +326,10 @@ export const locations: LocationOption[] = [
       latitude: -6.2088,
       longitude: 106.8456,
     },
-    timezone: "Asia/Jakarta",
+    timezone: {
+      name: "(UTC+07:00) Bangkok, Hanoi, Jakarta",
+      timezone: "Asia/Jakarta",
+    },
   },
   {
     name: "Bandung, Indonesia",
@@ -272,7 +340,10 @@ export const locations: LocationOption[] = [
       latitude: -6.9175,
       longitude: 107.6191,
     },
-    timezone: "Asia/Jakarta",
+    timezone: {
+      name: "(UTC+07:00) Bangkok, Hanoi, Jakarta",
+      timezone: "Asia/Jakarta",
+    },
   },
   {
     name: "Kuala Lumpur, Malaysia",
@@ -283,7 +354,10 @@ export const locations: LocationOption[] = [
       latitude: 3.139,
       longitude: 101.6869,
     },
-    timezone: "Asia/Kuala_Lumpur",
+    timezone: {
+      name: "(UTC+08:00) Kuala Lumpur, Singapore",
+      timezone: "Asia/Kuala_Lumpur",
+    },
   },
   {
     name: "Penang, Malaysia",
@@ -294,7 +368,10 @@ export const locations: LocationOption[] = [
       latitude: 5.4141,
       longitude: 100.3288,
     },
-    timezone: "Asia/Kuala_Lumpur",
+    timezone: {
+      name: "(UTC+08:00) Kuala Lumpur, Singapore",
+      timezone: "Asia/Kuala_Lumpur",
+    },
   },
 
   // 🇹🇷 / 🇮🇷
@@ -307,7 +384,10 @@ export const locations: LocationOption[] = [
       latitude: 41.0082,
       longitude: 28.9784,
     },
-    timezone: "Europe/Istanbul",
+    timezone: {
+      name: "(UTC+03:00) Istanbul",
+      timezone: "Europe/Istanbul",
+    },
   },
   {
     name: "Ankara, Turkey",
@@ -318,7 +398,10 @@ export const locations: LocationOption[] = [
       latitude: 39.9334,
       longitude: 32.8597,
     },
-    timezone: "Europe/Istanbul",
+    timezone: {
+      name: "(UTC+03:00) Istanbul",
+      timezone: "Europe/Istanbul",
+    },
   },
   {
     name: "Tehran, Iran",
@@ -329,7 +412,10 @@ export const locations: LocationOption[] = [
       latitude: 35.6892,
       longitude: 51.389,
     },
-    timezone: "Asia/Tehran",
+    timezone: {
+      name: "(UTC+03:30) Tehran",
+      timezone: "Asia/Tehran",
+    },
   },
 
   // 🇪🇹 East Africa
@@ -342,7 +428,10 @@ export const locations: LocationOption[] = [
       latitude: 9.03,
       longitude: 38.74,
     },
-    timezone: "Africa/Addis_Ababa",
+    timezone: {
+      name: "(UTC+03:00) Nairobi (Addis Ababa)",
+      timezone: "Africa/Addis_Ababa",
+    },
   },
   {
     name: "Mogadishu, Somalia",
@@ -353,7 +442,10 @@ export const locations: LocationOption[] = [
       latitude: 2.0469,
       longitude: 45.3182,
     },
-    timezone: "Africa/Mogadishu",
+    timezone: {
+      name: "(UTC+03:00) Nairobi (Mogadishu)",
+      timezone: "Africa/Mogadishu",
+    },
   },
 
   // 🇺🇿 / 🇦🇫 Central Asia
@@ -366,7 +458,10 @@ export const locations: LocationOption[] = [
       latitude: 41.2995,
       longitude: 69.2401,
     },
-    timezone: "Asia/Tashkent",
+    timezone: {
+      name: "(UTC+05:00) Tashkent",
+      timezone: "Asia/Tashkent",
+    },
   },
   {
     name: "Kabul, Afghanistan",
@@ -377,6 +472,9 @@ export const locations: LocationOption[] = [
       latitude: 34.5553,
       longitude: 69.2075,
     },
-    timezone: "Asia/Kabul",
+    timezone: {
+      name: "(UTC+04:30) Kabul",
+      timezone: "Asia/Kabul",
+    },
   },
 ];

@@ -10,8 +10,8 @@ type CurrentLocationProps = {
 };
 
 export function CurrentLocation({ type }: CurrentLocationProps) {
-  const location = useSettingsStore((s) => s.location);
-  const defaultLocation = useDefaultStore((s) => s.defaultLocation);
+  const location = useSettingsStore((s) => s.location.location);
+  const defaultLocation = useDefaultStore((s) => s.defaultLocation.location);
 
   // This is used for Solah Times and it is based on selected location.
   if (type === "chevron")

@@ -13,6 +13,15 @@ export function useSyncDefaultLocation() {
     if (!location) return;
 
     // Always sync latest GPS location
-    setDefaultLocation(location);
+    setDefaultLocation({
+      name: "Default (Current Location)",
+      location,
+      timezone: {
+        name: "Default (System Timezone)",
+        timezone: "Asia/Riyadh",
+        isDefault: true,
+      },
+      isDefault: true,
+    });
   }, [loading, error, location, setDefaultLocation]);
 }

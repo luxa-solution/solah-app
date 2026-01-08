@@ -1,2 +1,2 @@
 export { adhkarData, totalAdhkarAmt } from "./adhkarData";
-export { AdhkarType, AdhkarItem, AdhkarGroup, AdhkarEntry } from "./types";
+export { adhkarTags, AdhkarTag } from "./tags";

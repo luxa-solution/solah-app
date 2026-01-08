@@ -2,18 +2,23 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { createJSONStorage, persist, subscribeWithSelector } from "zustand/middleware";
 
-import { LanguageOptions, TimeZone } from "@/features-settings/types";
-import { CalculationMethodTypes, LocationData } from "@/features-solah/types";
+import type {
+  CalculationMethodOptions,
+  TimeZoneOption,
+  LocationOption,
+  LanguageOption,
+} from "@/features-settings/constants";
 
 type DefaultDataState = {
-  defaultCalculationMethod: CalculationMethodTypes;
-  defaultTimezone: TimeZone;
-  defaultLocation: LocationData;
-  defaultLanguage: LanguageOptions;
-  setDefaultCalculationMethod: (calculationMethod: CalculationMethodTypes) => void;
-  setDefaultTimeZone: (timezone: TimeZone) => void;
-  setDefaultLocation: (location: LocationData) => void;
-  setDefaultLanguage: (language: LanguageOptions) => void;
+  defaultCalculationMethod: CalculationMethodOptions;
+  defaultTimezone: TimeZoneOption;
+  defaultLocation: LocationOption;
+  defaultLanguage: LanguageOption;
+
+  setDefaultCalculationMethod: (calculationMethod: CalculationMethodOptions) => void;
+  setDefaultTimeZone: (timezone: TimeZoneOption) => void;
+  setDefaultLocation: (location: LocationOption) => void;
+  setDefaultLanguage: (language: LanguageOption) => void;
 };
 
 export const useDefaultStore = create<DefaultDataState>()(
@@ -21,16 +26,40 @@ export const useDefaultStore = create<DefaultDataState>()(
     persist(
       (set) => ({
         // App state
-        defaultCalculationMethod: "MoonsightingCommittee",
-        defaultTimezone: "Asia/Riyadh",
-        defaultLocation: {
-          longitude: 0,
-          latitude: 0,
-          city: "Ilorin",
-          region: "Kwara",
-          country: "Nigeria",
+        defaultCalculationMethod: {
+          name: "Default",
+          method: "MoonsightingCommittee",
+          isDefault: true,
         },
-        defaultLanguage: "Default",
+
+        defaultTimezone: {
+          name: "Default (System Timezone)",
+          timezone: "Asia/Riyadh",
+          isDefault: true,
+        },
+
+        defaultLocation: {
+          name: "Default (Current Location)",
+          location: {
+            longitude: 0,
+            latitude: 0,
+            city: "Riyadh",
+            region: "Riyadh",
+            country: "Saudi Arabia",
+          },
+          timezone: {
+            name: "Default (System Timezone)",
+            timezone: "Asia/Riyadh",
+            isDefault: true,
+          },
+          isDefault: true,
+        },
+
+        defaultLanguage: {
+          name: "Default",
+          value: "Default",
+          isDefault: true,
+        },
 
         // Set onboarding status
         setDefaultCalculationMethod: (calculationMethod) => {

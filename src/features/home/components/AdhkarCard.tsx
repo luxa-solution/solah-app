@@ -1,12 +1,12 @@
-import { useRouter } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 
 import { Card } from "@/features-adhkar/components";
-import { background, context, fontsize } from "@/shared/styles";
+import { useAdhkarAutoRotation } from "@/features-home/hooks";
+import { context, fontsize } from "@/shared/styles";
 import { ds } from "@/shared/utils/responsive-dimensions";
 
 export function AdhkarCard() {
-  const router = useRouter();
+  const { largeCard, topSmallCard, bottomSmallCard } = useAdhkarAutoRotation();
 
   return (
     <>
@@ -15,47 +15,14 @@ export function AdhkarCard() {
       <View style={styles.mainCardWrapper}>
         {/* Left - Large Card */}
         <View style={styles.largeCardWrapper}>
-          <Card
-            title="Before Prayer"
-            subtitle="Upon completing the ablution"
-            onPress={() => {
-              router.push("/adhkar/before");
-            }}
-            variant="large"
-            height={268}
-            bgStyle="light"
-            backgroundColor={background.default.primary}
-            illustration={require("@/assets/images/solah_illustrations/man-ablution.png")}
-          />
+          <Card data={largeCard} variant="large" height={268} bgStyle="dark" />
         </View>
 
         {/* Right - Two Small Cards Stacked */}
         <View style={styles.smallCardWrapper}>
-          <Card
-            title="During Prayer"
-            subtitle="While bowing in prayer (Rukoo')"
-            onPress={() => {
-              router.push("/adhkar/during");
-            }}
-            variant="small"
-            height={129}
-            bgStyle="light"
-            backgroundColor={background.default.primary}
-            illustration={require("@/assets/images/solah_illustrations/Prostration.png")}
-          />
+          <Card data={topSmallCard} variant="small" height={129} bgStyle="light" />
 
-          <Card
-            title="After Prayer"
-            subtitle="Remembrance after salām"
-            onPress={() => {
-              router.push("/adhkar/after");
-            }}
-            variant="small"
-            height={129}
-            bgStyle="light"
-            backgroundColor={background.default.primary}
-            illustration={require("@/assets/images/solah_illustrations/AfterSolah.png")}
-          />
+          <Card data={bottomSmallCard} variant="small" height={129} bgStyle="light" />
         </View>
       </View>
     </>

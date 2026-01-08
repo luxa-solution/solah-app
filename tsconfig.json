@@ -25,5 +25,7 @@
     ".expo/types/**/*.ts",
     "expo-env.d.ts",
     "eslint.config.ts"
-  ]
+,
+"src/features/settings/components/sheet/SheetTitle.tsx"
+]
 }

@@ -1,48 +1,48 @@
-import {
-  DimensionValue,
-  Image,
-  ImageSourcePropType,
-  Pressable,
-  Text,
-  View,
-  StyleSheet,
-} from "react-native";
+import { router } from "expo-router";
+import { DimensionValue, Image, Pressable, Text, View, StyleSheet } from "react-native";
 
+import { AdhkarItem } from "@/features-adhkar/types";
 import { background, context } from "@/shared/styles";
 
 export type AdhkarCardProps = {
-  title: string;
-  subtitle: string;
-  onPress: () => void;
+  data: AdhkarItem;
   variant?: "large" | "small";
   height?: DimensionValue;
   bgStyle: "light" | "dark";
-  illustration?: ImageSourcePropType;
-  backgroundColor?: string;
 };
 
 export const Card = ({
-  title,
-  subtitle,
-  onPress,
+  data,
   variant = "small",
   height = 126,
   bgStyle = "light",
-  illustration,
-  backgroundColor,
 }: AdhkarCardProps) => {
   const isLight = bgStyle === "light";
 
   const titleColor = isLight ? context.brand.secondary : context.brand.inverted;
-
   const subtitleColor = isLight ? context.brand.primary : context.default.inverted;
+  const bgColor = isLight ? background.brand.inverted : background.brand.secondary;
 
-  const bgColor =
-    backgroundColor ?? (isLight ? background.brand.inverted : background.brand.secondary);
+  const { id, title, type, illustration } = data;
+
+  const getAdhkarTitle = (adhkar_type: string) => {
+    switch (adhkar_type) {
+      case "before":
+        return "Before Prayer";
+      case "during":
+        return "During Prayer";
+      case "after":
+        return "After Prayer";
+      default:
+        return "";
+    }
+  };
+
+  const handlePress = () => router.push(`/adhkar/details?adhkar_type=${type}&id=${id}`);
 
   return (
     <Pressable
-      onPress={onPress}
+      onPress={handlePress}
       style={[
         styles.container,
         { height, backgroundColor: bgColor },
@@ -57,11 +57,11 @@ export const Card = ({
             isLight ? styles.lightCardsTextWrapper : styles.darkCardTextWrapper,
           ]}
         >
-          <Text style={[styles.title, { color: titleColor }]}>{title}</Text>
+          <Text style={[styles.title, { color: titleColor }]}>{getAdhkarTitle(type)}</Text>
           <Text
             style={[styles.subtitle, { color: subtitleColor }, !isLight && styles.darkCardSubtitle]}
           >
-            {subtitle}
+            {title}
           </Text>
         </View>
       </View>

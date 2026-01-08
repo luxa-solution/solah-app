@@ -2,7 +2,6 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { useSettingsStore } from "@/features/settings/store/settingsStore";
-import { CalendarFormat, TimeFormat } from "@/features-solah/types";
 import { formatDate, formatTime } from "@/features-solah/utils";
 
 export interface DateAndTime {
@@ -11,17 +10,14 @@ export interface DateAndTime {
 }
 
 interface UseDateAndTimeOptions {
-  timeFormat?: TimeFormat;
-  calendar?: CalendarFormat;
   locale?: string;
 }
 
-export const useDateAndTime = ({
-  calendar = "hijri",
-  locale = "en-US",
-}: UseDateAndTimeOptions = {}): DateAndTime => {
+export const useDateAndTime = ({ locale = "en-US" }: UseDateAndTimeOptions = {}): DateAndTime => {
   const [current, setCurrent] = useState<Date>(new Date());
-  const { timeFormat, timezone } = useSettingsStore();
+  const timezone = useSettingsStore((s) => s.timezone.timezone);
+  const timeFormat = useSettingsStore((s) => s.timeFormat.value);
+  const calendar = useSettingsStore((s) => s.calendarFormat.value);
 
   // ---- Update aligned to minute boundary ----
   useEffect(() => {
@@ -54,4 +50,19 @@ export const useDateAndTime = ({
   const date = useMemo(() => formatDate(current, calendar, locale), [current, calendar, locale]);
 
   return { date, time };
+};
+
+export const useMinuteTick = () => {
+  // Small local hook to force re-render on minute boundaries
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    const bump = () => setTick((x) => x + 1);
+    const delay = 60000 - (Date.now() % 60000);
+    const t = setTimeout(() => {
+      bump();
+      const i = setInterval(bump, 60000);
+      return () => clearInterval(i);
+    }, delay);
+    return () => clearTimeout(t as unknown as number);
+  }, []);
 };

@@ -1,3 +1,4 @@
+import { adhkarImages } from "./adhkar-images";
 import type { AdhkarGroup } from "./types";
 
 export const adhkarAfter: AdhkarGroup = {
@@ -7,6 +8,8 @@ export const adhkarAfter: AdhkarGroup = {
       id: "1",
       type: "after",
       title: "After finishing the prayer (Tasleem)",
+      illustration: adhkarImages.afterSolah,
+      tags: ["after_tasleem", "dhikr"],
       entries: [
         {
           arabicText: "أَسْتَغْفِرُ اللَّهَ، أَسْتَغْفِرُ اللَّهَ، أَسْتَغْفِرُ اللَّهَ",
@@ -28,6 +31,8 @@ export const adhkarAfter: AdhkarGroup = {
       id: "2",
       type: "after",
       title: "After every obligatory prayer",
+      illustration: adhkarImages.afterSolah,
+      tags: ["dhikr"],
       entries: [
         {
           arabicText:
@@ -52,6 +57,8 @@ export const adhkarAfter: AdhkarGroup = {
       id: "3",
       type: "after",
       title: "Ayatul Kursi (after each prayer)",
+      illustration: adhkarImages.afterSolah,
+      tags: ["dhikr"],
       entries: [
         {
           arabicText:
@@ -61,6 +68,37 @@ export const adhkarAfter: AdhkarGroup = {
           translation: {
             en: "Allah! There is no deity except Him, the Ever-Living, the Sustainer of [all] existence... His preservation of them tires Him not, and He is the Most High, the Most Great. (Al-Baqarah 2:255)",
           },
+        },
+      ],
+    },
+    {
+      id: "4",
+      type: "after",
+      title: "Du‘ā after prayer",
+      cardTitle: "Du‘ā After Prayer",
+      illustration: adhkarImages.afterSolah,
+      tags: ["dua", "after_tasleem"],
+      entries: [
+        {
+          arabicText: "اللَّهُمَّ أَعِنِّي عَلَى ذِكْرِكَ وَشُكْرِكَ وَحُسْنِ عِبَادَتِكَ",
+          transliteration: "Allāhumma aʿinnī ʿalā dhikrika wa shukrika wa ḥusni ʿibādatik",
+          translation: {
+            en: "O Allah, help me to remember You, thank You, and worship You in the best manner.",
+          },
+        },
+      ],
+    },
+    {
+      id: "5",
+      type: "after",
+      title: "Upon leaving the mosque",
+      illustration: adhkarImages.afterSolah,
+      tags: ["mosque_after"],
+      entries: [
+        {
+          arabicText: "اللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ فَضْلِكَ",
+          transliteration: "Allāhumma innī as’aluka min faḍlik",
+          translation: { en: "O Allah, I ask You for Your bounty." },
         },
       ],
     },
