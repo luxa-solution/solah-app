@@ -3,15 +3,15 @@ import { View } from "react-native";
 import { SettingsType } from "@/features-settings/types";
 import { screenStyle } from "@/shared/styles";
 
-import { ModalContents } from "./ModalContents";
-import { ModalTitleBar } from "./ModalTitleBar";
+import { SheetBody } from "./SheetBody";
+import { SheetTitle } from "./SheetTitle";
 
 interface SettingsModalProps {
   settings_type: SettingsType;
   onClose?: () => void;
 }
 
-export function SettingsModal({ settings_type, onClose }: SettingsModalProps) {
+export function SettingsSheet({ settings_type, onClose }: SettingsModalProps) {
   return (
     <View
       style={{
@@ -19,8 +19,8 @@ export function SettingsModal({ settings_type, onClose }: SettingsModalProps) {
         backgroundColor: "white",
       }}
     >
-      <ModalTitleBar settings_type={settings_type} />
-      <ModalContents settings_type={settings_type} onClose={onClose} />
+      <SheetTitle settings_type={settings_type} />
+      <SheetBody settings_type={settings_type} onClose={onClose} />
     </View>
   );
 }

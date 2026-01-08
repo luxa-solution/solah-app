@@ -2,7 +2,6 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { useSettingsStore } from "@/features/settings/store/settingsStore";
-import { CalendarFormat, TimeFormat } from "@/features-solah/types";
 import { formatDate, formatTime } from "@/features-solah/utils";
 
 export interface DateAndTime {
@@ -11,17 +10,14 @@ export interface DateAndTime {
 }
 
 interface UseDateAndTimeOptions {
-  timeFormat?: TimeFormat;
-  calendar?: CalendarFormat;
   locale?: string;
 }
 
-export const useDateAndTime = ({
-  calendar = "hijri",
-  locale = "en-US",
-}: UseDateAndTimeOptions = {}): DateAndTime => {
+export const useDateAndTime = ({ locale = "en-US" }: UseDateAndTimeOptions = {}): DateAndTime => {
   const [current, setCurrent] = useState<Date>(new Date());
-  const { timeFormat, timezone } = useSettingsStore();
+  const timezone = useSettingsStore((s) => s.timezone.timezone);
+  const timeFormat = useSettingsStore((s) => s.timeFormat.value);
+  const calendar = useSettingsStore((s) => s.calendarFormat.value);
 
   // ---- Update aligned to minute boundary ----
   useEffect(() => {

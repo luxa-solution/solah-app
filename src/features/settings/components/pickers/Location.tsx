@@ -1,11 +1,10 @@
-import React from "react";
+import { useMemo, useState } from "react";
 import { View, Text, Pressable, FlatList } from "react-native";
 
 import { locations, LocationOption } from "@/features-settings/constants";
 import { useDefaultStore, useSettingsStore } from "@/features-settings/store";
 
-import { SelectedIcon } from "./SelectedIcon";
-import { styles } from "./styles";
+import { SearchBar, SelectedIcon, styles } from "./shared";
 
 interface LocationProps {
   onClose?: () => void;
@@ -14,6 +13,21 @@ interface LocationProps {
 export function Location({ onClose }: LocationProps) {
   const { location, setLocation, setTimeZone } = useSettingsStore();
   const { defaultLocation } = useDefaultStore();
+
+  const [query, setQuery] = useState("");
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return locations;
+
+    return locations.filter((item) => {
+      const name = item.name.toLowerCase();
+      const city = item.location.city?.toLowerCase();
+      const country = item.location.country?.toLowerCase();
+      const region = (item.location.region ?? "").toLowerCase();
+      return name.includes(q) || city?.includes(q) || country?.includes(q) || region?.includes(q);
+    });
+  }, [query]);
 
   const handlePress = (item: LocationOption) => {
     if (item.isDefault) {
@@ -27,13 +41,7 @@ export function Location({ onClose }: LocationProps) {
       return;
     }
 
-    setLocation({
-      latitude: item.location.latitude,
-      longitude: item.location.longitude,
-      city: item.location.city,
-      region: item.location.region,
-      country: item.location.country,
-    });
+    setLocation(item);
 
     setTimeZone(item.timezone);
     onClose?.();
@@ -41,14 +49,14 @@ export function Location({ onClose }: LocationProps) {
 
   return (
     <View style={styles.container}>
+      <SearchBar value={query} onChange={setQuery} />
       <FlatList
-        data={locations}
+        data={filtered}
         keyExtractor={(item) => item.name}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
         renderItem={({ item }) => {
-          const selected = item.isDefault
-            ? false
-            : location.city === item.location.city && location.country === item.location.country;
+          const selected = item.isDefault ? false : location.name === item.name;
 
           return (
             <Pressable

@@ -1,11 +1,10 @@
 import React from "react";
 import { View, Text, Pressable, FlatList } from "react-native";
 
-import { SOLAH_TIME_NOTIFICATION_OPTIONS } from "@/features/settings/constants";
+import { notifications } from "@/features-settings/constants";
 import { useSettingsStore } from "@/features-settings/store";
 
-import { SelectedIcon } from "./SelectedIcon";
-import { styles } from "./styles";
+import { SelectedIcon, styles } from "./shared";
 
 export function SolahTimeNotification() {
   const { solahTimeNotification, setSolahTimeNotification } = useSettingsStore();
@@ -13,7 +12,7 @@ export function SolahTimeNotification() {
   return (
     <View style={styles.container}>
       <FlatList
-        data={SOLAH_TIME_NOTIFICATION_OPTIONS}
+        data={notifications}
         keyExtractor={(item) => item.label}
         showsVerticalScrollIndicator={false}
         renderItem={({ item }) => {

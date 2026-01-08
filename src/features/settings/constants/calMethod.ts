@@ -1,10 +1,12 @@
 import { CalculationMethodTypes } from "@/features-solah/types";
 
-export const calMethods: {
+export type CalculationMethodOptions = {
   name: string;
   method: CalculationMethodTypes;
   isDefault?: boolean;
-}[] = [
+};
+
+export const calMethods: CalculationMethodOptions[] = [
   // Default (the data inside the default is not used)
   {
     name: "Default",

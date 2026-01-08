@@ -15,7 +15,10 @@ import {
 import { useMinuteTick } from "./useDateAndTime";
 
 export function useSolahTimes(date?: Date) {
-  const { calculationMethod: methodName, timeFormat, location, timezone } = useSettingsStore();
+  const methodName = useSettingsStore((s) => s.calculationMethod.method);
+  const timeFormat = useSettingsStore((s) => s.timeFormat.value);
+  const location = useSettingsStore((s) => s.location.location);
+  const timezone = useSettingsStore((s) => s.timezone.timezone);
 
   const { lastKnownTimes, setLastKnownTimes } = useSolahStore();
 
@@ -79,7 +82,7 @@ export function useSolahTimes(date?: Date) {
 
 export function useCurrentSolah() {
   const { times } = useSolahTimes();
-  const { timezone } = useSettingsStore();
+  const timezone = useSettingsStore((s) => s.timezone.timezone);
   useMinuteTick();
 
   const currentSolah = useMemo(
@@ -92,7 +95,7 @@ export function useCurrentSolah() {
 
 export function useNextSolah() {
   const { times } = useSolahTimes();
-  const { timezone } = useSettingsStore();
+  const timezone = useSettingsStore((s) => s.timezone.timezone);
 
   useMinuteTick();
 

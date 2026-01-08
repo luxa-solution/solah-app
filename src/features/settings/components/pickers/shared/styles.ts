@@ -7,7 +7,8 @@ export const styles = {
     borderTopLeftRadius: spacing.lg,
     borderTopRightRadius: spacing.lg,
     paddingBottom: spacing.xl,
-    paddingTop: spacing.lg,
+    paddingTop: spacing.xs,
+    gap: spacing.xs,
   },
   option: {
     flexDirection: "row" as const,

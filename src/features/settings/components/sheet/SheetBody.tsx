@@ -1,5 +1,3 @@
-import { SettingsType } from "@/features-settings/types";
-
 import {
   CalculationMethod,
   Location,
@@ -9,14 +7,17 @@ import {
   Language,
   SolahTimeNotification,
   Sound,
-} from "./Modals";
+  CalendarFormat,
+  TimeFormat,
+} from "@/features-settings/components/pickers";
+import { SettingsType } from "@/features-settings/types";
 
 type AllModalContentsProps = {
   settings_type: SettingsType;
   onClose?: () => void;
 };
 
-export function ModalContents({ settings_type, onClose }: AllModalContentsProps) {
+export function SheetBody({ settings_type, onClose }: AllModalContentsProps) {
   switch (settings_type) {
     case "calmethod":
       return <CalculationMethod onClose={onClose} />;
@@ -34,6 +35,10 @@ export function ModalContents({ settings_type, onClose }: AllModalContentsProps)
       return <Sound onClose={onClose} />;
     case "language":
       return <Language onClose={onClose} />;
+    case "calendarformat":
+      return <CalendarFormat onClose={onClose} />;
+    case "timeformat":
+      return <TimeFormat onClose={onClose} />;
     default:
       return null;
   }

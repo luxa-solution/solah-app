@@ -12,10 +12,10 @@ interface CurrentSolahTimesProps {
 
 export function CurrentSolahTimes({ selectedDate }: CurrentSolahTimesProps) {
   const { times } = useSolahTimes(selectedDate);
-  const { location } = useSettingsStore();
+  const location = useSettingsStore((s) => s.location.location);
   const { currentSolah } = useCurrentSolah();
 
-  const calendarFormat: CalendarFormat = "hijri";
+  const calendarFormat: CalendarFormat = useSettingsStore((s) => s.calendarFormat.value);
   const dayName = selectedDate.toLocaleDateString("en-US", {
     weekday: "long",
   });

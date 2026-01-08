@@ -1,20 +1,18 @@
-import { Pressable, Switch, View, Text } from "react-native";
+import { Pressable, Switch, View, Text, StyleSheet } from "react-native";
 
 import { useSettingsStore } from "@/features-settings/store";
 import { SettingsType } from "@/features-settings/types";
 import { toText } from "@/features-settings/utils";
-import { colors } from "@/shared/styles/colors";
+import { colors, font, spacing } from "@/shared/styles";
 
-import { Card } from "../Card";
-import { Item } from "../Item";
+import { Card } from "./Card";
+import { Item } from "./Item";
 
-import { toggleStyles } from "./notificationItem.styles";
-
-export const NotificationItem = ({
-  setActiveSheet,
-}: {
+type Prop = {
   setActiveSheet: (sheet: SettingsType) => void;
-}) => {
+};
+
+export function NotificationItem({ setActiveSheet }: Prop) {
   const { solahTimeNotification, sound, setSolahTimeNotification } = useSettingsStore();
 
   return (
@@ -38,7 +36,35 @@ export const NotificationItem = ({
           ios_backgroundColor={colors.background.default.secondary}
         />
       </Pressable>
+
       <Item label="Sound" value={toText("sound", sound)} onPress={() => setActiveSheet("sound")} />
     </Card>
   );
-};
+}
+
+export const toggleStyles = StyleSheet.create({
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.xs,
+  },
+  pressed: {
+    backgroundColor: colors.background.default.secondary,
+    borderRadius: 8,
+  },
+  left: {
+    flex: 1,
+    paddingRight: spacing.sm,
+  },
+  label: {
+    ...font.label.large,
+    color: colors.context.default.primary,
+  },
+  value: {
+    ...font.body.xsmall,
+    color: colors.context.default.secondary,
+    marginTop: 6,
+  },
+});

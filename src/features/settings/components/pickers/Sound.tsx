@@ -1,11 +1,10 @@
 import React from "react";
 import { View, Text, Pressable, FlatList } from "react-native";
 
-import { SOUND_OPTIONS } from "@/features/settings/constants";
+import { sounds } from "@/features-settings/constants";
 import { useSettingsStore } from "@/features-settings/store";
 
-import { SelectedIcon } from "./SelectedIcon";
-import { styles } from "./styles";
+import { SelectedIcon, styles } from "./shared";
 
 type Prop = {
   onClose?: () => void;
@@ -22,7 +21,7 @@ export function Sound({ onClose }: Prop) {
   return (
     <View style={styles.container}>
       <FlatList
-        data={SOUND_OPTIONS}
+        data={sounds}
         keyExtractor={(item) => item}
         showsVerticalScrollIndicator={false}
         renderItem={({ item }) => {

@@ -6,3 +6,5 @@ export { ArabicFontStyle } from "./ArabicFontStyle";
 export { SolahTimeNotification } from "./SolahTimeNotification";
 export { Sound } from "./Sound";
 export { Language } from "./Language";
+export { CalendarFormat } from "./CalendarFormat";
+export { TimeFormat } from "./TimeFormat";

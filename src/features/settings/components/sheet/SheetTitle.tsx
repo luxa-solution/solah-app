@@ -16,7 +16,7 @@ const titles: Record<SettingsType, string> = {
   timeformat: "Time Format",
 };
 
-export function ModalTitleBar({ settings_type }: { settings_type: SettingsType }) {
+export function SheetTitle({ settings_type }: { settings_type: SettingsType }) {
   return (
     <View>
       <Text style={styles.title}>{titles[settings_type]}</Text>
@@ -26,9 +26,9 @@ export function ModalTitleBar({ settings_type }: { settings_type: SettingsType }
 
 const styles = StyleSheet.create({
   title: {
-    ...font.label.medium,
+    ...font.heading.xsmall,
     color: colors.context.default.primary,
     textAlign: "left",
-    fontWeight: "600",
+    fontWeight: "700",
   },
 });

@@ -31,7 +31,7 @@ const CONFIG = {
 export function useAdhkarAutoRotation(): AdhkarAutoRotationReturn {
   const { times } = useSolahTimes();
   const { currentSolah } = useCurrentSolah();
-  const { timezone } = useSettingsStore();
+  const timezone = useSettingsStore((s) => s.timezone.timezone);
 
   useMinuteTick();
 

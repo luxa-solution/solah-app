@@ -1,6 +1,6 @@
 import { SoundOptions } from "@/features-settings/types";
 
-export const SOUND_OPTIONS: SoundOptions[] = [
+export const sounds: SoundOptions[] = [
   "Default",
   "80's phone",
   "Asteroid",
@@ -10,12 +10,12 @@ export const SOUND_OPTIONS: SoundOptions[] = [
   "Icecubes",
 ];
 
-export type SolahTimeNotificationOption = {
+export type NotificationOption = {
   label: "On" | "Off";
   value: boolean;
 };
 
-export const SOLAH_TIME_NOTIFICATION_OPTIONS: SolahTimeNotificationOption[] = [
+export const notifications: NotificationOption[] = [
   { label: "On", value: true },
   { label: "Off", value: false },
 ];

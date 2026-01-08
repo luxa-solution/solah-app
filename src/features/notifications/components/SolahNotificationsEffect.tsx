@@ -7,9 +7,9 @@ import { syncSolahNotifications } from "../utils";
 export function SolahNotificationsEffect() {
   const enabled = useSettingsStore((s) => s.solahTimeNotification);
   const sound = useSettingsStore((s) => s.sound);
-  const location = useSettingsStore((s) => s.location);
-  const timezone = useSettingsStore((s) => s.timezone);
-  const calculationMethod = useSettingsStore((s) => s.calculationMethod);
+  const location = useSettingsStore((s) => s.location.location);
+  const timezone = useSettingsStore((s) => s.timezone.timezone);
+  const calculationMethod = useSettingsStore((s) => s.calculationMethod.method);
   const setEnabled = useSettingsStore((s) => s.setSolahTimeNotification);
 
   useEffect(() => {

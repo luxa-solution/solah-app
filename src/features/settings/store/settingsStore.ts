@@ -2,41 +2,39 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { createJSONStorage, persist, subscribeWithSelector } from "zustand/middleware";
 
-import {
-  ArabicFontSizeOptions,
-  ArabicFontStyleOptions,
-  SoundOptions,
-  LanguageOptions,
-  TimeZone,
-} from "@/features-settings/types";
-import {
-  CalculationMethodTypes,
-  CalendarFormat,
-  LocationData,
-  TimeFormat,
-} from "@/features-solah/types";
+import type {
+  CalculationMethodOptions,
+  TimeZoneOption,
+  LocationOption,
+  ArabicFontSizeOption,
+  ArabicFontStyleOption,
+  LanguageOption,
+  CalendarFormatOption,
+  TimeFormatOption,
+} from "@/features-settings/constants";
+import { SoundOptions } from "@/features-settings/types";
 
 type SettingsDataState = {
-  calculationMethod: CalculationMethodTypes;
-  timezone: TimeZone;
-  location: LocationData;
-  arabicFontSize: ArabicFontSizeOptions;
-  arabicFontStyle: ArabicFontStyleOptions;
+  calculationMethod: CalculationMethodOptions;
+  timezone: TimeZoneOption;
+  location: LocationOption;
+  arabicFontSize: ArabicFontSizeOption;
+  arabicFontStyle: ArabicFontStyleOption;
   solahTimeNotification: boolean;
   sound: SoundOptions;
-  language: LanguageOptions;
-  calendarFormat: CalendarFormat;
-  timeFormat: TimeFormat;
-  setCalculationMethod: (calculationMethod: CalculationMethodTypes) => void;
-  setTimeZone: (timezone: TimeZone) => void;
-  setLocation: (location: LocationData) => void;
-  setArabicFontSize: (arabicFontSize: ArabicFontSizeOptions) => void;
-  setArabicFontStyle: (arabicFontStyle: ArabicFontStyleOptions) => void;
+  language: LanguageOption;
+  calendarFormat: CalendarFormatOption;
+  timeFormat: TimeFormatOption;
+  setCalculationMethod: (calculationMethod: CalculationMethodOptions) => void;
+  setTimeZone: (timezone: TimeZoneOption) => void;
+  setLocation: (location: LocationOption) => void;
+  setArabicFontSize: (arabicFontSize: ArabicFontSizeOption) => void;
+  setArabicFontStyle: (arabicFontStyle: ArabicFontStyleOption) => void;
   setSolahTimeNotification: (solahTimeNotification: boolean) => void;
   setSound: (sound: SoundOptions) => void;
-  setLanguage: (language: LanguageOptions) => void;
-  setCalendarFormat: (calendarFormat: CalendarFormat) => void;
-  setTimeFormat: (timeFormat: TimeFormat) => void;
+  setLanguage: (language: LanguageOption) => void;
+  setCalendarFormat: (calendarFormat: CalendarFormatOption) => void;
+  setTimeFormat: (timeFormat: TimeFormatOption) => void;
 };
 
 export const useSettingsStore = create<SettingsDataState>()(
@@ -44,22 +42,43 @@ export const useSettingsStore = create<SettingsDataState>()(
     persist(
       (set) => ({
         // App state
-        calculationMethod: "MoonsightingCommittee",
-        timezone: "Asia/Riyadh",
-        location: {
-          longitude: 0,
-          latitude: 0,
-          city: "Ilorin",
-          region: "Kwara",
-          country: "Nigeria",
+        calculationMethod: {
+          name: "Default",
+          method: "MoonsightingCommittee",
+          isDefault: true,
         },
-        calendarFormat: "hijri",
-        timeFormat: "12hr",
-        arabicFontSize: 20,
-        arabicFontStyle: "Default",
+        timezone: {
+          name: "Default (System Timezone)",
+          timezone: "Asia/Riyadh",
+          isDefault: true,
+        },
+        location: {
+          name: "Default (Current Location)",
+          location: {
+            longitude: 0,
+            latitude: 0,
+            city: "Riyadh",
+            region: "Riyadh",
+            country: "Saudi Arabia",
+          },
+          timezone: {
+            name: "Default (System Timezone)",
+            timezone: "Asia/Riyadh",
+            isDefault: true,
+          },
+          isDefault: true,
+        },
+        calendarFormat: { name: "Hijri", value: "hijri" },
+        timeFormat: { name: "12-hour", value: "12hr" },
+        arabicFontSize: { name: "20", value: 20 },
+        arabicFontStyle: { name: "Default", value: "Default" },
         solahTimeNotification: false,
         sound: "Default",
-        language: "Default",
+        language: {
+          name: "Default",
+          value: "Default",
+          isDefault: true,
+        },
 
         // Set onboarding status
         setCalculationMethod: (calculationMethod) => {

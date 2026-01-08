@@ -1,8 +1,24 @@
-import { StyleSheet } from "react-native";
+import { View, Text, ViewStyle, StyleSheet } from "react-native";
 
-import { colors } from "@/shared/styles/colors";
-import { font, fontweight } from "@/shared/styles/font";
-import { spacing, borderRadius, effect } from "@/shared/styles/layout";
+import { borderRadius, colors, effect, font, fontweight, spacing } from "@/shared/styles";
+
+export type CardProps = {
+  title?: string;
+  description?: string;
+  children?: React.ReactNode;
+  style?: ViewStyle;
+};
+
+export function Card({ title, children, style }: CardProps) {
+  return (
+    <>
+      <Text style={cardStyles.title}>{title}</Text>
+      <View style={[cardStyles.container, style]}>
+        <View style={cardStyles.content}>{children}</View>
+      </View>
+    </>
+  );
+}
 
 export const cardStyles = StyleSheet.create({
   container: {
