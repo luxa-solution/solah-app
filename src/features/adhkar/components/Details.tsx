@@ -1,7 +1,9 @@
 import React from "react";
 import { View, Text } from "react-native";
 
-import { adhkarData, AdhkarItem, AdhkarType } from "@/features/adhkar/data";
+import { adhkarData } from "@/features-adhkar/data";
+
+import { AdhkarItem, AdhkarType } from "../types";
 
 import { AdhkarDisplay } from "./details-comps";
 

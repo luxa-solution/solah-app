@@ -4,5 +4,6 @@ export { CurrentSolahIcons } from "./CurrentSolahIcons";
 export { CurrentSolahTimes } from "./CurrentSolahTimes";
 export { NextSolahTime } from "./NextSolahTime";
 export { PrayerTimesCard } from "./PrayerTimesCard";
+export { PrayerTimingCard } from "./PrayerTimingCard";
 export { SolahCalendar } from "./SolahCalendar";
 export { QiblaCompass } from "./QiblaCompass";
