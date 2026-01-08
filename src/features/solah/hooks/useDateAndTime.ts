@@ -55,3 +55,18 @@ export const useDateAndTime = ({
 
   return { date, time };
 };
+
+export const useMinuteTick = () => {
+  // Small local hook to force re-render on minute boundaries
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    const bump = () => setTick((x) => x + 1);
+    const delay = 60000 - (Date.now() % 60000);
+    const t = setTimeout(() => {
+      bump();
+      const i = setInterval(bump, 60000);
+      return () => clearInterval(i);
+    }, delay);
+    return () => clearTimeout(t as unknown as number);
+  }, []);
+};
