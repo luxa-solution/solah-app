@@ -84,7 +84,7 @@ export function useCurrentSolah() {
 
   const currentSolah = useMemo(
     () => getCurrentAndNextSolah(times, timezone).current.title,
-    [times]
+    [times, timezone]
   );
 
   return { currentSolah };
@@ -96,7 +96,10 @@ export function useNextSolah() {
 
   useMinuteTick();
 
-  const nextSolah = useMemo<SolahTime>(() => getCurrentAndNextSolah(times, timezone).next, [times]);
+  const nextSolah = useMemo<SolahTime>(
+    () => getCurrentAndNextSolah(times, timezone).next,
+    [times, timezone]
+  );
 
   return { nextSolah };
 }
