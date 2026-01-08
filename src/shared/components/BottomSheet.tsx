@@ -10,115 +10,72 @@ import Animated, {
 } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
 
-const { height } = Dimensions.get("window");
+const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
-/**
- * Supported snap points
- */
 type SnapPoint = "25%" | "50%" | "75%";
 
-/**
- * Snap points expressed as translateY values
- * Negative values pull the sheet upward
- */
-const SNAP_POINT_MAP: Record<SnapPoint, number> = {
-  "25%": -height * 0.25,
-  "50%": -height * 0.5,
-  "75%": -height * 0.75,
+const SNAP_HEIGHT_MAP: Record<SnapPoint, number> = {
+  "25%": SCREEN_HEIGHT * 0.25,
+  "50%": SCREEN_HEIGHT * 0.5,
+  "75%": SCREEN_HEIGHT * 0.75,
 };
 
 interface BottomSheetProps {
   isOpen: boolean;
   onClose: () => void;
   children: ReactNode;
-  snapPoint?: SnapPoint; // 👈 NEW
+  snapPoint?: SnapPoint;
 }
 
-export function BottomSheet({
-  isOpen,
-  onClose,
-  children,
-  snapPoint = "50%", // 👈 DEFAULT
-}: BottomSheetProps) {
-  /**
-   * translateY controls the sheet vertical position
-   * Starts fully off-screen
-   */
-  const translateY = useSharedValue(height);
-
-  /**
-   * Prevent unmounting while animations / gestures are active
-   */
+export function BottomSheet({ isOpen, onClose, children, snapPoint = "50%" }: BottomSheetProps) {
+  const sheetHeight = SNAP_HEIGHT_MAP[snapPoint];
+  const translateY = useSharedValue(sheetHeight);
   const [mounted, setMounted] = useState(isOpen);
 
-  /**
-   * Fixed snap point
-   */
-  const SNAP_Y = SNAP_POINT_MAP[snapPoint];
-
-  /**
-   * Open / close controller
-   */
   useEffect(() => {
     if (isOpen) {
       setMounted(true);
-      translateY.value = withSpring(SNAP_Y);
+      translateY.value = withSpring(0, {});
     } else {
-      translateY.value = withSpring(height, {}, (finished) => {
+      translateY.value = withSpring(sheetHeight, {}, (finished) => {
         if (finished) {
           scheduleOnRN(setMounted, false);
         }
       });
     }
-  }, [isOpen, SNAP_Y]);
+  }, [isOpen, sheetHeight, translateY]);
 
-  /**
-   * Drag gesture
-   * - Pull down to close
-   * - Pull up is clamped to snap point
-   */
   const panGesture = Gesture.Pan()
     .onUpdate((event) => {
       const nextY = translateY.value + event.translationY;
-      translateY.value = Math.min(height, Math.max(SNAP_Y, nextY));
+      translateY.value = Math.min(SCREEN_HEIGHT, Math.max(sheetHeight, nextY));
     })
     .onEnd(() => {
-      if (translateY.value > SNAP_Y + 80) {
-        translateY.value = withSpring(height, {}, (finished) => {
+      if (translateY.value > sheetHeight * 0.2) {
+        translateY.value = withSpring(sheetHeight, {}, (finished) => {
           if (finished) {
             scheduleOnRN(onClose);
           }
         });
       } else {
-        translateY.value = withSpring(SNAP_Y);
+        translateY.value = withSpring(0, {});
       }
     });
 
-  /**
-   * Sheet animation
-   */
-  const sheetStyle = useAnimatedStyle(() => {
-    const borderRadius = interpolate(
+  const sheetStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: translateY.value }],
+    height: sheetHeight,
+    top: SCREEN_HEIGHT - sheetHeight, // Position at bottom of screen
+  }));
+
+  const backdropStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(
       translateY.value,
-      [SNAP_Y, height],
-      [12, 32],
+      [sheetHeight, 0], // Input: Closed -> Open
+      [0, 0.4], // Output: Transparent -> Dark
       Extrapolation.CLAMP
-    );
-
-    return {
-      transform: [{ translateY: translateY.value }],
-      borderRadius,
-    };
-  });
-
-  /**
-   * Backdrop fade animation
-   */
-  const backdropStyle = useAnimatedStyle(() => {
-    const opacity = interpolate(translateY.value, [height, SNAP_Y], [0, 0.4], Extrapolation.CLAMP);
-
-    return { opacity };
-  });
+    ),
+  }));
 
   if (!mounted) return null;
 
@@ -130,14 +87,15 @@ export function BottomSheet({
       </Animated.View>
 
       {/* Sheet */}
-      <GestureDetector gesture={panGesture}>
-        <Animated.View style={[styles.sheet, sheetStyle]}>
-          <View style={styles.handle} />
-
-          {/* Content */}
-          {children}
-        </Animated.View>
-      </GestureDetector>
+      <Animated.View style={[styles.sheet, sheetStyle]}>
+        <GestureDetector gesture={panGesture}>
+          <View style={styles.handleContainer}>
+            <View style={styles.handle} />
+          </View>
+        </GestureDetector>
+        {/* Content */}
+        <View style={styles.contentContainer}>{children}</View>
+      </Animated.View>
     </>
   );
 }
@@ -145,11 +103,16 @@ export function BottomSheet({
 const styles = StyleSheet.create({
   sheet: {
     position: "absolute",
-    top: height, // start off-screen
-    height: height,
     width: "100%",
     backgroundColor: "white",
     overflow: "hidden",
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+  },
+  handleContainer: {
+    width: "100%",
+    paddingVertical: 12,
+    backgroundColor: "transparent",
   },
   handle: {
     width: 40,
@@ -157,10 +120,10 @@ const styles = StyleSheet.create({
     borderRadius: 2,
     backgroundColor: "#ccc",
     alignSelf: "center",
-    marginVertical: 12,
   },
-  content: {
-    paddingBottom: 40,
+  contentContainer: {
+    flex: 1,
+    paddingBottom: 50,
   },
   backdrop: {
     ...StyleSheet.absoluteFillObject,

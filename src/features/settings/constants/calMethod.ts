@@ -3,7 +3,14 @@ import { CalculationMethodTypes } from "@/features-solah/types";
 export const calMethods: {
   name: string;
   method: CalculationMethodTypes;
+  isDefault?: boolean;
 }[] = [
+  // Default (the data inside the default is not used)
+  {
+    name: "Default",
+    method: "Other",
+    isDefault: true,
+  },
   {
     name: "Muslim World League",
     method: "MuslimWorldLeague",
@@ -51,9 +58,5 @@ export const calMethods: {
   {
     name: "North America",
     method: "NorthAmerica",
-  },
-  {
-    name: "Default",
-    method: "Other",
   },
 ];

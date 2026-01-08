@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, Pressable, FlatList } from "react-native";
 
-import { useSettingsStore } from "@/features/settings/store/settingsStore";
+import { useSettingsStore, useDefaultStore } from "@/features/settings/store";
 import { calMethods } from "@/features-settings/constants";
 
 import { SelectedIcon } from "./SelectedIcon";
@@ -13,9 +13,16 @@ type Prop = {
 
 export function CalculationMethod({ onClose }: Prop) {
   const { calculationMethod, setCalculationMethod } = useSettingsStore();
+  const { defaultCalculationMethod } = useDefaultStore();
 
-  const handleSelectMethod = (method: string) => {
-    setCalculationMethod(method as any);
+  const handlePress = (item: (typeof calMethods)[number]) => {
+    if (item.isDefault) {
+      setCalculationMethod(defaultCalculationMethod);
+      onClose?.();
+      return;
+    }
+
+    setCalculationMethod(item.method);
     onClose?.();
   };
 
@@ -25,22 +32,21 @@ export function CalculationMethod({ onClose }: Prop) {
         data={calMethods}
         keyExtractor={(item) => item.method}
         showsVerticalScrollIndicator={false}
-        renderItem={({ item }) => (
-          <Pressable
-            onPress={() => handleSelectMethod(item.method)}
-            style={[styles.option, calculationMethod === item.method && styles.selectedOption]}
-          >
-            <Text
-              style={[
-                styles.optionText,
-                calculationMethod === item.method && styles.selectedOptionText,
-              ]}
+        renderItem={({ item }) => {
+          const selected = item.isDefault ? false : calculationMethod === item.method;
+
+          return (
+            <Pressable
+              onPress={() => handlePress(item)}
+              style={[styles.option, selected && styles.selectedOption]}
             >
-              {item.name}
-            </Text>
-            {calculationMethod === item.method && <SelectedIcon />}
-          </Pressable>
-        )}
+              <Text style={[styles.optionText, selected && styles.selectedOptionText]}>
+                {item.name}
+              </Text>
+              {selected && <SelectedIcon />}
+            </Pressable>
+          );
+        }}
       />
     </View>
   );
