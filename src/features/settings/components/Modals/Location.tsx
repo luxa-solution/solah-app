@@ -1,10 +1,11 @@
 import React from "react";
-import { View, Text, Pressable, FlatList, Image } from "react-native";
+import { View, Text, Pressable, FlatList } from "react-native";
 
 import { locations, LocationOption } from "@/features-settings/constants";
 import { useDefaultStore, useSettingsStore } from "@/features-settings/store";
 
-import { styles } from "./Location.styles";
+import { SelectedIcon } from "./SelectedIcon";
+import { styles } from "./styles";
 
 interface LocationProps {
   onClose?: () => void;
@@ -44,6 +45,7 @@ export function Location({ onClose }: LocationProps) {
       <FlatList
         data={locations}
         keyExtractor={(item) => item.name}
+        showsVerticalScrollIndicator={false}
         renderItem={({ item }) => {
           const selected = item.isDefault
             ? false
@@ -57,16 +59,10 @@ export function Location({ onClose }: LocationProps) {
               <Text style={[styles.optionText, selected && styles.selectedOptionText]}>
                 {item.name}
               </Text>
-              {selected && (
-                <Image
-                  source={require("@/assets/adhkar-icons/verified-check.png")}
-                  style={styles.checkIcon}
-                />
-              )}
+              {selected && <SelectedIcon />}
             </Pressable>
           );
         }}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
     </View>
   );

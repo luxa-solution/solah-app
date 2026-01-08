@@ -19,21 +19,21 @@ type AllModalContentsProps = {
 export function ModalContents({ settings_type, onClose }: AllModalContentsProps) {
   switch (settings_type) {
     case "calmethod":
-      return <CalculationMethod />;
+      return <CalculationMethod onClose={onClose} />;
     case "timezone":
-      return <TimeZone />;
+      return <TimeZone onClose={onClose} />;
     case "location":
-      return <Location />;
+      return <Location onClose={onClose} />;
     case "arabicfontsize":
-      return <ArabicFontSize />;
+      return <ArabicFontSize onClose={onClose} />;
     case "arabicfontstyle":
-      return <ArabicFontStyle />;
+      return <ArabicFontStyle onClose={onClose} />;
     case "solahtimenotif":
       return <SolahTimeNotification />;
     case "sound":
       return <Sound onClose={onClose} />;
     case "language":
-      return <Language />;
+      return <Language onClose={onClose} />;
     default:
       return null;
   }

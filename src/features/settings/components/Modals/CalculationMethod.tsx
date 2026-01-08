@@ -1,15 +1,22 @@
 import React from "react";
-import { View, Text, Pressable, FlatList, Image } from "react-native";
+import { View, Text, Pressable, FlatList } from "react-native";
 
 import { useSettingsStore } from "@/features/settings/store/settingsStore";
 import { calMethods } from "@/features-settings/constants";
-import { colors, font, spacing } from "@/shared/styles";
 
-export function CalculationMethod() {
+import { SelectedIcon } from "./SelectedIcon";
+import { styles } from "./styles";
+
+type Prop = {
+  onClose?: () => void;
+};
+
+export function CalculationMethod({ onClose }: Prop) {
   const { calculationMethod, setCalculationMethod } = useSettingsStore();
 
   const handleSelectMethod = (method: string) => {
     setCalculationMethod(method as any);
+    onClose?.();
   };
 
   return (
@@ -17,6 +24,7 @@ export function CalculationMethod() {
       <FlatList
         data={calMethods}
         keyExtractor={(item) => item.method}
+        showsVerticalScrollIndicator={false}
         renderItem={({ item }) => (
           <Pressable
             onPress={() => handleSelectMethod(item.method)}
@@ -30,56 +38,10 @@ export function CalculationMethod() {
             >
               {item.name}
             </Text>
-            {calculationMethod === item.method && (
-              <Image
-                source={require("@/assets/adhkar-icons/verified-check.png")}
-                style={styles.checkIcon}
-              />
-            )}
+            {calculationMethod === item.method && <SelectedIcon />}
           </Pressable>
         )}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
     </View>
   );
 }
-
-export const styles = {
-  container: {
-    backgroundColor: colors.background.default.primary,
-    borderTopLeftRadius: spacing.lg,
-    borderTopRightRadius: spacing.lg,
-    paddingBottom: spacing.xl,
-    paddingTop: spacing.lg,
-  },
-  option: {
-    flexDirection: "row" as const,
-    justifyContent: "space-between" as const,
-    alignItems: "center" as const,
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.lg,
-    borderRadius: spacing.sm, // Add base borderRadius to all options
-  },
-  selectedOption: {
-    backgroundColor: colors.background.brand.primary, // Warm brown color
-    borderRadius: spacing.sm, // Add borderRadius for selected state
-  },
-  optionText: {
-    ...font.body.medium,
-    color: colors.context.default.primary,
-    flex: 1,
-  },
-  selectedOptionText: {
-    color: colors.background.brand.inverted,
-  },
-  checkIcon: {
-    width: 20,
-    height: 20,
-    marginLeft: spacing.sm,
-  },
-  separator: {
-    height: 1,
-    backgroundColor: colors.border.default.tertiary,
-    marginHorizontal: spacing.lg,
-  },
-};

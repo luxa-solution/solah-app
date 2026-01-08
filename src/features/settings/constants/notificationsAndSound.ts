@@ -1,4 +1,4 @@
-import { SoundOptions } from "../types";
+import { SoundOptions } from "@/features-settings/types";
 
 export const SOUND_OPTIONS: SoundOptions[] = [
   "Default",

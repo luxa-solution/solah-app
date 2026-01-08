@@ -4,7 +4,7 @@ import { SettingsType } from "@/features-settings/types";
 import { screenStyle } from "@/shared/styles";
 
 import { ModalContents } from "./ModalContents";
-import { TitleBar } from "./TitleBar";
+import { ModalTitleBar } from "./ModalTitleBar";
 
 interface SettingsModalProps {
   settings_type: SettingsType;
@@ -19,7 +19,7 @@ export function SettingsModal({ settings_type, onClose }: SettingsModalProps) {
         backgroundColor: "white",
       }}
     >
-      <TitleBar settings_type={settings_type} />
+      <ModalTitleBar settings_type={settings_type} />
       <ModalContents settings_type={settings_type} onClose={onClose} />
     </View>
   );
