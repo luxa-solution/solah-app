@@ -1,24 +1,30 @@
 import React from "react";
-import { View, Text, Pressable, FlatList, Image } from "react-native";
+import { View, Text, Pressable, FlatList } from "react-native";
 
 import { useSettingsStore } from "@/features/settings/store/settingsStore";
 import { timezones } from "@/features-settings/constants";
 
-import { styles } from "./TimeZone.styles";
+import { SelectedIcon } from "./SelectedIcon";
+import { styles } from "./styles";
 
-export function TimeZone() {
+type Prop = {
+  onClose?: () => void;
+};
+
+export function TimeZone({ onClose }: Prop) {
   const { timezone, setTimeZone } = useSettingsStore();
 
   const handleSelectTimezone = (selectedTimezone: string) => {
     setTimeZone(selectedTimezone as any);
+    onClose?.();
   };
 
   return (
     <View style={styles.container}>
-      {/* REMOVED THE HEADER SECTION */}
       <FlatList
         data={timezones}
         keyExtractor={(item) => item.name}
+        showsVerticalScrollIndicator={false}
         renderItem={({ item }) => (
           <Pressable
             onPress={() => handleSelectTimezone(item.timezone)}
@@ -29,15 +35,9 @@ export function TimeZone() {
             >
               {item.name}
             </Text>
-            {timezone === item.timezone && (
-              <Image
-                source={require("@/assets/adhkar-icons/verified-check.png")}
-                style={styles.checkIcon}
-              />
-            )}
+            {timezone === item.timezone && <SelectedIcon />}
           </Pressable>
         )}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
     </View>
   );
