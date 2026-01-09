@@ -17,7 +17,7 @@
     "test": "jest",
     "test:cov": "jest --coverage --watchAll=false",
     "test:prepush": "jest --changedSince=origin/main --passWithNoTests",
-    "test:ci": "jest --coverage --ci"
+    "test:ci": "jest --ci --coverage --coverageReporters=json-summary --coverageReporters=text --coverageReporters=lcov"
   },
   "dependencies": {
     "@expo-google-fonts/figtree": "^0.4.1",

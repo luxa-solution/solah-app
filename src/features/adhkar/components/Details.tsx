@@ -26,7 +26,14 @@ const WithData = ({ item }: { item: AdhkarItem }) => {
 };
 
 const NoData = () => (
-  <View className="flex-1 justify-center items-center p-4">
+  <View
+    style={{
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      padding: 16,
+    }}
+  >
     <Text>No data available</Text>
   </View>
 );
