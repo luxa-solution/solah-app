@@ -3,7 +3,8 @@ import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Details, TitleBar } from "@/features-adhkar/components";
-import { adhkarData, AdhkarType } from "@/features-adhkar/data";
+import { adhkarData } from "@/features-adhkar/data";
+import { AdhkarType } from "@/features-adhkar/types";
 import { screenStyle } from "@/shared/styles";
 
 interface AdhkarDetailsProps {

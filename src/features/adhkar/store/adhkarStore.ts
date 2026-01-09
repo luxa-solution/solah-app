@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { createJSONStorage, persist, subscribeWithSelector } from "zustand/middleware";
 
-import { AdhkarItem, AdhkarType } from "@/features-adhkar/data";
+import { AdhkarItem, AdhkarType } from "@/features-adhkar/types";
 
 interface AdhkarStoreState {
   favouriteIds: string[];

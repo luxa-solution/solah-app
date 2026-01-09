@@ -1,9 +1,10 @@
 import { useMemo } from "react";
-import { FlatList, View } from "react-native";
+import { FlatList, View, StyleSheet } from "react-native";
 
-import { AdhkarItem, adhkarData, AdhkarType } from "@/features-adhkar/data";
+import { adhkarData } from "@/features-adhkar/data";
+import { AdhkarItem, AdhkarType } from "@/features-adhkar/types";
+import { spacing } from "@/shared/styles";
 
-import { listStyles as styles } from "./List.styles";
 import { ListItem } from "./ListItem";
 
 export type AdhkarListProps = {
@@ -27,3 +28,11 @@ export const List = ({ type }: AdhkarListProps) => {
     </View>
   );
 };
+
+export const styles = StyleSheet.create({
+  wrapper: { flex: 1 },
+  contentContainer: {
+    paddingVertical: spacing.sm,
+    gap: spacing.xs,
+  },
+});

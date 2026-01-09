@@ -105,6 +105,7 @@ export function AppButton({
 
   return (
     <Pressable
+      testID="app-button"
       onPress={onPress}
       disabled={disabled || loading}
       style={({ pressed }) => [containerStyles, pressed && !disabled && { opacity: 0.8 }]}

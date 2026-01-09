@@ -1,10 +1,9 @@
 import { useRouter } from "expo-router";
-import { View, Text, Pressable, Image } from "react-native";
+import { View, Text, Pressable, Image, StyleSheet } from "react-native";
 
-import { AdhkarItem, totalAdhkarAmt } from "@/features-adhkar/data";
-import { colors } from "@/shared/styles";
-
-import { detailsNavigatorStyles as styles } from "./DetailsNavigator.styles";
+import { totalAdhkarAmt } from "@/features-adhkar/data";
+import { AdhkarItem } from "@/features-adhkar/types";
+import { colors, font, spacing, borderRadius } from "@/shared/styles";
 
 const chevronLeft = require("@/assets/adhkar-icons/chev-left.png");
 const chevronRight = require("@/assets/adhkar-icons/chev-right.png");
@@ -73,3 +72,36 @@ export const DetailsNavigator = ({ item }: DetailsNavigatorProps) => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: colors.context.brand.primary,
+    borderRadius: borderRadius.lg,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
+  },
+  chevronLeft: {
+    width: 36,
+    height: 36,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  titleWrap: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  title: {
+    ...font.heading.xsmall,
+    color: colors.background.default.primary,
+    fontWeight: "700",
+  },
+  chevronRight: {
+    width: 36,
+    height: 36,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+});

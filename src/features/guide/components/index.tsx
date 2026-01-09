@@ -1,4 +1,4 @@
-export { SolahButton } from "./solahButton";
+export { SolahButton } from "./SolahButton";
 export { StepDescription } from "./StepDescription";
 export { StepTitle } from "./StepTitle";
 export { AdhkarCard } from "./AdhkarCard";

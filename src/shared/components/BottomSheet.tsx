@@ -83,7 +83,11 @@ export function BottomSheet({ isOpen, onClose, children, snapPoint = "50%" }: Bo
     <>
       {/* Backdrop */}
       <Animated.View style={[styles.backdrop, backdropStyle]}>
-        <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
+        <Pressable
+          testID="bottomsheet-backdrop"
+          style={StyleSheet.absoluteFill}
+          onPress={onClose}
+        />
       </Animated.View>
 
       {/* Sheet */}

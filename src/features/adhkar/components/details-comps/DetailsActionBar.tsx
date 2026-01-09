@@ -1,9 +1,8 @@
-import { View, Pressable, Image, Share } from "react-native";
+import { View, Pressable, Image, Share, StyleSheet } from "react-native";
 
-import { useAdhkarStore } from "@/features/adhkar/store/adhkarStore";
-import { AdhkarItem } from "@/features-adhkar/data";
-
-import { detailsActionBarStyles as styles } from "./DetailsActionBar.styles";
+import { useAdhkarStore } from "@/features-adhkar/store";
+import { AdhkarItem } from "@/features-adhkar/types";
+import { colors, spacing, borderRadius } from "@/shared/styles";
 
 const iconPlay = require("@/assets/adhkar-icons/play.png");
 const iconShare = require("@/assets/adhkar-icons/share.png");
@@ -64,3 +63,31 @@ export const DetailsActionBar = ({ item }: DetailsActionBarProps) => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    marginTop: spacing.lg,
+    marginHorizontal: spacing.md,
+    backgroundColor: "#ecd8cf",
+    borderRadius: borderRadius.md,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    alignSelf: "flex-start",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  iconButton: {
+    marginHorizontal: spacing.sm,
+    width: 44,
+    height: 44,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  iconImage: {
+    width: 22,
+    height: 22,
+    resizeMode: "contain",
+    tintColor: colors.context.brand.primary,
+  },
+});

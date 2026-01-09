@@ -2,6 +2,7 @@ import tsParser from '@typescript-eslint/parser';
 import { defineConfig, globalIgnores } from 'eslint/config';
 import expoConfig from 'eslint-config-expo/flat';
 import prettierConfig from 'eslint-config-prettier';
+import jestPlugin from "eslint-plugin-jest";
 
 export default defineConfig( [
   // --- Global ignores ---
@@ -98,6 +99,27 @@ export default defineConfig( [
       'import/extensions': [ 'error', 'never', {
         json: 'always'
       } ],
+    },
+  },
+
+  // Jest Rules
+  {
+    files: [
+      "**/__tests__/**/*.{js,jsx,ts,tsx}",
+      "**/*.{test,spec}.{js,jsx,ts,tsx}",
+      "jest.setup.{js,ts}",
+    ],
+    plugins: {
+      jest: jestPlugin,
+    },
+    languageOptions: {
+      globals: {
+        ...jestPlugin.environments.globals.globals,
+      },
+    },
+    rules: {
+      // Start with the recommended rules for Jest tests
+      ...jestPlugin.configs.recommended.rules,
     },
   },
 

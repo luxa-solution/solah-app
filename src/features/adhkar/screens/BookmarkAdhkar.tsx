@@ -2,10 +2,10 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
 import { View, Text, FlatList, StyleSheet, TouchableOpacity } from "react-native";
 
-import { adhkarData, type AdhkarItem } from "@/features-adhkar/data";
+import { adhkarData } from "@/features-adhkar/data";
+import { useAdhkarStore } from "@/features-adhkar/store";
+import { AdhkarItem } from "@/features-adhkar/types";
 import { colors, font, spacing, borderWidth } from "@/shared/styles";
-
-import { useAdhkarStore } from "../store/adhkarStore";
 
 export function BookmarkAdhkar() {
   const router = useRouter();

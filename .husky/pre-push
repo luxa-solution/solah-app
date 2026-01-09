@@ -1,1 +1,2 @@
 npx expo-doctor@latest
+npm test
