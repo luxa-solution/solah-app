@@ -15,6 +15,7 @@
     "format:write": "prettier --write .",
     "prepare": "husky",
     "test": "jest",
+    "test:changed": "jest --changedSince=origin/main",
     "test:cov": "jest --coverage --watchAll=false",
     "perf:local": "node scripts/perf-local.mjs"
   },

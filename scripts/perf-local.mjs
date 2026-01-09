@@ -9,9 +9,8 @@ const OUT_DIR = path.join(PERF_DIR, "export");
 const BASELINE_FILE = path.join(PERF_DIR, "main-baseline.json");
 const LOCK_FILE = path.join(PERF_DIR, "lock");
 
-const REMOTE = "origin";
-const BASE_BRANCH = "main";
-const BASE_REF = `${REMOTE}/${BASE_BRANCH}`;
+const BASE_BRANCH = "main";        // local main only
+const BASE_REF = BASE_BRANCH;
 
 // ---- Config (env overrides) ----
 const CFG = {
@@ -24,12 +23,16 @@ const CFG = {
   LARGE_FILE_KB: Number(process.env.PERF_LARGE_FILE_KB ?? "200"),
   HUGE_FILE_KB: Number(process.env.PERF_HUGE_FILE_KB ?? "500"),
 
-  ASSUME_YES: process.env.PERF_ASSUME_YES === "1",
   SKIP: process.env.PERF_SKIP === "1",
-  DRY_RUN: process.env.PERF_DRY_RUN === "1",
   VERBOSE: process.env.PERF_VERBOSE === "1",
 
-  // If lock exists and is younger than this, assume another run is in progress
+  // Always run even if no relevant changes
+  FORCE: process.env.PERF_FORCE === "1",
+
+  // Refresh baseline explicitly and exit (best-effort)
+  BASELINE_ONLY: process.env.PERF_BASELINE === "1",
+
+  // lock age threshold
   LOCK_TTL_MS: 2 * 60 * 1000,
 };
 
@@ -132,37 +135,7 @@ function getDependencyCount(repoDir = process.cwd()) {
   }
 }
 
-// ---- prompt (Enter = yes; n = no) ----
-function promptContinue(message) {
-  if (CFG.ASSUME_YES) return true;
-
-  // Most reliable on macOS/Linux for git hooks:
-  if (process.platform !== "win32") {
-    try {
-      const fd = fs.openSync("/dev/tty", "r+");
-      fs.writeSync(fd, `${message} `);
-      const buf = Buffer.alloc(1024);
-      const n = fs.readSync(fd, buf, 0, buf.length, null);
-      fs.closeSync(fd);
-
-      const input = buf.toString("utf8", 0, n).trim().toLowerCase();
-      // Enter / y / yes => continue
-      if (input === "" || input === "y" || input === "yes") return true;
-      return false;
-    } catch {
-      console.log("⚠️ Could not prompt via /dev/tty (blocking push).");
-      console.log("Bypass with: PERF_ASSUME_YES=1 git push");
-      return false;
-    }
-  }
-
-  // Windows fallback: non-interactive safe default
-  console.log("⚠️ Interactive prompt not supported reliably on Windows hooks here.");
-  console.log("Blocking push. Bypass with: PERF_ASSUME_YES=1 git push");
-  return false;
-}
-
-// ---- locking ----
+// ---- locking (non-blocking) ----
 function acquireLock() {
   ensureDir(PERF_DIR);
 
@@ -171,17 +144,18 @@ function acquireLock() {
       const st = fs.statSync(LOCK_FILE);
       const age = Date.now() - st.mtimeMs;
       if (age < CFG.LOCK_TTL_MS) {
-        throw new Error("Perf check already running (lock file present).");
+        console.log("ℹ️ Perf check already running (lock present). Skipping.");
+        return false;
       }
-      // stale lock
       rmrf(LOCK_FILE);
     } catch {
-      // if we can't stat/remove, just fail safe
-      throw new Error("Perf lock file present and could not be validated.");
+      console.log("ℹ️ Perf lock present but could not be validated. Skipping.");
+      return false;
     }
   }
 
   fs.writeFileSync(LOCK_FILE, `${process.pid}\n${new Date().toISOString()}\n`, {flag: "w"});
+  return true;
 }
 
 function releaseLock() {
@@ -190,25 +164,17 @@ function releaseLock() {
   } catch {}
 }
 
-// ---- git helpers ----
-function ensureOriginMainRef() {
-  // If we don't even have origin/main locally, fetch once (light)
-  const hasLocal = !!safeSh(`git rev-parse ${BASE_REF}`, "");
-  if (hasLocal) return;
-
-  console.log("ℹ️ origin/main not found locally. Fetching...");
-  try {
-    execSync(`git fetch --quiet ${REMOTE} ${BASE_BRANCH}`, {stdio: "ignore"});
-  } catch {
-    // offline or no remote; let downstream handle it
-  }
+// ---- git helpers (LOCAL main only) ----
+function hasLocalMain() {
+  // exists if rev-parse succeeds
+  return !!safeSh(`git rev-parse ${BASE_REF}`, "");
 }
 
-function getOriginMainSha() {
+function getLocalMainSha() {
   return safeSh(`git rev-parse ${BASE_REF}`, "");
 }
 
-function getChangedFilesVsOriginMain() {
+function getChangedFilesVsLocalMain() {
   const raw = safeSh(`git diff --name-only ${BASE_REF}...HEAD`, "");
   return raw ? raw.split("\n").filter(Boolean) : [];
 }
@@ -224,38 +190,42 @@ function readBaseline() {
 }
 
 /**
- * Rebuild baseline if:
- * - no baseline exists
- * - baseline.originMainSha differs from current origin/main sha
+ * Best-effort baseline update. Never throws.
+ * - Rebuild if missing or local main sha changed.
+ * - If worktree export fails, keep old baseline (if any) and continue.
  */
-function ensureBaseline(originMainSha) {
-  if (!originMainSha) {
-    console.log("⚠️ No origin/main SHA available. Baseline unavailable.");
-    return null;
+function ensureBaseline(mainSha) {
+  if (!mainSha) {
+    console.log("ℹ️ No local main SHA available. Baseline unavailable.");
+    return readBaseline();
   }
 
   const cached = readBaseline();
-  if (cached?.originMainSha === originMainSha && typeof cached.exportBytes === "number") {
+  if (cached?.mainSha === mainSha && typeof cached.exportBytes === "number") {
     return cached;
   }
 
   console.log("\n==============================================================");
-  console.log("📌 Updating local baseline (origin/main changed or missing)");
+  console.log("📌 Updating local baseline (local main changed or missing)");
   console.log("==============================================================");
-  console.log(`Baseline SHA: ${originMainSha.slice(0, 7)} (${BASE_REF})`);
+  console.log(`Baseline SHA: ${mainSha.slice(0, 7)} (${BASE_REF})`);
 
-  // Build baseline in a detached worktree
+  // Build baseline in a detached worktree at local main SHA
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "perf-main-"));
   const wtDir = path.join(tmpDir, "wt");
 
   try {
-    execSync(`git worktree add --detach "${wtDir}" ${originMainSha}`, {stdio: "ignore"});
+    execSync(`git worktree add --detach "${wtDir}" ${mainSha}`, {stdio: "ignore"});
+
+    // Worktree has no node_modules. Install.
+    console.log("Installing deps in worktree (npm ci)...");
+    execSync(`npm ci`, {cwd: wtDir, stdio: "inherit"});
 
     const wtOut = path.join(wtDir, OUT_DIR);
     rmrf(wtOut);
     ensureDir(path.dirname(wtOut));
 
-    console.log(`Running baseline export in worktree...`);
+    console.log("Running baseline export in worktree...");
     execSync(`npx expo export --platform android --output-dir "${OUT_DIR}"`, {
       cwd: wtDir,
       stdio: "inherit",
@@ -267,7 +237,7 @@ function ensureBaseline(originMainSha) {
     const deps = getDependencyCount(wtDir);
 
     const baseline = {
-      originMainSha,
+      mainSha,
       generatedAt: new Date().toISOString(),
       platform: "android",
       exportBytes: total,
@@ -282,9 +252,9 @@ function ensureBaseline(originMainSha) {
     console.log(`✅ Baseline cached: ${fmtMB(total)} (deps: ${deps.total})`);
     return baseline;
   } catch (e) {
-    console.log("⚠️ Failed to build baseline. Continuing without baseline.");
+    console.log("⚠️ Failed to build baseline. Keeping previous baseline if any.");
     console.log(e?.message ?? e);
-    return null;
+    return cached ?? null;
   } finally {
     try {
       execSync(`git worktree remove --force "${wtDir}"`, {stdio: "ignore"});
@@ -310,18 +280,15 @@ function analyzeCurrentExport() {
 
   const topFiles = files.slice(0, CFG.TOP_N);
   const huge = files.filter((f) => f.bytes / 1024 > CFG.HUGE_FILE_KB);
-  const large = files.filter((f) => f.bytes / 1024 > CFG.LARGE_FILE_KB);
 
-  return {total, files, topFiles, huge, large};
+  return {total, files, topFiles, huge};
 }
 
 function buildWarnings({currentBytes, baseBytes, currentDeps, baseDeps, hugeCount}) {
   const warnings = [];
 
   const curMB = bytesToMB(currentBytes);
-  if (curMB >= CFG.WARN_ABS_MB) {
-    warnings.push(`Export size ${curMB.toFixed(2)}MB >= ${CFG.WARN_ABS_MB}MB`);
-  }
+  if (curMB >= CFG.WARN_ABS_MB) warnings.push(`Export size ${curMB.toFixed(2)}MB >= ${CFG.WARN_ABS_MB}MB`);
 
   if (typeof baseBytes === "number") {
     const delta = currentBytes - baseBytes;
@@ -337,9 +304,7 @@ function buildWarnings({currentBytes, baseBytes, currentDeps, baseDeps, hugeCoun
     if (depDelta > CFG.WARN_NEW_DEPS) warnings.push(`Added +${depDelta} dependencies`);
   }
 
-  if (hugeCount > 0) {
-    warnings.push(`Found ${hugeCount} huge files > ${CFG.HUGE_FILE_KB}KB`);
-  }
+  if (hugeCount > 0) warnings.push(`Found ${hugeCount} huge files > ${CFG.HUGE_FILE_KB}KB`);
 
   return warnings;
 }
@@ -369,21 +334,19 @@ function printSummary({current, baseline}) {
   }
 
   console.log("\n==============================================================");
-  console.log("📊 Local Performance Preview (vs origin/main)");
+  console.log("📊 Local Performance Preview (vs local main)");
   console.log("==============================================================");
 
   console.log(`Export size (android): ${fmtMB(currentBytes)} ${warnAbs ? "⚠️" : "✅"}`);
-  console.log(`Δ vs origin/main:      ${deltaLine}`);
+  console.log(`Δ vs main baseline:    ${deltaLine}`);
   console.log(`Dependencies:          ${depLine}`);
   console.log(`Huge files:            ${current.huge.length} (>${CFG.HUGE_FILE_KB}KB)`);
 
-  // Summary table-ish
   console.log("\nSummary");
   console.log(`- Abs threshold: ${CFG.WARN_ABS_MB}MB`);
   console.log(`- Delta threshold: +${CFG.WARN_DELTA_MB}MB or +${CFG.WARN_DELTA_PCT}%`);
   console.log(`- New deps threshold: +${CFG.WARN_NEW_DEPS}`);
 
-  // Top files
   console.log(`\nTop ${CFG.TOP_N} largest files:`);
   current.topFiles.forEach((f, idx) => {
     const prefix = idx < 3 ? "🔥" : "•";
@@ -399,29 +362,38 @@ async function main() {
     process.exit(0);
   }
 
-  acquireLock();
-  try {
-    ensureOriginMainRef();
-    const originMainSha = getOriginMainSha();
+  const locked = acquireLock();
+  if (!locked) process.exit(0);
 
-    // Fast path: skip if no relevant changes vs origin/main
-    if (originMainSha) {
-      const changed = getChangedFilesVsOriginMain();
-      const relevant = changed.filter(isRelevant);
-      if (changed.length > 0 && relevant.length === 0) {
-        console.log("✅ Perf preview skipped (no relevant changes vs origin/main).");
-        process.exit(0);
-      }
-    } else {
-      console.log("⚠️ origin/main not available locally. Running absolute-only check.");
+  try {
+    if (!hasLocalMain()) {
+      console.log("ℹ️ Local 'main' not found. Running absolute-only check (no baseline).");
     }
 
-    // Baseline (cached)
-    const baseline = ensureBaseline(originMainSha);
+    const mainSha = getLocalMainSha();
+
+    // Fast path: skip if no relevant changes vs local main
+    if (!CFG.FORCE && mainSha) {
+      const changed = getChangedFilesVsLocalMain();
+      const relevant = changed.filter(isRelevant);
+      if (changed.length > 0 && relevant.length === 0) {
+        console.log("✅ Perf preview skipped (no relevant changes vs local main).");
+        process.exit(0);
+      }
+    }
+
+    // If user wants only baseline refresh
+    if (CFG.BASELINE_ONLY) {
+      ensureBaseline(mainSha);
+      console.log("✅ Baseline refresh done (best-effort).");
+      process.exit(0);
+    }
+
+    // Baseline (best-effort, cached)
+    const baseline = ensureBaseline(mainSha);
 
     // Current export + analysis
     const current = analyzeCurrentExport();
-
     const {currentDeps, baseBytes, baseDeps} = printSummary({current, baseline});
 
     const warnings = buildWarnings({
@@ -437,28 +409,15 @@ async function main() {
       process.exit(0);
     }
 
-    console.log("\n⚠️ Warnings:");
+    console.log("\n⚠️ Warnings (info-only):");
     warnings.forEach((w) => console.log(`- ${w}`));
-
-    if (CFG.DRY_RUN) {
-      console.log("\nℹ️ PERF_DRY_RUN=1 set. Not blocking push.");
-      process.exit(0);
-    }
-
-    const ok = promptContinue("Continue push? (Enter/y = yes, n = no):");
-    if (!ok) {
-      console.log("❌ Push aborted due to perf warning.");
-      console.log("Bypass with: PERF_ASSUME_YES=1 git push");
-      process.exit(1);
-    }
-
-    console.log("✅ Continuing push (user approved).");
+    console.log("\nℹ️ Non-blocking. To skip perf entirely: PERF_SKIP=1 git push");
     process.exit(0);
   } catch (e) {
-    console.log("\n⚠️ Perf preview failed (blocking push to be safe).");
+    console.log("\n⚠️ Perf preview failed (non-blocking).");
     console.log(e?.message ?? e);
-    console.log("Bypass with: PERF_ASSUME_YES=1 git push");
-    process.exit(1);
+    console.log("ℹ️ Continuing without perf preview.");
+    process.exit(0);
   } finally {
     releaseLock();
   }
