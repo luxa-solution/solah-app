@@ -1,0 +1,89 @@
+name: Production Hotfix OTA (EAS)
+
+on:
+  pull_request:
+    branches: ['production']
+    types: [opened, synchronize, reopened]
+    paths:
+      - src/**
+      - index.js
+      - app.config.ts
+      - package.json
+      - assets/**
+
+jobs:
+  get_android_fingerprint:
+    name: Get Android fingerprint (hotfix PR)
+    if: ${{ startsWith(github.event.pull_request.head.ref, 'hotfix/') }}
+    runs_on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: eas/checkout
+      - id: fp
+        run: |
+          OUT=$(eas fingerprint:generate --json --non-interactive --platform android)
+          HASH=$(node -e "console.log(JSON.parse(process.argv[1]).hash)" "$OUT")
+          echo "runtime_version=$HASH" >> "$EAS_OUTPUTS"
+    outputs:
+      runtime_version: ${{ steps.fp.outputs.runtime_version }}
+
+  get_android_build:
+    name: Find production Android build matching fingerprint
+    needs: [get_android_fingerprint]
+    if: ${{ needs.get_android_fingerprint.result == 'success' }}
+    type: get-build
+    params:
+      platform: android
+      profile: production
+      runtime_version: ${{ needs.get_android_fingerprint.outputs.runtime_version }}
+
+  update_android_hotfix_if_build:
+    name: Publish production OTA (Android hotfix, only if build exists)
+    needs: [get_android_build]
+    if: ${{ needs.get_android_build.outputs.build_id }}
+    type: update
+    environment: production
+    params:
+      platform: android
+      channel: production
+      message: "Hotfix PR #${{ github.event.pull_request.number }}"
+
+  # ---------------------------
+  # iOS (kept commented for later)
+  # ---------------------------
+
+  # get_ios_fingerprint:
+  #   name: Get iOS fingerprint (hotfix PR)
+  #   if: ${{ startsWith(github.event.pull_request.head.ref, 'hotfix/') }}
+  #   runs_on: ubuntu-latest
+  #   environment: production
+  #   steps:
+  #     - uses: eas/checkout
+  #     - id: fp
+  #       run: |
+  #         OUT=$(eas fingerprint:generate --json --non-interactive --platform ios)
+  #         HASH=$(node -e "console.log(JSON.parse(process.argv[1]).hash)" "$OUT")
+  #         echo "runtime_version=$HASH" >> "$EAS_OUTPUTS"
+  #   outputs:
+  #     runtime_version: ${{ steps.fp.outputs.runtime_version }}
+
+  # get_ios_build:
+  #   name: Find production iOS build matching fingerprint
+  #   needs: [get_ios_fingerprint]
+  #   if: ${{ needs.get_ios_fingerprint.result == 'success' }}
+  #   type: get-build
+  #   params:
+  #     platform: ios
+  #     profile: production
+  #     runtime_version: ${{ needs.get_ios_fingerprint.outputs.runtime_version }}
+
+  # update_ios_hotfix_if_build:
+  #   name: Publish production OTA (iOS hotfix, only if build exists)
+  #   needs: [get_ios_build]
+  #   if: ${{ needs.get_ios_build.outputs.build_id }}
+  #   type: update
+  #   environment: production
+  #   params:
+  #     platform: ios
+  #     channel: production
+  #     message: "Hotfix PR #${{ github.event.pull_request.number }}"
