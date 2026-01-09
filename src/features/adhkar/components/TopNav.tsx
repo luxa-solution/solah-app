@@ -2,7 +2,7 @@ import { ShieldCheck, Star, Bookmark } from "lucide-react-native";
 import React, { useCallback } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, LayoutChangeEvent } from "react-native";
 
-import { AdhkarTab } from "@/features/adhkar/types/AdhkarTab";
+import { AdhkarTab } from "@/features-adhkar/types";
 import { colors } from "@/shared/styles";
 
 type TabLayout = { x: number; width: number };

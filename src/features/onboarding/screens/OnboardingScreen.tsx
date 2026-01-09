@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { FlatList, useWindowDimensions, View, StyleSheet } from "react-native";
 
 import { OnboardingContent } from "@/features-onboarding/components";
@@ -82,7 +82,7 @@ export function OnboardingScreen() {
   );
 }
 
-export const styles = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FDFDFD",

@@ -1,9 +1,8 @@
 import { useRouter } from "expo-router";
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 
+import { AdhkarCategory } from "@/features-adhkar/types";
 import { background } from "@/shared/styles";
-
-import { AdhkarCategory } from "../types/AdhkarCategory";
 
 interface Props {
   category: AdhkarCategory;

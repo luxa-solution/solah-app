@@ -19,7 +19,11 @@ export const TitleBar = () => {
       </View>
 
       <View style={styles.ctaWrapper}>
-        <Pressable onPress={() => router.push("/solah/qibla-direction")}>
+        <Pressable
+          onPress={() => router.push("/solah/qibla-direction")}
+          testID="qibla-direction"
+          accessibilityLabel="Qibla direction"
+        >
           <Image source={qiblaImg} style={styles.qiblaIcon} />
         </Pressable>
       </View>

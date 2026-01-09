@@ -2,7 +2,7 @@ import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { List, TitleBar } from "@/features-adhkar/components";
-import { AdhkarType } from "@/features-adhkar/data";
+import { AdhkarType } from "@/features-adhkar/types";
 import { screenStyle } from "@/shared/styles";
 
 interface AdhkarListProps {

@@ -3,16 +3,14 @@ import { useRouter } from "expo-router";
 import { useState, useMemo } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
 
-import { AdhkarDisplay } from "@/features/adhkar/components/details-comps/AdhkarDisplay";
-import { HomeButton } from "@/features/adhkar/components/HomeButton";
-import { TopNav } from "@/features/adhkar/components/TopNav";
-import { BookmarkAdhkar } from "@/features/adhkar/screens/BookmarkAdhkar";
-import { FavouriteAdhkar } from "@/features/adhkar/screens/FavouriteAdhkar";
-import { useAdhkarStore } from "@/features/adhkar/store/adhkarStore";
-import { AdhkarCategory } from "@/features/adhkar/types/AdhkarCategory";
-import { AdhkarTab } from "@/features/adhkar/types/AdhkarTab";
-import { adhkarData, type AdhkarItem } from "@/features-adhkar/data";
+import { AdhkarDisplay, HomeButton, TopNav } from "@/features-adhkar/components";
+import { adhkarData } from "@/features-adhkar/data";
+import { useAdhkarStore } from "@/features-adhkar/store";
+import { AdhkarCategory, AdhkarTab, AdhkarItem } from "@/features-adhkar/types";
 import { colors, font, spacing } from "@/shared/styles";
+
+import { BookmarkAdhkar } from "./BookmarkAdhkar";
+import { FavouriteAdhkar } from "./FavouriteAdhkar";
 
 export function AdhkarHome() {
   const router = useRouter();

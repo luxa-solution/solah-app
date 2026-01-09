@@ -1,7 +1,6 @@
-import { AdhkarType, AdhkarItem } from "@/features-adhkar/data";
+import { useAdhkarStore } from "@/features-adhkar/store";
+import { AdhkarItem, AdhkarType } from "@/features-adhkar/types";
 import { TitleBar as AppTitleBar } from "@/shared/components";
-
-import { useAdhkarStore } from "../store/adhkarStore";
 
 const titles = {
   before: "Before Prayer",

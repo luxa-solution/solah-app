@@ -1,5 +1,6 @@
+import { AdhkarGroup } from "@/features-adhkar/types";
+
 import { adhkarImages } from "./adhkar-images";
-import type { AdhkarGroup } from "./types";
 
 export const adhkarDuring: AdhkarGroup = {
   type: "during",

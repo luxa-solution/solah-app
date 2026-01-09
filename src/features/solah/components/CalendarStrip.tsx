@@ -85,17 +85,19 @@ export const CalendarStrip = ({ setSelectedDate }: CalendarStripProps) => {
   const displayMonth = referenceDate.toLocaleString("default", { month: "long" });
   const displayYear = referenceDate.getFullYear();
 
+  const dayId = (d: Date) => d.toISOString().slice(0, 10);
+
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Pressable onPress={handlePrev}>
+        <Pressable onPress={handlePrev} testID="calendar-prev">
           <Text style={styles.chevron}>‹</Text>
         </Pressable>
-        <Text style={styles.monthLabel}>
+        <Text style={styles.monthLabel} testID="calendar-month-label">
           {displayMonth} {displayYear}
         </Text>
-        <Pressable onPress={handleNext}>
+        <Pressable onPress={handleNext} testID="calendar-next">
           <Text style={styles.chevron}>›</Text>
         </Pressable>
       </View>
@@ -118,6 +120,7 @@ export const CalendarStrip = ({ setSelectedDate }: CalendarStripProps) => {
           return (
             <Pressable
               key={date.toISOString()}
+              testID={`calendar-day-${dayId(date)}`}
               onPress={() => handleDatePress(date)}
               style={() => [
                 styles.dayContainer,

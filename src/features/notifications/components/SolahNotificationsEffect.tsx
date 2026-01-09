@@ -16,7 +16,6 @@ export function SolahNotificationsEffect() {
     let cancelled = false;
 
     (async () => {
-      if (cancelled) return;
       const result = await syncSolahNotifications({
         enabled,
         sound,
@@ -24,6 +23,8 @@ export function SolahNotificationsEffect() {
         timezone,
         calculationMethod,
       });
+
+      if (cancelled) return;
 
       // If user turned it on but permissions are denied, revert switch to Off.
       if (enabled && !result.permissionOk) {

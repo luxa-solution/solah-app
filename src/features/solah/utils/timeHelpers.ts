@@ -9,9 +9,19 @@ export const parseTimeToMinutes = (time: string): number => {
   let h = Number(hStr);
   const m = Number(mStr);
 
+  // minute validation
+  if (!Number.isFinite(h) || !Number.isFinite(m) || m < 0 || m > 59) return 0;
+
   if (period) {
+    // 12-hour validation: hour must be 1..12
+    if (h < 1 || h > 12) return 0;
+
+    // convert to 24-hour
     if (period === "AM" && h === 12) h = 0;
     if (period === "PM" && h < 12) h += 12;
+  } else {
+    // 24-hour validation: hour must be 0..23
+    if (h < 0 || h > 23) return 0;
   }
   return h * 60 + m;
 };
