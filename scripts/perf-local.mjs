@@ -2,23 +2,14 @@
 import {execSync} from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
-import os from "node:os";
 
 const PERF_DIR = ".perf";
 const OUT_DIR = path.join(PERF_DIR, "export");
-const BASELINE_FILE = path.join(PERF_DIR, "main-baseline.json");
 const LOCK_FILE = path.join(PERF_DIR, "lock");
-
-const BASE_BRANCH = "main";        // local main only
-const BASE_REF = BASE_BRANCH;
 
 // ---- Config (env overrides) ----
 const CFG = {
   WARN_ABS_MB: Number(process.env.PERF_WARN_ABS_MB ?? "15"),
-  WARN_DELTA_MB: Number(process.env.PERF_WARN_DELTA_MB ?? "0.5"),
-  WARN_DELTA_PCT: Number(process.env.PERF_WARN_DELTA_PCT ?? "10"),
-  WARN_NEW_DEPS: Number(process.env.PERF_WARN_NEW_DEPS ?? "2"),
-
   TOP_N: Number(process.env.PERF_TOP_N ?? "10"),
   LARGE_FILE_KB: Number(process.env.PERF_LARGE_FILE_KB ?? "200"),
   HUGE_FILE_KB: Number(process.env.PERF_HUGE_FILE_KB ?? "500"),
@@ -26,11 +17,8 @@ const CFG = {
   SKIP: process.env.PERF_SKIP === "1",
   VERBOSE: process.env.PERF_VERBOSE === "1",
 
-  // Always run even if no relevant changes
+  // If set, always run even if no relevant changes (kept for convenience)
   FORCE: process.env.PERF_FORCE === "1",
-
-  // Refresh baseline explicitly and exit (best-effort)
-  BASELINE_ONLY: process.env.PERF_BASELINE === "1",
 
   // lock age threshold
   LOCK_TTL_MS: 2 * 60 * 1000,
@@ -86,12 +74,20 @@ function bytesToMB(b) {
   return b / (1024 * 1024);
 }
 
-function fmtMB(b) {
-  return `${bytesToMB(b).toFixed(2)} MB`;
+function bytesToKB(b) {
+  return b / 1024;
 }
 
-function fmtKB(b) {
-  return `${(b / 1024).toFixed(1)} KB`;
+/**
+ * Format bytes:
+ * - show KB when between 0 and 999 KB (inclusive of 0, exclusive of 1000)
+ * - show MB when >= 1000 KB
+ */
+function fmtSize(bytes) {
+  const kb = bytesToKB(bytes);
+  if (kb < 1000) return `${kb.toFixed(1)} KB`;
+  const mb = bytesToMB(bytes);
+  return `${mb.toFixed(2)} MB`;
 }
 
 function isRelevant(file) {
@@ -115,7 +111,9 @@ function walk(dir) {
           const st = fs.statSync(full);
           total += st.size;
           files.push({file: path.relative(dir, full), bytes: st.size});
-        } catch {}
+        } catch {
+          // ignore
+        }
       }
     }
   }
@@ -135,7 +133,7 @@ function getDependencyCount(repoDir = process.cwd()) {
   }
 }
 
-// ---- locking (non-blocking) ----
+// ---- locking (non-blocking; skip if another run is active) ----
 function acquireLock() {
   ensureDir(PERF_DIR);
 
@@ -161,111 +159,57 @@ function acquireLock() {
 function releaseLock() {
   try {
     fs.unlinkSync(LOCK_FILE);
-  } catch {}
+  } catch {
+    // ignore
+  }
 }
 
-// ---- git helpers (LOCAL main only) ----
-function hasLocalMain() {
-  // exists if rev-parse succeeds
-  return !!safeSh(`git rev-parse ${BASE_REF}`, "");
-}
-
-function getLocalMainSha() {
-  return safeSh(`git rev-parse ${BASE_REF}`, "");
-}
-
+// ---- change detection (local main only) ----
 function getChangedFilesVsLocalMain() {
-  const raw = safeSh(`git diff --name-only ${BASE_REF}...HEAD`, "");
+  // If "main" doesn't exist locally, we can't diff. Just return [] so we run anyway.
+  const hasMain = !!safeSh("git rev-parse main", "");
+  if (!hasMain) return [];
+
+  const raw = safeSh("git diff --name-only main...HEAD", "");
   return raw ? raw.split("\n").filter(Boolean) : [];
 }
 
-// ---- baseline management ----
-function readBaseline() {
-  if (!fileExists(BASELINE_FILE)) return null;
+// ---- expo asset hash -> original name mapping ----
+function loadAssetMap(exportDir) {
+  const metaPath = path.join(exportDir, "metadata.json");
+  if (!fs.existsSync(metaPath)) return new Map();
+
   try {
-    return JSON.parse(fs.readFileSync(BASELINE_FILE, "utf8"));
+    const meta = JSON.parse(fs.readFileSync(metaPath, "utf8"));
+    const map = new Map();
+
+    for (const asset of meta.assets ?? []) {
+      const baseDir = asset.fileSystemLocation || "";
+      const name = asset.name;
+      const type = asset.type;
+
+      // Prefer a relative-ish path if possible
+      // fileSystemLocation often contains absolute path; try to strip repo root.
+      const repoRoot = process.cwd().replace(/\\/g, "/");
+      const baseNormalized = String(baseDir).replace(/\\/g, "/");
+      const baseRel =
+        baseNormalized.startsWith(repoRoot) ? baseNormalized.slice(repoRoot.length).replace(/^\/+/, "") : baseNormalized;
+
+      for (const hash of asset.fileHashes ?? []) {
+        const original = baseRel
+          ? path.posix.join(baseRel, `${name}.${type}`)
+          : `${name}.${type}`;
+        map.set(hash, original);
+      }
+    }
+
+    return map;
   } catch {
-    return null;
+    return new Map();
   }
 }
 
-/**
- * Best-effort baseline update. Never throws.
- * - Rebuild if missing or local main sha changed.
- * - If worktree export fails, keep old baseline (if any) and continue.
- */
-function ensureBaseline(mainSha) {
-  if (!mainSha) {
-    console.log("ℹ️ No local main SHA available. Baseline unavailable.");
-    return readBaseline();
-  }
-
-  const cached = readBaseline();
-  if (cached?.mainSha === mainSha && typeof cached.exportBytes === "number") {
-    return cached;
-  }
-
-  console.log("\n==============================================================");
-  console.log("📌 Updating local baseline (local main changed or missing)");
-  console.log("==============================================================");
-  console.log(`Baseline SHA: ${mainSha.slice(0, 7)} (${BASE_REF})`);
-
-  // Build baseline in a detached worktree at local main SHA
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "perf-main-"));
-  const wtDir = path.join(tmpDir, "wt");
-
-  try {
-    execSync(`git worktree add --detach "${wtDir}" ${mainSha}`, {stdio: "ignore"});
-
-    // Worktree has no node_modules. Install.
-    console.log("Installing deps in worktree (npm ci)...");
-    execSync(`npm ci`, {cwd: wtDir, stdio: "inherit"});
-
-    const wtOut = path.join(wtDir, OUT_DIR);
-    rmrf(wtOut);
-    ensureDir(path.dirname(wtOut));
-
-    console.log("Running baseline export in worktree...");
-    execSync(`npx expo export --platform android --output-dir "${OUT_DIR}"`, {
-      cwd: wtDir,
-      stdio: "inherit",
-    });
-
-    const {total, files} = walk(wtOut);
-    files.sort((a, b) => b.bytes - a.bytes);
-
-    const deps = getDependencyCount(wtDir);
-
-    const baseline = {
-      mainSha,
-      generatedAt: new Date().toISOString(),
-      platform: "android",
-      exportBytes: total,
-      exportMB: bytesToMB(total),
-      depCount: deps.total,
-      topFiles: files.slice(0, CFG.TOP_N).map((f) => ({file: f.file, bytes: f.bytes})),
-    };
-
-    ensureDir(PERF_DIR);
-    fs.writeFileSync(BASELINE_FILE, JSON.stringify(baseline, null, 2));
-
-    console.log(`✅ Baseline cached: ${fmtMB(total)} (deps: ${deps.total})`);
-    return baseline;
-  } catch (e) {
-    console.log("⚠️ Failed to build baseline. Keeping previous baseline if any.");
-    console.log(e?.message ?? e);
-    return cached ?? null;
-  } finally {
-    try {
-      execSync(`git worktree remove --force "${wtDir}"`, {stdio: "ignore"});
-    } catch {}
-    try {
-      rmrf(tmpDir);
-    } catch {}
-  }
-}
-
-// ---- main compare ----
+// ---- main compare (current only) ----
 function analyzeCurrentExport() {
   rmrf(OUT_DIR);
   ensureDir(PERF_DIR);
@@ -280,80 +224,61 @@ function analyzeCurrentExport() {
 
   const topFiles = files.slice(0, CFG.TOP_N);
   const huge = files.filter((f) => f.bytes / 1024 > CFG.HUGE_FILE_KB);
+  const large = files.filter((f) => f.bytes / 1024 > CFG.LARGE_FILE_KB);
 
-  return {total, files, topFiles, huge};
+  return {total, files, topFiles, huge, large};
 }
 
-function buildWarnings({currentBytes, baseBytes, currentDeps, baseDeps, hugeCount}) {
-  const warnings = [];
+function resolveReasonableName(fileRelPath, assetMap) {
+  // Metro-hashed assets are often in "assets/<hash>" (sometimes with extension).
+  // Try to map the last path segment (hash) to the original path via metadata.json.
+  const base = path.basename(fileRelPath);
+  const noExt = base.replace(/\.[^/.]+$/, "");
 
-  const curMB = bytesToMB(currentBytes);
-  if (curMB >= CFG.WARN_ABS_MB) warnings.push(`Export size ${curMB.toFixed(2)}MB >= ${CFG.WARN_ABS_MB}MB`);
-
-  if (typeof baseBytes === "number") {
-    const delta = currentBytes - baseBytes;
-    const deltaMB = bytesToMB(delta);
-    const pct = baseBytes > 0 ? (delta / baseBytes) * 100 : 0;
-
-    if (deltaMB >= CFG.WARN_DELTA_MB) warnings.push(`Size increased by +${deltaMB.toFixed(2)}MB`);
-    if (pct >= CFG.WARN_DELTA_PCT) warnings.push(`Size increased by +${pct.toFixed(1)}%`);
-  }
-
-  if (typeof baseDeps === "number") {
-    const depDelta = currentDeps - baseDeps;
-    if (depDelta > CFG.WARN_NEW_DEPS) warnings.push(`Added +${depDelta} dependencies`);
-  }
-
-  if (hugeCount > 0) warnings.push(`Found ${hugeCount} huge files > ${CFG.HUGE_FILE_KB}KB`);
-
-  return warnings;
+  return assetMap.get(base) ?? assetMap.get(noExt) ?? fileRelPath;
 }
 
-function printSummary({current, baseline}) {
-  const currentBytes = current.total;
+function printSummary({current}) {
   const currentDeps = getDependencyCount(process.cwd()).total;
 
-  const baseBytes = baseline?.exportBytes;
-  const baseDeps = baseline?.depCount;
+  const absMB = bytesToMB(current.total);
+  const warnAbs = absMB >= CFG.WARN_ABS_MB;
 
-  const curMB = bytesToMB(currentBytes);
-  const warnAbs = curMB >= CFG.WARN_ABS_MB;
-
-  let deltaLine = "_No baseline available._";
-  let depLine = `${currentDeps}`;
-  if (typeof baseBytes === "number") {
-    const delta = currentBytes - baseBytes;
-    const pct = baseBytes > 0 ? (delta / baseBytes) * 100 : 0;
-    const sign = delta >= 0 ? "+" : "";
-    deltaLine = `${sign}${bytesToMB(delta).toFixed(2)}MB (${sign}${pct.toFixed(1)}%)`;
-  }
-  if (typeof baseDeps === "number") {
-    const depDelta = currentDeps - baseDeps;
-    const sign = depDelta >= 0 ? "+" : "";
-    depLine = `${currentDeps} (${sign}${depDelta})`;
-  }
+  const assetMap = loadAssetMap(OUT_DIR);
 
   console.log("\n==============================================================");
-  console.log("📊 Local Performance Preview (vs local main)");
+  console.log("📊 Local Performance Preview (current only)");
   console.log("==============================================================");
 
-  console.log(`Export size (android): ${fmtMB(currentBytes)} ${warnAbs ? "⚠️" : "✅"}`);
-  console.log(`Δ vs main baseline:    ${deltaLine}`);
-  console.log(`Dependencies:          ${depLine}`);
+  console.log(`Export size (android): ${fmtSize(current.total)} ${warnAbs ? "⚠️" : "✅"}`);
+  console.log(`Dependencies:          ${currentDeps}`);
   console.log(`Huge files:            ${current.huge.length} (>${CFG.HUGE_FILE_KB}KB)`);
 
   console.log("\nSummary");
   console.log(`- Abs threshold: ${CFG.WARN_ABS_MB}MB`);
-  console.log(`- Delta threshold: +${CFG.WARN_DELTA_MB}MB or +${CFG.WARN_DELTA_PCT}%`);
-  console.log(`- New deps threshold: +${CFG.WARN_NEW_DEPS}`);
+  console.log(`- Huge files threshold: >${CFG.HUGE_FILE_KB}KB`);
+  console.log(`- Large files threshold: >${CFG.LARGE_FILE_KB}KB`);
 
   console.log(`\nTop ${CFG.TOP_N} largest files:`);
   current.topFiles.forEach((f, idx) => {
     const prefix = idx < 3 ? "🔥" : "•";
-    console.log(`${prefix} ${fmtKB(f.bytes).padStart(9)}  ${f.file}`);
+    const pretty = resolveReasonableName(f.file, assetMap);
+    console.log(`${prefix} ${fmtSize(f.bytes).padStart(9)}  ${pretty}`);
   });
 
-  return {currentDeps, baseBytes, baseDeps};
+  // Info-only warnings
+  const warnings = [];
+  if (warnAbs) warnings.push(`Export size ${absMB.toFixed(2)}MB >= ${CFG.WARN_ABS_MB}MB`);
+  if (current.huge.length > 0) warnings.push(`Found ${current.huge.length} huge files > ${CFG.HUGE_FILE_KB}KB`);
+
+  if (warnings.length) {
+    console.log("\n⚠️ Warnings (info-only):");
+    warnings.forEach((w) => console.log(`- ${w}`));
+  } else {
+    console.log("\n✅ Looks good (no warnings).");
+  }
+
+  console.log("\nℹ️ Non-blocking. To skip perf entirely: PERF_SKIP=1 git push");
 }
 
 async function main() {
@@ -366,14 +291,8 @@ async function main() {
   if (!locked) process.exit(0);
 
   try {
-    if (!hasLocalMain()) {
-      console.log("ℹ️ Local 'main' not found. Running absolute-only check (no baseline).");
-    }
-
-    const mainSha = getLocalMainSha();
-
-    // Fast path: skip if no relevant changes vs local main
-    if (!CFG.FORCE && mainSha) {
+    // Fast path: skip if no relevant changes vs local main (unless forced).
+    if (!CFG.FORCE) {
       const changed = getChangedFilesVsLocalMain();
       const relevant = changed.filter(isRelevant);
       if (changed.length > 0 && relevant.length === 0) {
@@ -382,38 +301,12 @@ async function main() {
       }
     }
 
-    // If user wants only baseline refresh
-    if (CFG.BASELINE_ONLY) {
-      ensureBaseline(mainSha);
-      console.log("✅ Baseline refresh done (best-effort).");
-      process.exit(0);
-    }
-
-    // Baseline (best-effort, cached)
-    const baseline = ensureBaseline(mainSha);
-
-    // Current export + analysis
     const current = analyzeCurrentExport();
-    const {currentDeps, baseBytes, baseDeps} = printSummary({current, baseline});
+    printSummary({current});
 
-    const warnings = buildWarnings({
-      currentBytes: current.total,
-      baseBytes,
-      currentDeps,
-      baseDeps,
-      hugeCount: current.huge.length,
-    });
-
-    if (warnings.length === 0) {
-      console.log("\n✅ Looks good (no warnings).");
-      process.exit(0);
-    }
-
-    console.log("\n⚠️ Warnings (info-only):");
-    warnings.forEach((w) => console.log(`- ${w}`));
-    console.log("\nℹ️ Non-blocking. To skip perf entirely: PERF_SKIP=1 git push");
     process.exit(0);
   } catch (e) {
+    // non-blocking
     console.log("\n⚠️ Perf preview failed (non-blocking).");
     console.log(e?.message ?? e);
     console.log("ℹ️ Continuing without perf preview.");
