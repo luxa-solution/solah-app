@@ -119,7 +119,7 @@ export default ( { config }: ConfigContext ): ExpoConfig => {
     },
     owner: OWNER,
     runtimeVersion: {
-      policy: "appVersion",
+      policy: "fingerprint",
     },
     updates: {
       url: `https://u.expo.dev/${EAS_PROJECT_ID}`,

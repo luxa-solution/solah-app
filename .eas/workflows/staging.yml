@@ -1,0 +1,112 @@
+name: Staging PR Preview (EAS)
+
+on:
+  pull_request:
+    branches: ['staging']
+    paths:
+      - src/**
+      - index.js
+      - app.config.ts
+      - package.json
+      - assets/**
+
+jobs:
+  # 0) Compute Android fingerprint runtime for the current PR
+  get_android_fingerprint:
+    name: Get Android fingerprint for this PR
+    runs_on: ubuntu-latest
+    environment: preview
+    steps:
+      - uses: eas/checkout
+      - id: fp
+        run: |
+          OUT=$(eas fingerprint:generate --json --non-interactive --platform android)
+          HASH=$(node -e "console.log(JSON.parse(process.argv[1]).hash)" "$OUT")
+          echo "runtime_version=$HASH" >> "$EAS_OUTPUTS"
+    outputs:
+      runtime_version: ${{ steps.fp.outputs.runtime_version }}
+
+  # 1) Check if an Android build exists that matches this fingerprint runtime
+  get_android_build:
+    name: Check for existing Android build (fingerprint runtime)
+    needs: [get_android_fingerprint]
+    type: get-build
+    params:
+      platform: android
+      profile: preview
+      runtime_version: ${{ needs.get_android_fingerprint.outputs.runtime_version }}
+
+  # 2) If Android build exists => push OTA update
+  update_android_if_build:
+    name: Publish preview update (Android, if build exists)
+    needs: [get_android_build]
+    if: ${{ needs.get_android_build.outputs.build_id }}
+    type: update
+    environment: preview
+    params:
+      platform: android
+      channel: preview
+      message: "Preview update for PR #${{ github.event.pull_request.number }}"
+
+  # 3) If Android build missing => create one
+  build_android_if_missing:
+    name: Build Android (if no build matches this fingerprint runtime)
+    needs: [get_android_build]
+    if: ${{ !needs.get_android_build.outputs.build_id }}
+    type: build
+    environment: preview
+    params:
+      platform: android
+      profile: preview
+
+  # ---------------------------
+  # iOS (kept commented for later)
+  # ---------------------------
+
+  # # 0) Compute iOS fingerprint runtime for the current PR
+  # get_ios_fingerprint:
+  #   name: Get iOS fingerprint for this PR
+  #   runs_on: ubuntu-latest
+  #   environment: preview
+  #   steps:
+  #     - uses: eas/checkout
+  #     - id: fp
+  #       run: |
+  #         OUT=$(eas fingerprint:generate --json --non-interactive --platform ios)
+  #         HASH=$(node -e "console.log(JSON.parse(process.argv[1]).hash)" "$OUT")
+  #         echo "runtime_version=$HASH" >> "$EAS_OUTPUTS"
+  #   outputs:
+  #     runtime_version: ${{ steps.fp.outputs.runtime_version }}
+
+  # # 1) Check if an iOS build exists that matches this fingerprint runtime
+  # get_ios_build:
+  #   name: Check for existing iOS build (fingerprint runtime)
+  #   needs: [get_ios_fingerprint]
+  #   type: get-build
+  #   params:
+  #     platform: ios
+  #     profile: preview
+  #     runtime_version: ${{ needs.get_ios_fingerprint.outputs.runtime_version }}
+
+  # # 2) If iOS build exists => push OTA update
+  # update_ios_if_build:
+  #   name: Publish preview update (iOS, if build exists)
+  #   needs: [get_ios_build]
+  #   if: ${{ needs.get_ios_build.outputs.build_id }}
+  #   type: update
+  #   environment: preview
+  #   params:
+  #     platform: ios
+  #     channel: preview
+  #     message: "Preview update for PR #${{ github.event.pull_request.number }}"
+
+  # # 3) If iOS build missing => create one
+  # build_ios_if_missing:
+  #   name: Build iOS (if no build matches this fingerprint runtime)
+  #   needs: [get_ios_build]
+  #   if: ${{ !needs.get_ios_build.outputs.build_id }}
+  #   type: build
+  #   environment: preview
+  #   params:
+  #     platform: ios
+  #     profile: preview
