@@ -1,5 +1,2 @@
 echo "🧪 Tests..."
-npm run test:changed
-
-echo "🔍 Perf preview..."
-npm run perf:local
+npm run test:prepush

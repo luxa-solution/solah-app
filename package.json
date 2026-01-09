@@ -15,9 +15,9 @@
     "format:write": "prettier --write .",
     "prepare": "husky",
     "test": "jest",
-    "test:changed": "jest --changedSince=origin/main",
     "test:cov": "jest --coverage --watchAll=false",
-    "perf:local": "node scripts/perf-local.mjs"
+    "test:prepush": "jest --findRelatedTests --coverage --passWithNoTests",
+    "test:ci": "jest --coverage --ci"
   },
   "dependencies": {
     "@expo-google-fonts/figtree": "^0.4.1",
