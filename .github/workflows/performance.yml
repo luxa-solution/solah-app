@@ -1,17 +1,15 @@
 name: Performance Monitoring
 
 on:
-  push:
-    branches:
-      - main
-      - staging
-      - production
   pull_request:
     types: [opened, synchronize, reopened]
     branches:
       - main
-      - staging
-      - production
+    paths:
+      - 'src/**'
+      - 'assets/**'
+      - 'app.config.ts'
+      - 'package.json'
 
 concurrency:
   group: perf-${{ github.workflow }}-${{ github.ref }}

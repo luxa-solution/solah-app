@@ -5,10 +5,13 @@ on:
     branches: ['staging']
     paths:
       - src/**
-      - index.js
       - app.config.ts
       - package.json
       - assets/**
+
+concurrency:
+  cancel_in_progress: true
+  group: ${{ workflow.filename }}-${{ github.ref }}
 
 jobs:
   # 0) Compute Android fingerprint runtime for the current PR
