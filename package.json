@@ -16,7 +16,7 @@
     "prepare": "husky",
     "test": "jest",
     "test:cov": "jest --coverage --watchAll=false",
-    "test:prepush": "jest --changedSince=main --passWithNoTests",
+    "test:prepush": "jest --changedSince=origin/main --passWithNoTests",
     "test:ci": "jest --coverage --ci"
   },
   "dependencies": {
