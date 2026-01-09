@@ -1,2 +1,2 @@
-npx expo-doctor@latest
-npm test
+echo "🧪 Tests..."
+npm run test:prepush

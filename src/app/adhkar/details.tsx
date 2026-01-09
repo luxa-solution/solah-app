@@ -1,7 +1,7 @@
 import { useLocalSearchParams } from "expo-router";
 
-import { AdhkarType } from "@/features-adhkar/data";
 import { AdhkarDetails } from "@/features-adhkar/screens";
+import { AdhkarType } from "@/features-adhkar/types";
 
 function Details() {
   const { adhkar_type, id } = useLocalSearchParams<{ id: string; adhkar_type: string }>();

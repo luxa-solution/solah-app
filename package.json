@@ -14,7 +14,10 @@
     "format": "prettier --check .",
     "format:write": "prettier --write .",
     "prepare": "husky",
-    "test": "jest"
+    "test": "jest",
+    "test:cov": "jest --coverage --watchAll=false",
+    "test:prepush": "jest --changedSince=origin/main --passWithNoTests",
+    "test:ci": "jest --coverage --ci"
   },
   "dependencies": {
     "@expo-google-fonts/figtree": "^0.4.1",
