@@ -93,6 +93,7 @@ export default ( { config }: ConfigContext ): ExpoConfig => {
       "expo-router",
       "expo-font",
       "expo-localization",
+      "expo-web-browser",
       [
         "expo-splash-screen",
         {
