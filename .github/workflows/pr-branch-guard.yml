@@ -65,8 +65,21 @@ jobs:
               ].join('\n');
 
             } else if (base === 'main') {
-              // develop: feature/*, bugfix/*, ... OR hotfix/*
+              // main: allow common work branches + dependabot
               const allowedPrefixes = [
+                // common conventional-ish prefixes
+                'feat/',
+                'fix/',
+                'perf/',
+                'style/',
+                'build/',
+                'ci/',
+                'revert/',
+
+                // tooling/bots
+                'dependabot/',
+
+                // your existing patterns
                 'feature/',
                 'bugfix/',
                 'release/',
@@ -81,9 +94,11 @@ jobs:
 
               explanation = [
                 'Allowed PR sources into `main`:',
-                '- `feature/*`, `bugfix/*`, `refactor/*`, `docs/*`, `test/*`, `chore/*` (New Work)',
-                '- `hotfix/*` (Standard Development and Hotfix Propagation)',
-                '- `release/*` (Cross-Propagation)',
+                '- `feat/*`, `fix/*`, `perf/*`, `style/*`, `build/*`, `ci/*`, `revert/*` (Conventional work branches)',
+                '- `feature/*`, `bugfix/*`, `refactor/*`, `docs/*`, `test/*`, `chore/*` (Existing work branches)',
+                '- `hotfix/*` (Hotfix propagation)',
+                '- `release/*` (Cross-propagation)',
+                '- `dependabot/*` (Dependency updates)',
               ].join('\n');
             } else {
               core.info(`Branch Guard: no rules defined for target "${base}", skipping validation.`);
