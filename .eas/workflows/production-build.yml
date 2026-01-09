@@ -6,10 +6,13 @@ on:
     types: [labeled]
     paths:
       - src/**
-      - index.js
       - app.config.ts
       - package.json
       - assets/**
+
+concurrency:
+  cancel_in_progress: true
+  group: ${{ workflow.filename }}-${{ github.ref }}
 
 jobs:
   build_android_if_labeled:

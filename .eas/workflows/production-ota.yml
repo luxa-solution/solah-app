@@ -1,4 +1,4 @@
-name: Production Hotfix OTA (EAS)
+name: Production Hotfix OTA
 
 on:
   pull_request:
@@ -6,10 +6,11 @@ on:
     types: [opened, synchronize, reopened]
     paths:
       - src/**
-      - index.js
-      - app.config.ts
-      - package.json
       - assets/**
+
+concurrency:
+  cancel_in_progress: true
+  group: ${{ workflow.filename }}-${{ github.ref }}
 
 jobs:
   get_android_fingerprint:

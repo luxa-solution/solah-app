@@ -2,13 +2,17 @@ name: Development PR
 
 on:
   pull_request:
-    branches: ['main']
+    branches: 
+      - 'main'
     paths:
       - src/**
-      - index.js
       - app.config.ts
       - package.json
       - assets/**
+
+concurrency:
+  cancel_in_progress: true
+  group: ${{ workflow.filename }}-${{ github.ref }}
 
 jobs:
 
