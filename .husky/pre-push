@@ -1,2 +1,11 @@
-npx expo-doctor@latest
+
+npm run tsc
+
+echo "🧪 Tests..."
 npm test
+
+echo "🩺 Expo doctor..."
+npx expo-doctor@latest
+
+echo "🔍 Perf preview..."
+npm run perf:local
