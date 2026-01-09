@@ -17,7 +17,7 @@ jobs:
   # 0) Compute Android fingerprint runtime for the current PR
   get_android_fingerprint:
     name: Get Android fingerprint for this PR
-    runs_on: ubuntu-latest
+    runs_on: linux-medium
     environment: preview
     steps:
       - uses: eas/checkout
@@ -69,7 +69,7 @@ jobs:
   # # 0) Compute iOS fingerprint runtime for the current PR
   # get_ios_fingerprint:
   #   name: Get iOS fingerprint for this PR
-  #   runs_on: ubuntu-latest
+  #   runs_on: linux-medium
   #   environment: preview
   #   steps:
   #     - uses: eas/checkout
