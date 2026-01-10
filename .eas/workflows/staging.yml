@@ -14,30 +14,20 @@ concurrency:
   group: ${{ workflow.filename }}-${{ github.ref }}
 
 jobs:
-  # 0) Compute Android fingerprint runtime for the current PR
-  get_android_fingerprint:
-    name: Get Android fingerprint for this PR
-    runs_on: linux-medium
+  fingerprint:
+    name: Compute fingerprint (Android/iOS)
+    type: fingerprint
     environment: preview
-    steps:
-      - uses: eas/checkout
-      - id: fp
-        run: |
-          OUT=$(eas fingerprint:generate --json --non-interactive --platform android)
-          HASH=$(node -e "console.log(JSON.parse(process.argv[1]).hash)" "$OUT")
-          echo "runtime_version=$HASH" >> "$EAS_OUTPUTS"
-    outputs:
-      runtime_version: ${{ steps.fp.outputs.runtime_version }}
 
   # 1) Check if an Android build exists that matches this fingerprint runtime
   get_android_build:
     name: Check for existing Android build (fingerprint runtime)
-    needs: [get_android_fingerprint]
+    needs: [fingerprint]
     type: get-build
     params:
       platform: android
       profile: preview
-      runtime_version: ${{ needs.get_android_fingerprint.outputs.runtime_version }}
+      fingerprint_hash: ${{ needs.fingerprint.outputs.android_fingerprint_hash }}
 
   # 2) If Android build exists => push OTA update
   update_android_if_build:
@@ -66,30 +56,15 @@ jobs:
   # iOS (kept commented for later)
   # ---------------------------
 
-  # # 0) Compute iOS fingerprint runtime for the current PR
-  # get_ios_fingerprint:
-  #   name: Get iOS fingerprint for this PR
-  #   runs_on: linux-medium
-  #   environment: preview
-  #   steps:
-  #     - uses: eas/checkout
-  #     - id: fp
-  #       run: |
-  #         OUT=$(eas fingerprint:generate --json --non-interactive --platform ios)
-  #         HASH=$(node -e "console.log(JSON.parse(process.argv[1]).hash)" "$OUT")
-  #         echo "runtime_version=$HASH" >> "$EAS_OUTPUTS"
-  #   outputs:
-  #     runtime_version: ${{ steps.fp.outputs.runtime_version }}
-
   # # 1) Check if an iOS build exists that matches this fingerprint runtime
   # get_ios_build:
   #   name: Check for existing iOS build (fingerprint runtime)
-  #   needs: [get_ios_fingerprint]
+  #   needs: [fingerprint]
   #   type: get-build
   #   params:
   #     platform: ios
   #     profile: preview
-  #     runtime_version: ${{ needs.get_ios_fingerprint.outputs.runtime_version }}
+  #     fingerprint_hash: ${{ needs.fingerprint.outputs.ios_fingerprint_hash }}
 
   # # 2) If iOS build exists => push OTA update
   # update_ios_if_build:

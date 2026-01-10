@@ -13,30 +13,21 @@ concurrency:
   group: ${{ workflow.filename }}-${{ github.ref }}
 
 jobs:
-  get_android_fingerprint:
-    name: Get Android fingerprint (hotfix PR)
+  fingerprint:
+    name: Compute fingerprint (Android/iOS)
     if: ${{ startsWith(github.event.pull_request.head.ref, 'hotfix/') }}
-    runs_on: linux-medium
+    type: fingerprint
     environment: production
-    steps:
-      - uses: eas/checkout
-      - id: fp
-        run: |
-          OUT=$(eas fingerprint:generate --json --non-interactive --platform android)
-          HASH=$(node -e "console.log(JSON.parse(process.argv[1]).hash)" "$OUT")
-          echo "runtime_version=$HASH" >> "$EAS_OUTPUTS"
-    outputs:
-      runtime_version: ${{ steps.fp.outputs.runtime_version }}
 
   get_android_build:
     name: Find production Android build matching fingerprint
-    needs: [get_android_fingerprint]
-    if: ${{ needs.get_android_fingerprint.result == 'success' }}
+    needs: [fingerprint]
+    if: ${{ needs.fingerprint.result == 'success' }}
     type: get-build
     params:
       platform: android
       profile: production
-      runtime_version: ${{ needs.get_android_fingerprint.outputs.runtime_version }}
+      fingerprint_hash: ${{ needs.fingerprint.outputs.android_fingerprint_hash }}
 
   update_android_hotfix_if_build:
     name: Publish production OTA (Android hotfix, only if build exists)
@@ -53,30 +44,15 @@ jobs:
   # iOS (kept commented for later)
   # ---------------------------
 
-  # get_ios_fingerprint:
-  #   name: Get iOS fingerprint (hotfix PR)
-  #   if: ${{ startsWith(github.event.pull_request.head.ref, 'hotfix/') }}
-  #   runs_on: linux-medium
-  #   environment: production
-  #   steps:
-  #     - uses: eas/checkout
-  #     - id: fp
-  #       run: |
-  #         OUT=$(eas fingerprint:generate --json --non-interactive --platform ios)
-  #         HASH=$(node -e "console.log(JSON.parse(process.argv[1]).hash)" "$OUT")
-  #         echo "runtime_version=$HASH" >> "$EAS_OUTPUTS"
-  #   outputs:
-  #     runtime_version: ${{ steps.fp.outputs.runtime_version }}
-
   # get_ios_build:
   #   name: Find production iOS build matching fingerprint
-  #   needs: [get_ios_fingerprint]
-  #   if: ${{ needs.get_ios_fingerprint.result == 'success' }}
+  #   needs: [fingerprint]
+  #   if: ${{ needs.fingerprint.result == 'success' }}
   #   type: get-build
   #   params:
   #     platform: ios
   #     profile: production
-  #     runtime_version: ${{ needs.get_ios_fingerprint.outputs.runtime_version }}
+  #     fingerprint_hash: ${{ needs.fingerprint.outputs.ios_fingerprint_hash }}
 
   # update_ios_hotfix_if_build:
   #   name: Publish production OTA (iOS hotfix, only if build exists)
