@@ -9,7 +9,7 @@ const titles: Record<SettingsType, string> = {
   location: "Location",
   arabicfontsize: "Arabic Font Size",
   arabicfontstyle: "Arabic Font Style",
-  solahtimenotif: "Solah Time Notification",
+  solahtimenotif: "Salah Time Notification",
   sound: "Sound",
   language: "Language",
   calendarformat: "Calendar Format",

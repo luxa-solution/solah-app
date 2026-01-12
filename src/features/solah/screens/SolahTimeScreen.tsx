@@ -21,7 +21,7 @@ export function SolahTimeScreen() {
       }}
       showsVerticalScrollIndicator={false}
     >
-      <TitleBar title="Solah time" />
+      <TitleBar title="Salah time" />
 
       <View style={{ gap: ds(8) }}>
         <PrayerTimesCard style={{ marginTop: 0 }} />

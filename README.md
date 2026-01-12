@@ -1,6 +1,6 @@
-# Welcome to the Solah App
+# Welcome to the Salah App
 
-This is an [Expo](https://expo.dev) for the Solah App.
+This is an [Expo](https://expo.dev) for the Salah App.
 
 ## Get started
 

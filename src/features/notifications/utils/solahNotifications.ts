@@ -99,7 +99,7 @@ async function scheduleSolahNotifications(
 
   const ids: SolahNotifId[] = [];
   for (const item of future) {
-    const title = "Solah time";
+    const title = "Salah time";
     const body = `It's time for ${item.label}.`;
 
     try {
@@ -149,7 +149,7 @@ async function ensureSolahNotificationChannel(channelId: string, sound: SoundOpt
   // Android-only; safe to call elsewhere
   try {
     await Notifications.setNotificationChannelAsync(channelId, {
-      name: "Solah Times",
+      name: "Salah Times",
       importance: Notifications.AndroidImportance.MAX,
       vibrationPattern: [0, 250, 250, 250],
       enableVibrate: true,

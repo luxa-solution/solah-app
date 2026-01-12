@@ -42,7 +42,7 @@ export function SettingsHome() {
         <TitleBar title="Settings" showBack={false} />
 
         {/* Prayer times group */}
-        <Card title="Solah times">
+        <Card title="Salah times">
           <Item
             label="Calculation method"
             value={toText("calmethod", calculationMethod)}
