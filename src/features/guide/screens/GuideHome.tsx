@@ -16,7 +16,7 @@ export const GuideHome = () => {
         paddingBottom: bottom,
       }}
     >
-      <TitleBar title="Solah Guide" showBack={false} />
+      <TitleBar title="Salah Guide" showBack={false} />
 
       {/* Solah Cards */}
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
