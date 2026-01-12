@@ -38,6 +38,7 @@ const styles = StyleSheet.create({
   container: {
     width: "100%",
     marginTop: ds(32), // Converting spacing.xl
+    marginBottom: ds(22), // Converting spacing.xl
     position: "relative",
     padding: ds(16), // Converting spacing.md
     borderRadius: ds(borderRadius.lg),
