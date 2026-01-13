@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.s,
     paddingHorizontal: spacing.xs,
     borderRadius: borderRadius[4],
-    backgroundColor: colors.background.default.inverted,
+    backgroundColor: colors.background.brand.tertiary,
     gap: spacing.m,
   },
   dateLocContainer: {
