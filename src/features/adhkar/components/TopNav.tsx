@@ -17,6 +17,7 @@ interface TopNavProps {
   value: AdhkarTab;
   onChange: (tab: AdhkarTab) => void;
   favouriteCount?: number;
+  bookmarkCount?: number;
 }
 
 const TAB_ITEMS: { key: AdhkarTab; label: string; Icon: IconComponent }[] = [
@@ -25,7 +26,7 @@ const TAB_ITEMS: { key: AdhkarTab; label: string; Icon: IconComponent }[] = [
   { key: "bm", label: "Bookmark", Icon: Bookmark },
 ];
 
-export function TopNav({ value, onChange, favouriteCount = 0 }: TopNavProps) {
+export function TopNav({ value, onChange, favouriteCount = 0, bookmarkCount = 0 }: TopNavProps) {
   const [tabLayouts, setTabLayouts] = React.useState<TabLayout[]>([]);
 
   const active = TAB_ITEMS.findIndex((t) => t.key === value);
@@ -51,8 +52,9 @@ export function TopNav({ value, onChange, favouriteCount = 0 }: TopNavProps) {
         {TAB_ITEMS.map((item, index) => {
           const isActive = active === index;
 
-          // Only show count for favourite tab
-          const showCount = item.key === "fav" && favouriteCount > 0;
+          // Show count for favourite and bookmark tabs
+          const showCount =
+            (item.key === "fav" && favouriteCount > 0) || (item.key === "bm" && bookmarkCount > 0);
 
           return (
             <TouchableOpacity
@@ -76,7 +78,9 @@ export function TopNav({ value, onChange, favouriteCount = 0 }: TopNavProps) {
                 <Text style={[styles.tab, isActive && styles.activeTab]}>{item.label}</Text>
                 {showCount && (
                   <View style={styles.countBadge}>
-                    <Text style={styles.countText}>{favouriteCount}</Text>
+                    <Text style={styles.countText}>
+                      {item.key === "fav" ? favouriteCount : bookmarkCount}
+                    </Text>
                   </View>
                 )}
               </View>
