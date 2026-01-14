@@ -6,7 +6,7 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  FlatList,
+  ScrollView,
   TextInput,
   Keyboard,
   TouchableWithoutFeedback,
@@ -31,7 +31,7 @@ export function AdhkarHome() {
   const [isSearching, setIsSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<AdhkarItem[]>([]);
 
-  const { favouriteIds, bookmarkIds } = useAdhkarStore();
+  const { favouriteIds } = useAdhkarStore();
   const favouriteCount = favouriteIds.length;
 
   // Get all adhkar items
@@ -45,49 +45,12 @@ export function AdhkarHome() {
     [favouriteIds, allAdhkarItems]
   );
 
-  const bookmarkedItems = useMemo(
-    () => allAdhkarItems.filter((item) => bookmarkIds.includes(`${item.type}-${item.id}`)),
-    [bookmarkIds, allAdhkarItems]
-  );
-
-  // Calculate counts
-  const beforeGroup = adhkarData.find((group) => group.type === "before");
-  const duringGroup = adhkarData.find((group) => group.type === "during");
-  const afterGroup = adhkarData.find((group) => group.type === "after");
-
-  const beforeSubCount = beforeGroup?.items.length || 0;
-  const beforeAdhkarCount =
-    beforeGroup?.items.reduce((total, item) => total + item.entries.length, 0) || 0;
-
-  const duringSubCount = duringGroup?.items.length || 0;
-  const duringAdhkarCount =
-    duringGroup?.items.reduce((total, item) => total + item.entries.length, 0) || 0;
-
-  const afterSubCount = afterGroup?.items.length || 0;
-  const afterAdhkarCount =
-    afterGroup?.items.reduce((total, item) => total + item.entries.length, 0) || 0;
-
-  // Handle search
   const handleSearch = (text: string) => {
     setSearchQuery(text);
 
     if (text.trim()) {
       setIsSearching(true);
-
-      let itemsToSearch: AdhkarItem[] = [];
-
-      switch (tab) {
-        case "fav":
-          itemsToSearch = favouriteItems;
-          break;
-        case "bm":
-          itemsToSearch = bookmarkedItems;
-          break;
-        default:
-          itemsToSearch = allAdhkarItems;
-      }
-
-      const results = searchAdhkar(itemsToSearch, text);
+      const results = searchAdhkar(allAdhkarItems, text);
       setSearchResults(results);
     } else {
       setIsSearching(false);
@@ -110,39 +73,18 @@ export function AdhkarHome() {
     }
   };
 
-  // Get current items based on tab and search
-  const getCurrentItems = () => {
-    if (isSearching && searchQuery.trim()) {
-      return searchResults;
-    }
-
-    switch (tab) {
-      case "fav":
-        return favouriteItems;
-      case "bm":
-        return bookmarkedItems;
-      default:
-        return [];
-    }
-  };
-
-  const currentItems = getCurrentItems();
-  const showCategoryButtons = tab === "all" && !isSearching;
-  const showList = isSearching || tab !== "all";
-
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={styles.container}>
-        {/* Header */}
+        {/* Top Bar */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
+            <TouchableOpacity onPress={() => router.back()}>
+              <Ionicons name="arrow-back" size={25} color={colors.context.brand.primary} />
+            </TouchableOpacity>
+
             {!isSearching ? (
-              <>
-                <TouchableOpacity onPress={() => router.back()}>
-                  <Ionicons name="arrow-back" size={25} color={colors.context.brand.primary} />
-                </TouchableOpacity>
-                <Text style={styles.pageTitle}>Adhkar</Text>
-              </>
+              <Text style={styles.pageTitle}>Adhkar</Text>
             ) : (
               <View style={styles.searchInputContainer}>
                 <Ionicons
@@ -161,26 +103,23 @@ export function AdhkarHome() {
                   autoCapitalize="none"
                   autoCorrect={false}
                 />
-                {searchQuery.length > 0 && (
-                  <TouchableOpacity onPress={handleClearSearch}>
-                    <Ionicons
-                      name="close-circle"
-                      size={20}
-                      color={colors.context.default.secondary}
-                    />
-                  </TouchableOpacity>
-                )}
+                <TouchableOpacity onPress={handleClearSearch}>
+                  <Ionicons
+                    name="close-circle"
+                    size={20}
+                    color={colors.context.default.secondary}
+                  />
+                </TouchableOpacity>
               </View>
             )}
           </View>
 
-          <TouchableOpacity onPress={handleToggleSearch} style={styles.searchButton}>
-            {isSearching ? (
-              <Text style={styles.cancelText}>Cancel</Text>
-            ) : (
+          {/* Search Button - Show only when not searching */}
+          {!isSearching && (
+            <TouchableOpacity onPress={handleToggleSearch}>
               <Ionicons name="search-outline" size={22} color={colors.context.brand.primary} />
-            )}
-          </TouchableOpacity>
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* Search Results Info */}
@@ -196,16 +135,14 @@ export function AdhkarHome() {
           </View>
         )}
 
-        {/* Tabs - Hide when searching */}
+        {/* Tabs with counts (only for favourite) - Hide when searching */}
         {!isSearching && <TopNav value={tab} onChange={setTab} favouriteCount={favouriteCount} />}
 
-        {/* Content */}
-        {showCategoryButtons && (
+        {/* Content - Show category buttons only when not searching */}
+        {tab === "all" && !isSearching && (
           <View style={styles.buttonGroup}>
             <HomeButton
               category={AdhkarCategory.BEFORE_PRAYER}
-              subCount={beforeSubCount}
-              adhkarCount={beforeAdhkarCount}
               image={require("@/assets/images/solah_illustrations/BeforePrayer.png")}
               backgroundColor={colors.background.brand.primary}
               href="/adhkar/before"
@@ -213,8 +150,6 @@ export function AdhkarHome() {
 
             <HomeButton
               category={AdhkarCategory.DURING_PRAYER}
-              subCount={duringSubCount}
-              adhkarCount={duringAdhkarCount}
               image={require("@/assets/images/solah_illustrations/DuringPrayer.png")}
               backgroundColor={colors.background.brand.secondary}
               href="/adhkar/during"
@@ -222,8 +157,6 @@ export function AdhkarHome() {
 
             <HomeButton
               category={AdhkarCategory.AFTER_PRAYER}
-              subCount={afterSubCount}
-              adhkarCount={afterAdhkarCount}
               image={require("@/assets/images/solah_illustrations/AfterPrayer.png")}
               backgroundColor={colors.background.brand.tertiary}
               href="/adhkar/after"
@@ -231,52 +164,50 @@ export function AdhkarHome() {
           </View>
         )}
 
-        {/* Search Results or Favourites/Bookmarks List */}
-        {showList && (
-          <FlatList
-            data={currentItems}
-            renderItem={({ item }) => {
-              if (tab === "fav") {
-                return (
-                  <View style={styles.listItem}>
-                    <View style={styles.favouriteItem}>
-                      <AdhkarDisplay item={item} />
-                    </View>
-                  </View>
-                );
-              }
-
-              return (
-                <View style={styles.listItem}>
-                  <TouchableOpacity
-                    style={styles.resultItem}
-                    onPress={() =>
-                      router.push(`/adhkar/details?adhkar_type=${item.type}&id=${item.id}`)
-                    }
-                  >
-                    <Text style={styles.resultTitle}>{item.title}</Text>
-                    {item.entries[0] && (
-                      <Text style={styles.resultText} numberOfLines={2}>
-                        {item.entries[0].translation?.en || item.entries[0].arabicText}
-                      </Text>
-                    )}
-                  </TouchableOpacity>
-                </View>
-              );
-            }}
-            keyExtractor={(item) => `${item.type}-${item.id}`}
-            contentContainerStyle={styles.listContainer}
+        {/* Search Results */}
+        {isSearching && searchQuery.trim() && (
+          <ScrollView
+            style={styles.favouritesScrollView}
+            contentContainerStyle={styles.favouritesContainer}
             showsVerticalScrollIndicator={false}
-            ListEmptyComponent={
-              !isSearching ? (
-                <>
-                  {tab === "fav" && favouriteCount === 0 && <FavouriteAdhkar />}
-                  {tab === "bm" && <BookmarkAdhkar />}
-                </>
-              ) : null
-            }
-          />
+          >
+            {searchResults.map((item) => (
+              <View key={`${item.type}-${item.id}`} style={styles.resultItem}>
+                <TouchableOpacity
+                  onPress={() =>
+                    router.push(`/adhkar/details?adhkar_type=${item.type}&id=${item.id}`)
+                  }
+                >
+                  <Text style={styles.resultTitle}>{item.title}</Text>
+                  {item.entries[0] && (
+                    <Text style={styles.resultText} numberOfLines={2}>
+                      {item.entries[0].translation?.en || item.entries[0].arabicText}
+                    </Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+            ))}
+          </ScrollView>
         )}
+
+        {/* Original Favourites - Only show when not searching */}
+        {!isSearching && tab === "fav" && favouriteCount > 0 && (
+          <ScrollView
+            style={styles.favouritesScrollView}
+            contentContainerStyle={styles.favouritesContainer}
+            showsVerticalScrollIndicator={false}
+          >
+            {favouriteItems.map((item) => (
+              <View key={`${item.type}-${item.id}`} style={styles.favouriteItem}>
+                <AdhkarDisplay item={item} />
+              </View>
+            ))}
+          </ScrollView>
+        )}
+
+        {/* Original Empty States - Only show when not searching */}
+        {!isSearching && tab === "fav" && favouriteCount === 0 && <FavouriteAdhkar />}
+        {!isSearching && tab === "bm" && <BookmarkAdhkar />}
       </View>
     </TouchableWithoutFeedback>
   );
@@ -307,11 +238,19 @@ const styles = StyleSheet.create({
     marginLeft: spacing.md,
     color: colors.context.brand.primary,
   },
-  searchButton: {
-    padding: spacing.xs,
-    minWidth: 40,
-    alignItems: "flex-end",
+  buttonGroup: {
+    gap: spacing.lg,
   },
+  favouritesScrollView: {
+    flex: 1,
+  },
+  favouritesContainer: {
+    paddingBottom: spacing.xl,
+  },
+  favouriteItem: {
+    marginBottom: spacing.xl,
+  },
+  // Search styles
   searchInputContainer: {
     flex: 1,
     flexDirection: "row",
@@ -321,7 +260,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     height: 40,
     borderWidth: 1,
-    borderColor: colors.border.default.tertiary,
+    borderColor: "#e8e8e8",
+    marginLeft: spacing.md,
   },
   searchIcon: {
     marginRight: spacing.sm,
@@ -329,13 +269,9 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 16,
-    color: colors.context.default.primary,
+    color: "#000000", // Black text for visibility
     height: "100%",
-  },
-  cancelText: {
-    fontSize: 16,
-    color: colors.context.brand.primary,
-    fontWeight: "500",
+    padding: 0,
   },
   searchInfo: {
     marginBottom: spacing.md,
@@ -352,21 +288,13 @@ const styles = StyleSheet.create({
     marginTop: spacing.xs,
     fontStyle: "italic",
   },
-  buttonGroup: {
-    gap: spacing.lg,
-  },
-  listContainer: {
-    paddingBottom: spacing.xl,
-  },
-  listItem: {
-    marginBottom: spacing.lg,
-  },
   resultItem: {
     backgroundColor: colors.palette.primary[100],
     borderRadius: 12,
     padding: spacing.md,
     borderWidth: 1,
     borderColor: colors.palette.primary[300],
+    marginBottom: spacing.lg,
   },
   resultTitle: {
     fontSize: font.heading.xsmall.fontSize,
@@ -380,8 +308,5 @@ const styles = StyleSheet.create({
     fontFamily: font.body.small.fontFamily,
     color: colors.palette.primary[800],
     lineHeight: 20,
-  },
-  favouriteItem: {
-    marginBottom: spacing.xl,
   },
 });
