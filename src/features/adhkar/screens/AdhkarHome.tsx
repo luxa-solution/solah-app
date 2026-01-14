@@ -17,8 +17,8 @@ export function AdhkarHome() {
   const [tab, setTab] = useState<AdhkarTab>("all");
 
   const { favouriteIds, bookmarkIds } = useAdhkarStore();
-  const favouriteCount = favouriteIds.length;
-  const bookmarkCount = bookmarkIds.length;
+  const favouriteCount = favouriteIds?.length || 0;
+  const bookmarkCount = bookmarkIds?.length || 0;
 
   // Get all favourite items
   const allAdhkarItems: AdhkarItem[] = useMemo(
