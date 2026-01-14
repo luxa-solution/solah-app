@@ -4,6 +4,7 @@ import { Image, Pressable, Text, View, StyleSheet } from "react-native";
 
 import { AdhkarItem } from "@/features-adhkar/types";
 import { borderRadius, colors, effect, font, spacing } from "@/shared/styles";
+import { mvs } from "@/shared/utils/responsive-dimensions";
 
 export type AdhkarCardProps = {
   data: AdhkarItem;
@@ -29,11 +30,11 @@ export const Card = ({ data, variant = "small" }: AdhkarCardProps) => {
   const height = useMemo(() => {
     switch (variant) {
       case "large":
-        return 268;
+        return mvs(268, 0.3);
       case "small":
-        return 129;
+        return mvs(129, 0.3);
       default:
-        return 129;
+        return mvs(129, 0.3);
     }
   }, [variant]);
 
@@ -72,7 +73,7 @@ export const Card = ({ data, variant = "small" }: AdhkarCardProps) => {
   );
 };
 
-export const styles = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     padding: spacing.xs,
     borderRadius: borderRadius[4],
@@ -117,7 +118,7 @@ export const styles = StyleSheet.create({
   largeCardIllustration: {
     width: "100%",
     height: "100%",
-    bottom: -80,
+    bottom: mvs(-80, 0.3),
     right: 0,
   },
   smallCardsIllustration: {
