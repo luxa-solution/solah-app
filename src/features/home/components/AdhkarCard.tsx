@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from "react-native";
 
 import { Card } from "@/features-adhkar/components";
 import { context, fontsize } from "@/shared/styles";
-import { ds } from "@/shared/utils/responsive-dimensions";
+import { hp, spacing } from "@/shared/utils/responsive-dimensions";
 
 export function AdhkarCard() {
   const router = useRouter();
@@ -22,7 +22,7 @@ export function AdhkarCard() {
               router.push("/adhkar/before");
             }}
             variant="large"
-            height={268}
+            height={hp(268)}
             bgStyle="dark"
             illustration={require("@/assets/images/solah_illustrations/man-ablution.png")}
           />
@@ -37,7 +37,7 @@ export function AdhkarCard() {
               router.push("/adhkar/during");
             }}
             variant="small"
-            height={129}
+            height={hp(129)}
             bgStyle="light"
             illustration={require("@/assets/images/solah_illustrations/Prostration.png")}
           />
@@ -49,7 +49,7 @@ export function AdhkarCard() {
               router.push("/adhkar/after");
             }}
             variant="small"
-            height={129}
+            height={hp(129)}
             bgStyle="light"
             illustration={require("@/assets/images/solah_illustrations/AfterSolah.png")}
           />
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: fontsize.xl,
     textAlign: "left",
-    marginBottom: ds(20),
+    marginBottom: spacing(20),
     fontWeight: "bold",
     color: context.brand.primary,
   },
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     width: "100%",
     alignSelf: "center",
-    gap: ds(8),
+    gap: spacing(8),
   },
   largeCardWrapper: {
     width: "50%",
@@ -83,5 +83,6 @@ const styles = StyleSheet.create({
     width: "48%",
     flexDirection: "column",
     justifyContent: "space-between",
+    gap: spacing(8),
   },
 });
