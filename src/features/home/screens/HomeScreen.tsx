@@ -4,7 +4,7 @@ import ScreenContainer, { edgesHorizontal } from "@/shared/components/screen-con
 
 export function HomeScreen() {
   return (
-    <ScreenContainer scrollable edges={["top", ...edgesHorizontal]} withPadding>
+    <ScreenContainer scrollable edges={["top", "bottom", ...edgesHorizontal]} withPadding>
       <TitleBar />
       <PrayerTimesCard />
       <PrayerTimingCard />

@@ -17,6 +17,8 @@ export function SolahTimeScreen() {
       style={{
         ...screenStyle.container,
         backgroundColor: colors.background.default.primary,
+      }}
+      contentContainerStyle={{
         paddingBottom: bottom,
       }}
       showsVerticalScrollIndicator={false}
