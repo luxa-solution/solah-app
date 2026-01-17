@@ -7,7 +7,7 @@ export const ishaGuide: SolahGroup = {
   description: {
     en: "Night solah",
   },
-  illustration: require("@/assets/guide-illustrations/Asr.png"),
+  illustration: require("@/assets/guide-illustrations/Isha.png"),
   rakaat: 4,
   items: [
     {
