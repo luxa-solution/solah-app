@@ -2,8 +2,7 @@ import { StyleSheet, Text, View } from "react-native";
 
 import { Card } from "@/features-adhkar/components";
 import { useAdhkarAutoRotation } from "@/features-home/hooks";
-import { context, fontsize } from "@/shared/styles";
-import { ds } from "@/shared/utils/responsive-dimensions";
+import { context, fontsize, spacing } from "@/shared/styles";
 
 export function AdhkarCard() {
   const { largeCard, topSmallCard, bottomSmallCard } = useAdhkarAutoRotation();
@@ -33,7 +32,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: fontsize.xl,
     textAlign: "left",
-    marginBottom: ds(12),
+    marginBottom: spacing.md,
     fontWeight: "bold",
     color: context.brand.primary,
   },
@@ -43,7 +42,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     width: "100%",
     alignSelf: "center",
-    gap: ds(8),
+    gap: spacing.sm,
   },
   largeCardWrapper: {
     width: "50%",
