@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { memo } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, Pressable, StyleSheet, Image } from "react-native";
 
 import { AdhkarItem } from "@/features-adhkar/types";
 import { colors, font, spacing, borderRadius, borderWidth } from "@/shared/styles";
@@ -8,6 +8,8 @@ import { colors, font, spacing, borderRadius, borderWidth } from "@/shared/style
 const BORDER_COLOR = colors.border.brand.primary;
 const TEXT_COLOR = colors.context.brand.primary;
 const BG = colors.background.default.primary;
+
+const listIcon = require("@/assets/adhkar-icons/list-icon.png");
 
 export type AdhkarListItemProps = {
   item: AdhkarItem;
@@ -26,7 +28,8 @@ export const ListItem = memo(function AdhkarListItem({ item }: AdhkarListItemPro
       onPress={handlePress}
     >
       <View style={styles.left}>
-        <View style={styles.iconPlaceholder} />
+        {/* ✅ Changed from View to Image with icon */}
+        <Image source={listIcon} style={styles.icon} />
         <Text style={styles.title} numberOfLines={2}>
           {title}
         </Text>
@@ -56,13 +59,12 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingRight: spacing.sm,
   },
-  iconPlaceholder: {
+
+  icon: {
     width: 28,
     height: 28,
-    borderRadius: 14,
-    borderWidth: 1.6,
-    borderColor: BORDER_COLOR,
     marginRight: spacing.md,
+    resizeMode: "contain",
   },
   title: {
     flexShrink: 1,
