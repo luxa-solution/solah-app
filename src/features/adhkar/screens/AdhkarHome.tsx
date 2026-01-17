@@ -16,8 +16,9 @@ export function AdhkarHome() {
   const router = useRouter();
   const [tab, setTab] = useState<AdhkarTab>("all");
 
-  const { favouriteIds } = useAdhkarStore();
-  const favouriteCount = favouriteIds.length;
+  const { favouriteIds, bookmarkIds } = useAdhkarStore();
+  const favouriteCount = favouriteIds?.length || 0;
+  const bookmarkCount = bookmarkIds?.length || 0;
 
   // Get all favourite items
   const allAdhkarItems: AdhkarItem[] = useMemo(
@@ -65,7 +66,12 @@ export function AdhkarHome() {
       </View>
 
       {/* Tabs with counts (only for favourite) */}
-      <TopNav value={tab} onChange={setTab} favouriteCount={favouriteCount} />
+      <TopNav
+        value={tab}
+        onChange={setTab}
+        favouriteCount={favouriteCount}
+        bookmarkCount={bookmarkCount}
+      />
 
       {/* Content */}
       {tab === "all" && (

@@ -67,7 +67,7 @@ describe("AdhkarHome (necessary behavior only)", () => {
   });
 
   it("shows FavouriteAdhkar empty state when on fav tab and there are no favourites", () => {
-    mockUseAdhkarStore.mockReturnValue({ favouriteIds: [] });
+    mockUseAdhkarStore.mockReturnValue({ favouriteIds: [], bookmarkIds: [] });
 
     const { getByLabelText, queryByText } = render(<AdhkarHome />);
 
@@ -78,7 +78,7 @@ describe("AdhkarHome (necessary behavior only)", () => {
   });
 
   it("shows BookmarkAdhkar screen when on bm tab", () => {
-    mockUseAdhkarStore.mockReturnValue({ favouriteIds: [] });
+    mockUseAdhkarStore.mockReturnValue({ favouriteIds: [], bookmarkIds: [] });
 
     const { getByLabelText, queryByText } = render(<AdhkarHome />);
 
