@@ -61,6 +61,8 @@ const styles = StyleSheet.create({
     fontFamily: font.display.medium.fontFamily ?? font.heading.medium.fontFamily,
     lineHeight: 38,
     color: colors.context.brand.primary,
+    textAlign: "right",
+    writingDirection: "rtl",
   },
   transliteration: {
     fontSize: font.body.small.fontSize,
