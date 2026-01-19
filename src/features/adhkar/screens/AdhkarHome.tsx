@@ -65,7 +65,7 @@ export function AdhkarHome() {
         </TouchableOpacity>
       </View>
 
-      {/* Tabs with counts (only for favourite) */}
+      {/* Tabs with counts */}
       <TopNav
         value={tab}
         onChange={setTab}
@@ -113,7 +113,8 @@ export function AdhkarHome() {
         >
           {favouriteItems.map((item) => (
             <View key={`${item.type}-${item.id}`} style={styles.favouriteItem}>
-              <AdhkarDisplay item={item} />
+              {/* ✅ FIXED: Add showNavigator={false} to hide the DetailsNavigator */}
+              <AdhkarDisplay item={item} showNavigator={false} />
             </View>
           ))}
         </ScrollView>
