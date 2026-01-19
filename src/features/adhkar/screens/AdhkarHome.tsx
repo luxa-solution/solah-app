@@ -7,16 +7,16 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  TextInput,
   Keyboard,
   TouchableWithoutFeedback,
 } from "react-native";
 
+import { SearchHeader } from "@/features/adhkar/components/SearchHeader";
+import { useAdhkarSearch } from "@/features/adhkar/hooks/useAdhkarSearch";
 import { AdhkarDisplay, HomeButton, TopNav } from "@/features-adhkar/components";
 import { adhkarData } from "@/features-adhkar/data";
 import { useAdhkarStore } from "@/features-adhkar/store";
 import { AdhkarCategory, AdhkarTab, AdhkarItem } from "@/features-adhkar/types";
-import { searchAdhkar } from "@/features-adhkar/utils/searchUtils";
 import { colors, font, spacing, borderRadius } from "@/shared/styles";
 
 import { BookmarkAdhkar } from "./BookmarkAdhkar";
@@ -25,9 +25,6 @@ import { FavouriteAdhkar } from "./FavouriteAdhkar";
 export function AdhkarHome() {
   const router = useRouter();
   const [tab, setTab] = useState<AdhkarTab>("all");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isSearching, setIsSearching] = useState(false);
-  const [searchResults, setSearchResults] = useState<AdhkarItem[]>([]);
 
   const { favouriteIds } = useAdhkarStore();
   const favouriteCount = favouriteIds.length;
@@ -37,6 +34,18 @@ export function AdhkarHome() {
     () => adhkarData.flatMap((group) => group.items),
     []
   );
+
+  // Use search hook
+  const {
+    searchQuery,
+    isSearchActive,
+    searchResults,
+    handleSearch,
+    handleClearSearch,
+    handleToggleSearch,
+    setIsSearchActive,
+    isSearching,
+  } = useAdhkarSearch(allAdhkarItems);
 
   const favouriteItems = useMemo(
     () => allAdhkarItems.filter((item) => favouriteIds.includes(`${item.type}-${item.id}`)),
@@ -60,177 +69,132 @@ export function AdhkarHome() {
   const afterAdhkarCount =
     afterGroup?.items.reduce((total, item) => total + item.entries.length, 0) || 0;
 
-  const handleSearch = (text: string) => {
-    setSearchQuery(text);
-
-    if (text.trim()) {
-      setIsSearching(true);
-      const results = searchAdhkar(allAdhkarItems, text);
-      setSearchResults(results);
-    } else {
-      setIsSearching(false);
-      setSearchResults([]);
-    }
-  };
-
-  const handleClearSearch = () => {
-    setSearchQuery("");
-    setIsSearching(false);
-    setSearchResults([]);
+  const handleBackFromSearch = () => {
+    setIsSearchActive(false);
+    handleClearSearch();
     Keyboard.dismiss();
-  };
-
-  const handleToggleSearch = () => {
-    if (isSearching) {
-      handleClearSearch();
-    } else {
-      setIsSearching(true);
-    }
   };
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={styles.container}>
-        {/* Top Bar */}
+        {/* Header - Changes based on search state */}
         <View style={styles.header}>
-          <View style={styles.headerLeft}>
-            <TouchableOpacity onPress={() => router.back()}>
-              <Ionicons name="arrow-back" size={25} color={colors.context.brand.primary} />
-            </TouchableOpacity>
-
-            {!isSearching ? (
-              <Text style={styles.pageTitle}>Adhkar</Text>
-            ) : (
-              <View style={styles.searchInputContainer}>
-                <Ionicons
-                  name="search-outline"
-                  size={20}
-                  color={colors.context.default.secondary}
-                  style={styles.searchIcon}
-                />
-                <TextInput
-                  style={styles.searchInput}
-                  placeholder="Search adhkar..."
-                  placeholderTextColor={colors.context.default.secondary}
-                  value={searchQuery}
-                  onChangeText={handleSearch}
-                  autoFocus={true}
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                />
-                {searchQuery ? (
-                  <TouchableOpacity onPress={handleClearSearch}>
-                    <Ionicons
-                      name="close-circle"
-                      size={20}
-                      color={colors.context.default.secondary}
-                    />
-                  </TouchableOpacity>
-                ) : null}
+          {isSearchActive ? (
+            <SearchHeader
+              searchQuery={searchQuery}
+              onSearchChange={handleSearch}
+              onClearSearch={handleClearSearch}
+              onBack={handleBackFromSearch}
+            />
+          ) : (
+            <>
+              <View style={styles.headerLeft}>
+                <TouchableOpacity onPress={() => router.back()}>
+                  <Ionicons name="arrow-back" size={25} color={colors.context.brand.primary} />
+                </TouchableOpacity>
+                <Text style={styles.pageTitle}>Adhkar</Text>
               </View>
-            )}
-          </View>
 
-          {/* Search Button - Show only when not searching */}
-          {!isSearching && (
-            <TouchableOpacity onPress={handleToggleSearch}>
-              <Ionicons name="search-outline" size={22} color={colors.context.brand.primary} />
-            </TouchableOpacity>
+              <TouchableOpacity onPress={handleToggleSearch}>
+                <Ionicons name="search-outline" size={22} color={colors.context.brand.primary} />
+              </TouchableOpacity>
+            </>
           )}
         </View>
 
-        {/* Search Results Info */}
-        {isSearching && searchQuery.trim() && (
-          <View style={styles.searchInfo}>
+        {/* Search Results - Overlay on top when searching */}
+        {isSearchActive && isSearching && (
+          <View style={styles.searchResultsOverlay}>
             <Text style={styles.searchResultsText}>
               {searchResults.length} result{searchResults.length !== 1 ? "s" : ""} found
               {searchQuery.trim() && ` for "${searchQuery}"`}
             </Text>
-            {searchResults.length === 0 && searchQuery.trim() && (
+
+            {searchResults.length === 0 ? (
               <Text style={styles.noResultsText}>No adhkar found. Try different keywords.</Text>
+            ) : (
+              <ScrollView
+                style={styles.searchResultsScrollView}
+                showsVerticalScrollIndicator={false}
+              >
+                {searchResults.map((item) => (
+                  <TouchableOpacity
+                    key={`${item.type}-${item.id}`}
+                    style={styles.resultItem}
+                    onPress={() =>
+                      router.push(`/adhkar/details?adhkar_type=${item.type}&id=${item.id}`)
+                    }
+                  >
+                    <Text style={styles.resultTitle}>{item.title}</Text>
+                    {item.entries[0] && (
+                      <Text style={styles.resultText} numberOfLines={2}>
+                        {item.entries[0].translation?.en || item.entries[0].arabicText}
+                      </Text>
+                    )}
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
             )}
           </View>
         )}
 
-        {/* Tabs with counts - Hide when searching */}
-        {!isSearching && <TopNav value={tab} onChange={setTab} favouriteCount={favouriteCount} />}
+        {/* Regular Content - ALWAYS visible (even when searching) */}
+        <View style={styles.regularContent}>
+          {/* Tabs with counts - ALWAYS show */}
+          <TopNav value={tab} onChange={setTab} favouriteCount={favouriteCount} />
 
-        {/* Content - Show category buttons only when not searching */}
-        {tab === "all" && !isSearching && (
-          <View style={styles.buttonGroup}>
-            <HomeButton
-              category={AdhkarCategory.BEFORE_PRAYER}
-              subCount={beforeSubCount}
-              adhkarCount={beforeAdhkarCount}
-              image={require("@/assets/images/solah_illustrations/BeforePrayer.png")}
-              backgroundColor={colors.background.brand.primary}
-              href="/adhkar/before"
-            />
+          {/* Category buttons - Show when on "all" tab */}
+          {tab === "all" && (
+            <View style={styles.buttonGroup}>
+              <HomeButton
+                category={AdhkarCategory.BEFORE_PRAYER}
+                subCount={beforeSubCount}
+                adhkarCount={beforeAdhkarCount}
+                image={require("@/assets/images/solah_illustrations/BeforePrayer.png")}
+                backgroundColor={colors.background.brand.primary}
+                href="/adhkar/before"
+              />
 
-            <HomeButton
-              category={AdhkarCategory.DURING_PRAYER}
-              subCount={duringSubCount}
-              adhkarCount={duringAdhkarCount}
-              image={require("@/assets/images/solah_illustrations/DuringPrayer.png")}
-              backgroundColor={colors.background.brand.secondary}
-              href="/adhkar/during"
-            />
+              <HomeButton
+                category={AdhkarCategory.DURING_PRAYER}
+                subCount={duringSubCount}
+                adhkarCount={duringAdhkarCount}
+                image={require("@/assets/images/solah_illustrations/DuringPrayer.png")}
+                backgroundColor={colors.background.brand.secondary}
+                href="/adhkar/during"
+              />
 
-            <HomeButton
-              category={AdhkarCategory.AFTER_PRAYER}
-              subCount={afterSubCount}
-              adhkarCount={afterAdhkarCount}
-              image={require("@/assets/images/solah_illustrations/AfterPrayer.png")}
-              backgroundColor={colors.background.brand.tertiary}
-              href="/adhkar/after"
-            />
-          </View>
-        )}
+              <HomeButton
+                category={AdhkarCategory.AFTER_PRAYER}
+                subCount={afterSubCount}
+                adhkarCount={afterAdhkarCount}
+                image={require("@/assets/images/solah_illustrations/AfterPrayer.png")}
+                backgroundColor={colors.background.brand.tertiary}
+                href="/adhkar/after"
+              />
+            </View>
+          )}
 
-        {/* Search Results */}
-        {isSearching && searchQuery.trim() && searchResults.length > 0 && (
-          <ScrollView
-            style={styles.favouritesScrollView}
-            contentContainerStyle={styles.favouritesContainer}
-            showsVerticalScrollIndicator={false}
-          >
-            {searchResults.map((item) => (
-              <View key={`${item.type}-${item.id}`} style={styles.resultItem}>
-                <TouchableOpacity
-                  onPress={() =>
-                    router.push(`/adhkar/details?adhkar_type=${item.type}&id=${item.id}`)
-                  }
-                >
-                  <Text style={styles.resultTitle}>{item.title}</Text>
-                  {item.entries[0] && (
-                    <Text style={styles.resultText} numberOfLines={2}>
-                      {item.entries[0].translation?.en || item.entries[0].arabicText}
-                    </Text>
-                  )}
-                </TouchableOpacity>
-              </View>
-            ))}
-          </ScrollView>
-        )}
+          {/* Favourites - Show when on "fav" tab */}
+          {tab === "fav" && favouriteCount > 0 && (
+            <ScrollView
+              style={styles.favouritesScrollView}
+              contentContainerStyle={styles.favouritesContainer}
+              showsVerticalScrollIndicator={false}
+            >
+              {favouriteItems.map((item) => (
+                <View key={`${item.type}-${item.id}`} style={styles.favouriteItem}>
+                  <AdhkarDisplay item={item} />
+                </View>
+              ))}
+            </ScrollView>
+          )}
 
-        {/* Original Favourites - Only show when not searching */}
-        {!isSearching && tab === "fav" && favouriteCount > 0 && (
-          <ScrollView
-            style={styles.favouritesScrollView}
-            contentContainerStyle={styles.favouritesContainer}
-            showsVerticalScrollIndicator={false}
-          >
-            {favouriteItems.map((item) => (
-              <View key={`${item.type}-${item.id}`} style={styles.favouriteItem}>
-                <AdhkarDisplay item={item} />
-              </View>
-            ))}
-          </ScrollView>
-        )}
-
-        {/* Original Empty States - Only show when not searching */}
-        {!isSearching && tab === "fav" && favouriteCount === 0 && <FavouriteAdhkar />}
-        {!isSearching && tab === "bm" && <BookmarkAdhkar />}
+          {/* Empty States */}
+          {tab === "fav" && favouriteCount === 0 && <FavouriteAdhkar />}
+          {tab === "bm" && <BookmarkAdhkar />}
+        </View>
       </View>
     </TouchableWithoutFeedback>
   );
@@ -248,6 +212,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     marginBottom: spacing.lg,
+    height: 40,
   },
   headerLeft: {
     flexDirection: "row",
@@ -261,6 +226,9 @@ const styles = StyleSheet.create({
     marginLeft: spacing.md,
     color: colors.context.brand.primary,
   },
+  regularContent: {
+    flex: 1,
+  },
   buttonGroup: {
     gap: spacing.lg,
   },
@@ -273,39 +241,25 @@ const styles = StyleSheet.create({
   favouriteItem: {
     marginBottom: spacing.xl,
   },
-  // Search styles
-  searchInputContainer: {
+  searchResultsOverlay: {
+    position: "absolute",
+    top: 90,
+    left: spacing.lg,
+    right: spacing.lg,
+    bottom: 0,
+    backgroundColor: colors.background.default.primary,
+    zIndex: 10,
+    paddingTop: spacing.md,
+  },
+  searchResultsScrollView: {
     flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: colors.background.default.secondary,
-    borderRadius: 20,
-    paddingHorizontal: spacing.md,
-    height: 40,
-    borderWidth: 1,
-    borderColor: colors.border.default.tertiary,
-    marginLeft: spacing.md,
-  },
-  searchIcon: {
-    marginRight: spacing.sm,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: font.body.medium.fontSize,
-    color: colors.context.default.primary,
-    height: "100%",
-    padding: 0,
-    fontFamily: font.body.medium.fontFamily,
-  },
-  searchInfo: {
-    marginBottom: spacing.md,
-    paddingVertical: spacing.sm,
   },
   searchResultsText: {
     fontSize: font.body.small.fontSize,
     color: colors.context.default.primary,
     fontFamily: font.body.small.fontFamily,
     fontWeight: "500",
+    marginBottom: spacing.sm,
   },
   noResultsText: {
     fontSize: font.body.small.fontSize,
