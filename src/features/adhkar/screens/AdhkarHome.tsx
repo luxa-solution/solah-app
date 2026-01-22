@@ -17,21 +17,30 @@ export function AdhkarHome() {
   const [tab, setTab] = useState<AdhkarTab>("all");
 
   const { favouriteIds, bookmarkIds } = useAdhkarStore();
-  const favouriteCount = favouriteIds?.length || 0;
-  const bookmarkCount = bookmarkIds?.length || 0;
 
-  // Get all favourite items
   const allAdhkarItems: AdhkarItem[] = useMemo(
     () => adhkarData.flatMap((group) => group.items),
     []
   );
 
-  const favouriteItems = useMemo(
-    () => allAdhkarItems.filter((item) => favouriteIds.includes(`${item.type}-${item.id}`)),
-    [favouriteIds, allAdhkarItems]
-  );
+  const favouriteItems = useMemo(() => {
+    const favoritedItemIds = new Set<string>();
 
-  // Calculate real counts from data
+    favouriteIds.forEach((favId) => {
+      const match = favId.match(/^(.+)-entry-\d+$/);
+      if (match) {
+        favoritedItemIds.add(match[1]);
+      } else {
+        favoritedItemIds.add(favId);
+      }
+    });
+
+    return allAdhkarItems.filter((item) => favoritedItemIds.has(`${item.type}-${item.id}`));
+  }, [favouriteIds, allAdhkarItems]);
+
+  const favouriteCount = favouriteItems.length;
+  const bookmarkCount = bookmarkIds?.length || 0;
+
   const beforeGroup = adhkarData.find((group) => group.type === "before");
   const duringGroup = adhkarData.find((group) => group.type === "during");
   const afterGroup = adhkarData.find((group) => group.type === "after");
@@ -65,7 +74,7 @@ export function AdhkarHome() {
         </TouchableOpacity>
       </View>
 
-      {/* Tabs with counts (only for favourite) */}
+      {/* Tabs with counts */}
       <TopNav
         value={tab}
         onChange={setTab}
@@ -113,7 +122,7 @@ export function AdhkarHome() {
         >
           {favouriteItems.map((item) => (
             <View key={`${item.type}-${item.id}`} style={styles.favouriteItem}>
-              <AdhkarDisplay item={item} />
+              <AdhkarDisplay item={item} showNavigator={false} />
             </View>
           ))}
         </ScrollView>

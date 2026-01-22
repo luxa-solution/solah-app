@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
 
 import { AdhkarItem } from "@/features-adhkar/types";
-import { colors, font, spacing } from "@/shared/styles";
+import { colors, font, spacing, borderWidth, fontsize } from "@/shared/styles";
 
 import { DetailsActionBar } from "./DetailsActionBar";
 import { DetailsNavigator } from "./DetailsNavigator";
@@ -14,13 +14,14 @@ export type AdhkarDisplayProps = {
   onShare?: () => void;
   onFavorite?: () => void;
   onPlay?: () => void;
+  showNavigator?: boolean;
 };
 
-export const AdhkarDisplay: React.FC<AdhkarDisplayProps> = ({ item }) => {
+export const AdhkarDisplay: React.FC<AdhkarDisplayProps> = ({ item, showNavigator = true }) => {
   const { entries } = item;
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <DetailsNavigator item={item} />
+      {showNavigator && <DetailsNavigator item={item} />}
 
       {entries.map(({ arabicText, translation, transliteration }, idx) => (
         <React.Fragment key={idx}>
@@ -33,7 +34,7 @@ export const AdhkarDisplay: React.FC<AdhkarDisplayProps> = ({ item }) => {
 
             {translation?.en ? <Text style={styles.translation}>{translation.en}</Text> : null}
 
-            <DetailsActionBar item={item} />
+            <DetailsActionBar item={item} entryIndex={idx} />
           </View>
 
           {idx < entries.length - 1 ? <View style={styles.divider} /> : null}
@@ -57,10 +58,12 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   arabicText: {
-    fontSize: 28,
+    fontSize: fontsize.xxl,
     fontFamily: font.display.medium.fontFamily ?? font.heading.medium.fontFamily,
     lineHeight: 38,
     color: colors.context.brand.primary,
+    textAlign: "right",
+    writingDirection: "rtl",
   },
   transliteration: {
     fontSize: font.body.small.fontSize,
@@ -77,7 +80,7 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   divider: {
-    height: 1,
+    height: borderWidth.xs,
     backgroundColor: colors.border.default.tertiary,
     marginVertical: spacing.lg,
   },
