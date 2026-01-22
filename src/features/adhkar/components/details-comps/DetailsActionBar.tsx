@@ -11,17 +11,19 @@ const iconStarFilled = require("@/assets/adhkar-icons/StarFilled.png");
 
 export type DetailsActionBarProps = {
   item: AdhkarItem;
+  entryIndex?: number;
 };
 
-export const DetailsActionBar = ({ item }: DetailsActionBarProps) => {
-  const { toggleFavourite, isFavourite } = useAdhkarStore();
-  const isFav = isFavourite(item);
+export const DetailsActionBar = ({ item, entryIndex }: DetailsActionBarProps) => {
+  const { toggleFavourite, isFavourite, toggleEntryFavourite, isEntryFavourite } = useAdhkarStore();
+
+  const isFav = entryIndex !== undefined ? isEntryFavourite(item, entryIndex) : isFavourite(item);
 
   const onShare = async () => {
     try {
-      const firstEntry = item.entries[0];
+      const entryToShare = entryIndex !== undefined ? item.entries[entryIndex] : item.entries[0];
 
-      if (!firstEntry) {
+      if (!entryToShare) {
         await Share.share({
           message: item.title,
           title: item.title,
@@ -29,7 +31,7 @@ export const DetailsActionBar = ({ item }: DetailsActionBarProps) => {
         return;
       }
 
-      const shareMessage = `${item.title}\n\n${firstEntry.arabicText}\n\n${firstEntry.transliteration}\n\n${firstEntry.translation.en}`;
+      const shareMessage = `${item.title}\n\n${entryToShare.arabicText}\n\n${entryToShare.transliteration}\n\n${entryToShare.translation.en}`;
 
       await Share.share({
         message: shareMessage,
@@ -39,7 +41,11 @@ export const DetailsActionBar = ({ item }: DetailsActionBarProps) => {
   };
 
   const onFavorite = () => {
-    toggleFavourite(item);
+    if (entryIndex !== undefined) {
+      toggleEntryFavourite(item, entryIndex);
+    } else {
+      toggleFavourite(item);
+    }
   };
 
   const onPlay = () => {
@@ -72,7 +78,7 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.md,
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
-    alignSelf: "flex-start",
+    alignSelf: "center",
     flexDirection: "row",
     alignItems: "center",
   },
