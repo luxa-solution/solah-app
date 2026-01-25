@@ -11,7 +11,7 @@ export type AdhkarCardProps = {
 };
 
 export const Card = ({ data, variant = "small" }: AdhkarCardProps) => {
-  const { id, title, type, illustration } = data;
+  const { id, title, type, illustration, cardTitle } = data;
 
   const getAdhkarTitle = (adhkar_type: string) => {
     switch (adhkar_type) {
@@ -51,7 +51,7 @@ export const Card = ({ data, variant = "small" }: AdhkarCardProps) => {
               variant === "small" ? styles.smallCardSubtitle : styles.largeCardSubtitle,
             ]}
           >
-            {title}
+            {cardTitle ?? title}
           </Text>
         </View>
       </View>

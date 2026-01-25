@@ -9,6 +9,7 @@ export const adhkarBefore: AdhkarGroup = {
       id: "1",
       type: "before",
       title: "When performing ablution (Wudu)",
+      cardTitle: "Before Ablution",
       illustration: adhkarImages.ablution,
       tags: ["ablution"],
       entries: [
@@ -23,6 +24,7 @@ export const adhkarBefore: AdhkarGroup = {
       id: "2",
       type: "before",
       title: "After completing ablution",
+      cardTitle: "After Ablution",
       illustration: adhkarImages.ablution,
       tags: ["ablution"],
       entries: [
@@ -49,6 +51,7 @@ export const adhkarBefore: AdhkarGroup = {
       id: "3",
       type: "before",
       title: "When leaving for the mosque",
+      cardTitle: "Going to the Mosque",
       illustration: adhkarImages.ablution,
       tags: ["walking"],
       entries: [
@@ -67,6 +70,7 @@ export const adhkarBefore: AdhkarGroup = {
       id: "4",
       type: "before",
       title: "Upon entering the mosque",
+      cardTitle: "Entering the Mosque",
       illustration: adhkarImages.ablution,
       tags: ["mosque_before"],
       entries: [
@@ -81,6 +85,7 @@ export const adhkarBefore: AdhkarGroup = {
       id: "5",
       type: "before",
       title: "After the Adhaan (Call to Prayer)",
+      cardTitle: "Du‘ā After Adhaan",
       illustration: adhkarImages.prostration,
       tags: ["adhan"],
       entries: [
@@ -99,7 +104,6 @@ export const adhkarBefore: AdhkarGroup = {
       id: "6",
       type: "before",
       title: "When leaving the house",
-      cardTitle: "Leave Home",
       illustration: adhkarImages.ablution,
       tags: ["walking"],
       entries: [
