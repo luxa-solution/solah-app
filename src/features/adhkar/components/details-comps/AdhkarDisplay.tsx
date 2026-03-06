@@ -14,13 +14,14 @@ export type AdhkarDisplayProps = {
   onShare?: () => void;
   onFavorite?: () => void;
   onPlay?: () => void;
+  showNavigator?: boolean;
 };
 
-export const AdhkarDisplay: React.FC<AdhkarDisplayProps> = ({ item }) => {
+export const AdhkarDisplay: React.FC<AdhkarDisplayProps> = ({ item, showNavigator = true }) => {
   const { entries } = item;
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <DetailsNavigator item={item} />
+      {showNavigator && <DetailsNavigator item={item} />}
 
       {entries.map(({ arabicText, translation, transliteration }, idx) => (
         <React.Fragment key={idx}>
