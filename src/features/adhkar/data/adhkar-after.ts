@@ -9,6 +9,7 @@ export const adhkarAfter: AdhkarGroup = {
       id: "1",
       type: "after",
       title: "After finishing the prayer (Tasleem)",
+      cardTitle: "Adhkar After Tasleem",
       illustration: adhkarImages.afterSolah,
       tags: ["after_tasleem", "dhikr"],
       entries: [
@@ -32,6 +33,7 @@ export const adhkarAfter: AdhkarGroup = {
       id: "2",
       type: "after",
       title: "After every obligatory prayer",
+      cardTitle: "After Obligatory Prayers",
       illustration: adhkarImages.afterSolah,
       tags: ["dhikr"],
       entries: [
@@ -58,6 +60,7 @@ export const adhkarAfter: AdhkarGroup = {
       id: "3",
       type: "after",
       title: "Ayatul Kursi (after each prayer)",
+      cardTitle: "Ayatul Kursi",
       illustration: adhkarImages.afterSolah,
       tags: ["dhikr"],
       entries: [
@@ -75,8 +78,7 @@ export const adhkarAfter: AdhkarGroup = {
     {
       id: "4",
       type: "after",
-      title: "Du‘ā after prayer",
-      cardTitle: "Du‘ā After Prayer",
+      title: "Adhkar after prayer",
       illustration: adhkarImages.afterSolah,
       tags: ["dua", "after_tasleem"],
       entries: [
@@ -93,6 +95,7 @@ export const adhkarAfter: AdhkarGroup = {
       id: "5",
       type: "after",
       title: "Upon leaving the mosque",
+      cardTitle: "Leaving the Mosque",
       illustration: adhkarImages.afterSolah,
       tags: ["mosque_after"],
       entries: [

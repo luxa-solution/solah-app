@@ -9,6 +9,7 @@ export const adhkarDuring: AdhkarGroup = {
       id: "1",
       type: "during",
       title: "Opening supplication (Du‘ā’ al-Istiftāḥ)",
+      cardTitle: "Opening Supplication",
       illustration: adhkarImages.prostration,
       tags: ["opening"],
       entries: [
@@ -27,6 +28,7 @@ export const adhkarDuring: AdhkarGroup = {
       id: "2",
       type: "during",
       title: "While bowing (Rukū‘)",
+      cardTitle: "While In Rukū‘",
       illustration: adhkarImages.prostration,
       tags: ["ruku"],
       entries: [
@@ -41,6 +43,7 @@ export const adhkarDuring: AdhkarGroup = {
       id: "3",
       type: "during",
       title: "When rising from Rukū‘",
+      cardTitle: "Rising from Rukū‘",
       illustration: adhkarImages.prostration,
       tags: ["ruku"],
       entries: [
@@ -60,6 +63,7 @@ export const adhkarDuring: AdhkarGroup = {
       id: "4",
       type: "during",
       title: "While prostrating (Sujūd)",
+      cardTitle: "while In Sujūd",
       illustration: adhkarImages.prostration,
       tags: ["sujud"],
       entries: [
@@ -74,6 +78,7 @@ export const adhkarDuring: AdhkarGroup = {
       id: "5",
       type: "during",
       title: "Between the two prostrations",
+      cardTitle: "Between two Sujud",
       illustration: adhkarImages.prostration,
       tags: ["between_sujud"],
       entries: [
@@ -92,6 +97,7 @@ export const adhkarDuring: AdhkarGroup = {
       id: "6",
       type: "during",
       title: "After Tashahhud (before Taslīm)",
+      cardTitle: "After Tashahhud",
       illustration: adhkarImages.prostration,
       tags: ["tashahhud"],
       entries: [
