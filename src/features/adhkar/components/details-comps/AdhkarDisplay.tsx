@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
 
 import { AdhkarItem } from "@/features-adhkar/types";
-import { colors, font, spacing } from "@/shared/styles";
+import { colors, font, spacing, borderWidth, fontsize } from "@/shared/styles";
 
 import { DetailsActionBar } from "./DetailsActionBar";
 import { DetailsNavigator } from "./DetailsNavigator";
@@ -57,10 +57,12 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   arabicText: {
-    fontSize: 28,
+    fontSize: fontsize.xxl,
     fontFamily: font.display.medium.fontFamily ?? font.heading.medium.fontFamily,
     lineHeight: 38,
     color: colors.context.brand.primary,
+    textAlign: "right",
+    writingDirection: "rtl",
   },
   transliteration: {
     fontSize: font.body.small.fontSize,
@@ -77,7 +79,7 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   divider: {
-    height: 1,
+    height: borderWidth.xs,
     backgroundColor: colors.border.default.tertiary,
     marginVertical: spacing.lg,
   },
