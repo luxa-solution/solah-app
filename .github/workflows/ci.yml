@@ -1,0 +1,265 @@
+name: CI
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - production
+      - staging
+      - main
+    paths:
+      - 'src/**'
+      - 'assets/**'
+      - 'app.config.ts'
+      - 'package.json'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+      contents: read
+      pull-requests: write
+
+jobs:
+  wait-for-branch-guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions:
+      checks: read
+      contents: read
+    steps:
+      - name: Skip for non-PR events
+        run: echo "Non-PR event; skipping branch guard wait."
+
+      - name: Wait for PR Branch Guard
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const sha = context.payload.pull_request.head.sha;
+            const checkName = 'branch-guard';
+            const maxTries = 30;
+            const delayMs = 10000;
+            const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+            for (let attempt = 1; attempt <= maxTries; attempt++) {
+              const { data } = await github.rest.checks.listForRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: sha,
+                check_name: checkName,
+              });
+
+              const run = data.check_runs.find(r => r.name === checkName);
+
+              if (run && run.status === 'completed') {
+                if (run.conclusion === 'success') {
+                  core.info('Branch guard passed.');
+                  return;
+                }
+
+                core.setFailed(`Branch guard ${run.conclusion}`);
+                return;
+              }
+
+              core.info(`Branch guard not finished (try ${attempt}/${maxTries}); waiting ${delayMs / 1000}s`);
+              await sleep(delayMs);
+            }
+
+            core.setFailed('Branch guard did not complete in time.');
+
+  lint:
+    needs: wait-for-branch-guard
+    if: github.event_name != 'pull_request' || needs.wait-for-branch-guard.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref }} # Use github.ref for push/PR
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Run TypeScript type check
+        run: npx tsc --noEmit
+
+  test:
+    needs: wait-for-branch-guard
+    if: github.event_name != 'pull_request' || needs.wait-for-branch-guard.result == 'success' # Check job result
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    timeout-minutes: 5
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm run test:ci
+
+      - name: Add coverage summary to workflow summary
+        if: github.event_name == 'pull_request'
+        shell: bash
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+
+          const p = 'coverage/coverage-summary.json';
+          if (!fs.existsSync(p)) {
+            console.log('No coverage summary found at', p);
+            process.exit(0);
+          }
+
+          const s = JSON.parse(fs.readFileSync(p, 'utf8')).total;
+          const pct = (k) => (s?.[k]?.pct ?? 0);
+
+          const md = `
+          ## 🧪 Test Coverage
+
+          | Metric | % | Covered / Total |
+          |---|---:|---:|
+          | Lines | ${pct('lines')}% | ${s.lines.covered}/${s.lines.total} |
+          | Statements | ${pct('statements')}% | ${s.statements.covered}/${s.statements.total} |
+          | Functions | ${pct('functions')}% | ${s.functions.covered}/${s.functions.total} |
+          | Branches | ${pct('branches')}% | ${s.branches.covered}/${s.branches.total} |
+          `;
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, md + '\n');
+          NODE
+
+      - name: Comment coverage on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+
+            const p = 'coverage/coverage-summary.json';
+            if (!fs.existsSync(p)) {
+              core.info(`No coverage summary found at ${p}`);
+              return;
+            }
+
+            const summary = JSON.parse(fs.readFileSync(p, 'utf8')).total;
+            const pct = (k) => summary?.[k]?.pct ?? 0;
+
+            const body = `## 🧪 Coverage Report
+
+            | Metric | % | Covered / Total |
+            |---|---:|---:|
+            | Lines | ${pct('lines')}% | ${summary.lines.covered}/${summary.lines.total} |
+            | Statements | ${pct('statements')}% | ${summary.statements.covered}/${summary.statements.total} |
+            | Functions | ${pct('functions')}% | ${summary.functions.covered}/${summary.functions.total} |
+            | Branches | ${pct('branches')}% | ${summary.branches.covered}/${summary.branches.total} |
+
+            _Generated by CI (Jest coverage)._`;
+
+            const { owner, repo } = context.repo;
+            const issue_number = context.payload.pull_request.number;
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner, repo, issue_number,
+            });
+
+            const marker = "## 🧪 Coverage Report";
+            const existing = comments.find(c => c.user?.type === "Bot" && c.body?.includes(marker));
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner, repo,
+                comment_id: existing.id,
+                body,
+              });
+              core.info("Updated existing coverage comment.");
+            } else {
+              await github.rest.issues.createComment({
+                owner, repo,
+                issue_number,
+                body,
+              });
+              core.info("Created new coverage comment.");
+            }
+
+  build:
+    needs: wait-for-branch-guard # Depends on the guard check
+    if: github.event_name != 'pull_request' || needs.wait-for-branch-guard.result == 'success' # Check job result
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref }} # Use github.ref for push/PR
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: 'npm'
+
+      - name: Setup Expo
+        uses: expo/expo-github-action@v8
+        with:
+          expo-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build for preview
+        run: npx expo export --platform all
+
+  security:
+    needs: wait-for-branch-guard # Depends on the guard check
+    if: github.event_name != 'pull_request' || needs.wait-for-branch-guard.result == 'success' # Check job result
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: 'npm'
+
+      - name: Install dependencies  
+        run: npm ci
+
+      - name: Run npm audit
+        run: npm audit --audit-level=moderate
+        continue-on-error: true
+
+      - name: Check for outdated dependencies
+        run: npm outdated || true

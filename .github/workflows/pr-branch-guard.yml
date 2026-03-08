@@ -1,0 +1,140 @@
+name: PR Branch Guard
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+    branches:
+      - '**'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  branch-guard:
+    name: branch-guard
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Enforce PR Branch Flow Rules
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const pr = context.payload.pull_request;
+            if (!pr) {
+              core.info('No pull_request payload found; skipping branch guard.');
+              return;
+            }
+
+            const base = pr.base.ref; // target branch
+            const head = pr.head.ref; // source branch
+            const prNumber = pr.number;
+
+            core.info(`Branch Guard: checking PR #${prNumber}: ${head} -> ${base}`);
+
+            const startsWithOneOf = (branch, prefixes) =>
+              prefixes.some(prefix => branch.startsWith(prefix));
+
+            let allowed = true;
+            let explanation = '';
+
+            if (base === 'production') {
+              // main: only from staging, hotfix/*, release/*
+              allowed =
+                head === 'staging' ||
+                head === 'release' ||
+                head.startsWith('hotfix/') ||
+                head.startsWith('release/');
+
+              explanation = [
+                'Allowed PR sources into `production`:',
+                '- `staging`',
+                '- `release`',
+                '- `hotfix/*`',
+                '- `release/*`',
+              ].join('\n');
+
+            } else if (base === 'staging') {
+              // staging: only from main OR hotfix/*
+              allowed = head === 'main' || head.startsWith('hotfix/');
+              explanation = [
+                'Allowed PR sources into `staging`:',
+                '- `main` (Standard Integration Flow)',
+                '- `hotfix/*` (Direct Hotfix Propagation)',
+              ].join('\n');
+
+            } else if (base === 'main') {
+              // main: allow common work branches + dependabot
+              const allowedPrefixes = [
+                // common conventional-ish prefixes
+                'feat/',
+                'fix/',
+                'perf/',
+                'style/',
+                'build/',
+                'ci/',
+                'revert/',
+
+                // tooling/bots
+                'dependabot/',
+
+                // your existing patterns
+                'feature/',
+                'bugfix/',
+                'release/',
+                'refactor/',
+                'docs/',
+                'test/',
+                'chore/',
+                'hotfix/',
+              ];
+
+              allowed = startsWithOneOf(head, allowedPrefixes);
+
+              explanation = [
+                'Allowed PR sources into `main`:',
+                '- `feat/*`, `fix/*`, `perf/*`, `style/*`, `build/*`, `ci/*`, `revert/*` (Conventional work branches)',
+                '- `feature/*`, `bugfix/*`, `refactor/*`, `docs/*`, `test/*`, `chore/*` (Existing work branches)',
+                '- `hotfix/*` (Hotfix propagation)',
+                '- `release/*` (Cross-propagation)',
+                '- `dependabot/*` (Dependency updates)',
+              ].join('\n');
+            } else {
+              core.info(`Branch Guard: no rules defined for target "${base}", skipping validation.`);
+              return;
+            }
+
+            if (!allowed) {
+              const message = [
+                '[Blocked] **Branch flow violation**',
+                '',
+                `This pull request is not allowed based on the repository branch strategy.`,
+                '',
+                `**From:** \`${head}\``,
+                `**To:** \`${base}\``,
+                '',
+                explanation,
+                '',
+                '> Please re-open a PR from an allowed source branch for this target.',
+              ].join('\n');
+
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: message,
+              });
+
+              // Auto-close the PR to prevent merge
+              await github.rest.pulls.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: prNumber,
+                state: 'closed',
+              });
+
+              core.setFailed(`Disallowed PR: ${head} -> ${base}`);
+            } else {
+              core.info(`Branch Guard: PR #${prNumber}: ${head} -> ${base} is allowed (passed)`);
+            }

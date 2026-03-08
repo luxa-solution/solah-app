@@ -2,16 +2,28 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": true,
+    "typeRoots": ["./types", "./node_modules/@types"],
     "paths": {
-      "@/*": [
-        "./*"
-      ]
+      "@/features-adhkar/*": ["./src/features/adhkar/*"],
+      "@/features-guide/*": ["./src/features/guide/*"],
+      "@/features-home/*": ["./src/features/home/*"],
+      "@/features-onboarding/*": ["./src/features/onboarding/*"],
+      "@/features-solah/*": ["./src/features/solah/*"],
+      "@/features-settings/*": ["./src/features/settings/*"],
+      "@/app/*": ["./src/app/*"],
+      "@/screens/*": ["./src/screens/*"],
+      "@/features/*": ["./src/features/*"],
+      "@/shared/*": ["./src/shared/*"],
+      "@/*": ["./*"]
     }
   },
   "include": [
     "**/*.ts",
     "**/*.tsx",
     ".expo/types/**/*.ts",
-    "expo-env.d.ts"
+    "expo-env.d.ts",
+    "eslint.config.ts",
   ]
 }

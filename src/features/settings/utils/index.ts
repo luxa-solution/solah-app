@@ -1,0 +1,1 @@
+export { toText } from "./toText";

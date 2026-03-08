@@ -1,0 +1,19 @@
+import { Platform } from "react-native";
+
+/**
+ * Debounce function for search inputs
+ */
+export const debounce = <T extends (...args: any[]) => any>(
+  func: T,
+  wait: number
+): ((...args: Parameters<T>) => void) => {
+  let timeout: ReturnType<typeof setTimeout>;
+
+  return (...args: Parameters<T>) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
+  };
+};
+
+export const isIOS = (): boolean => Platform.OS === "ios";
+export const isAndroid = (): boolean => Platform.OS === "android";

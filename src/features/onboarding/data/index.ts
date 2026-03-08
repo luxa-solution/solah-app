@@ -1,0 +1,1 @@
+export { onboardingData } from "./onboardingData";

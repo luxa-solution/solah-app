@@ -1,15 +1,10 @@
-import { Text, View } from "react-native";
+import { Redirect } from "expo-router";
+
+import { useOnboardingStore } from "@/features-onboarding/store";
 
 export default function Index() {
-  return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text>Edit app/index.tsx to edit this screen.</Text>
-    </View>
-  );
+  const hasOnboarded = useOnboardingStore((s) => s.hasOnboarded);
+
+  if (!hasOnboarded) return <Redirect href="/onboarding" />;
+  return <Redirect href="/(tabs)/home" />;
 }

@@ -23,13 +23,19 @@ In the output, you'll find options to open the app in a
 - [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
 - [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
 
-You can start developing by editing the files inside the **src** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+You can start developing by editing the files inside the **src** directory. This project uses
+[file-based routing](https://docs.expo.dev/router/introduction).
 
 ## Contribution Guides
 
-The guide on how you can contribute to this project is available [here](docs/Contribution/index.md).
+1. Setup your work environment: see guide [here](docs/Contribution/EnvSetup.md).
+
+2. Contribute your work to this project: see guide [here](docs/Contribution/index.md).
+
+Any bug found in the app or any feature recommended must be added as a new issue on the
+[Issues](https://github.com/LUXA-Digital-Solutions/solah-app/issues) page.
 
 ## Project Setup
 
-The details on the steps taken in setting up the project are documented [here](docs/Project-Setup/index.md).
-
+The details on the steps taken in setting up the project are documented
+[here](docs/Project-Setup/index.md).

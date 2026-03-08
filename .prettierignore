@@ -1,0 +1,24 @@
+# Ignore build / output directories
+**/dist/
+**/build/
+**/.expo/
+**/android/
+**/ios/
+
+# Ignore scripts
+**/scripts/
+
+# Node modules
+**/node_modules/
+
+# Ignore config files and others
+**/*.json
+**/*.config.*
+**/*.jpg
+**/*.png
+**/*.svg
+
+# Others
+**/.github/
+**/.vscode/
+**/.*ignore
