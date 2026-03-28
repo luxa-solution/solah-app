@@ -2,7 +2,7 @@ name: Production Release Build
 
 on:
   pull_request:
-    branches: ['production']
+    branches: ["production"]
     types: [labeled]
     paths:
       - src/**
