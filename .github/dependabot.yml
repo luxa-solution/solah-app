@@ -1,0 +1,58 @@
+version: 2
+
+updates:
+  # npm dependencies
+  # NOTE: This repo uses Expo SDK-managed packages.
+  # Do NOT blindly merge Dependabot PRs for Expo or React Native packages.
+  # For expo-*, react-native, and closely coupled packages, validate with
+  # `npx expo install <pkg>` to ensure SDK version alignment before merging.
+  
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 10
+    labels:
+      - dependencies
+    groups:
+      production-patch-and-minor:
+        dependency-type: production
+        update-types:
+          - minor
+          - patch
+      development-patch-and-minor:
+        dependency-type: development
+        update-types:
+          - minor
+          - patch
+
+    ignore:
+      # Expo SDK-managed packages should be updated with `npx expo install`
+      - dependency-name: "expo"
+      - dependency-name: "expo-*"
+      - dependency-name: "@expo/*"
+      - dependency-name: "@expo-*"
+      - dependency-name: "eslint-config-expo"
+      - dependency-name: "jest-expo"
+      - dependency-name: "react"
+      - dependency-name: "react-dom"
+      - dependency-name: "@types/react"
+      - dependency-name: "@types/react-dom"
+      - dependency-name: "react-native"
+      - dependency-name: "react-native-*"
+      - dependency-name: "@react-native/*"
+      - dependency-name: "@react-navigation/*"
+      - dependency-name: "@testing-library/react-native"
+    
+    # Major version bumps are NOT grouped — they surface as individual PRs for manual review
+
+  # GitHub Actions
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 3
+    labels:
+      - dependencies
+      - ci
