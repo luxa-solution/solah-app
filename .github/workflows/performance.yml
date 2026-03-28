@@ -1,4 +1,4 @@
-name: Performance Monitoring
+name: Bundle Size Monitoring
 
 on:
   pull_request:
@@ -10,6 +10,16 @@ on:
       - 'assets/**'
       - 'app.config.ts'
       - 'package.json'
+      - 'package-lock.json'
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+      - 'assets/**'
+      - 'app.config.ts'
+      - 'package.json'
+      - 'package-lock.json'
 
 concurrency:
   group: perf-${{ github.workflow }}-${{ github.ref }}
@@ -79,13 +89,9 @@ jobs:
             relevant:
               - 'src/**'
               - 'assets/**'
-              - 'app.config.*'
-              - 'metro.config.*'
+              - 'app.config.ts'
               - 'package.json'
               - 'package-lock.json'
-              - 'tsconfig.json'
-              - '.github/workflows/**'
-              - '.eas/workflows/**'
 
   perf_baseline:
     name: Baseline snapshot (push)
@@ -398,3 +404,13 @@ jobs:
                 owner, repo, issue_number, body,
               });
             }
+
+      - name: Upload PR performance artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: perf-pr-${{ github.event.pull_request.number }}-${{ github.run_id }}
+          path: |
+            perf-report.json
+            perf-comment.md
+          retention-days: 14

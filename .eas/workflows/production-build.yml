@@ -6,9 +6,10 @@ on:
     types: [labeled]
     paths:
       - src/**
+      - assets/**
       - app.config.ts
       - package.json
-      - assets/**
+      - package-lock.json
 
 concurrency:
   cancel_in_progress: true
