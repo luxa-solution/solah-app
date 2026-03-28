@@ -73,4 +73,30 @@ describe("AppButton (critical behavior)", () => {
       expect.arrayContaining([expect.objectContaining({ backgroundColor: "transparent" })])
     );
   });
+
+  it("renders filled variant with brand background color", () => {
+    const { getByTestId } = render(<AppButton title="Submit" variant="filled" />);
+
+    const styles = getByTestId("app-button").props.style.flat();
+    const hasBrandBg = styles.some(
+      (s: any) => s && typeof s.backgroundColor === "string" && s.backgroundColor !== "transparent"
+    );
+    expect(hasBrandBg).toBe(true);
+  });
+
+  it("applies opacity style when disabled", () => {
+    const { getByTestId } = render(<AppButton title="Disabled" disabled />);
+
+    const styles = getByTestId("app-button").props.style.flat();
+    expect(styles).toEqual(expect.arrayContaining([expect.objectContaining({ opacity: 0.6 })]));
+  });
+
+  it("stretches to full width by default", () => {
+    const { getByTestId } = render(<AppButton title="Wide" />);
+
+    const styles = getByTestId("app-button").props.style.flat();
+    expect(styles).toEqual(
+      expect.arrayContaining([expect.objectContaining({ alignSelf: "stretch" })])
+    );
+  });
 });

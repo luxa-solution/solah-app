@@ -39,10 +39,25 @@ jest.mock("@/shared/components", () => ({
   },
 }));
 
-describe("Adhkar TitleBar wrapper (critical behavior)", () => {
+describe("Adhkar TitleBar wrapper", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockIsBookmarked.mockReturnValue(false);
+  });
+
+  it("renders 'Before Prayer' title for before type", () => {
+    const { getByText } = render(<TitleBar adhkar_type={"before" as any} />);
+    expect(getByText("Before Prayer")).toBeTruthy();
+  });
+
+  it("renders 'During Prayer' title for during type", () => {
+    const { getByText } = render(<TitleBar adhkar_type={"during" as any} />);
+    expect(getByText("During Prayer")).toBeTruthy();
+  });
+
+  it("renders 'After Prayer' title for after type", () => {
+    const { getByText } = render(<TitleBar adhkar_type={"after" as any} />);
+    expect(getByText("After Prayer")).toBeTruthy();
   });
 
   it("does not show bookmark when adhkarItem is missing", () => {
@@ -52,16 +67,60 @@ describe("Adhkar TitleBar wrapper (critical behavior)", () => {
     expect(getByText("showBookmark:false")).toBeTruthy();
   });
 
-  it("toggles bookmark when item is provided and showBookmark is true", () => {
-    const item = { id: "1", type: "before", title: "T", entries: [] } as any;
+  it("does not show bookmark when showBookmark is false even with item", () => {
+    const item = { id: "1", type: "before", title: "T", entries: [], illustration: null } as any;
 
-    const { getByText, getByLabelText } = render(
+    const { getByText } = render(
+      <TitleBar adhkar_type={"before" as any} adhkarItem={item} showBookmark={false} />
+    );
+
+    expect(getByText("showBookmark:false")).toBeTruthy();
+  });
+
+  it("shows bookmark when item is provided and showBookmark is true", () => {
+    const item = { id: "1", type: "before", title: "T", entries: [], illustration: null } as any;
+
+    const { getByText } = render(
       <TitleBar adhkar_type={"before" as any} adhkarItem={item} showBookmark />
     );
 
     expect(getByText("showBookmark:true")).toBeTruthy();
+  });
+
+  it("toggles bookmark when item is provided and showBookmark is true", () => {
+    const item = { id: "1", type: "before", title: "T", entries: [], illustration: null } as any;
+
+    const { getByLabelText } = render(
+      <TitleBar adhkar_type={"before" as any} adhkarItem={item} showBookmark />
+    );
 
     fireEvent.press(getByLabelText("bookmark"));
     expect(mockToggleBookmark).toHaveBeenCalledWith(item);
+  });
+
+  it("does not call toggleBookmark when no item is provided", () => {
+    const { getByLabelText } = render(<TitleBar adhkar_type={"before" as any} showBookmark />);
+
+    fireEvent.press(getByLabelText("bookmark"));
+    expect(mockToggleBookmark).not.toHaveBeenCalled();
+  });
+
+  it("reflects isBookmarked true from store", () => {
+    mockIsBookmarked.mockReturnValue(true);
+    const item = { id: "1", type: "before", title: "T", entries: [], illustration: null } as any;
+
+    const { getByText } = render(
+      <TitleBar adhkar_type={"before" as any} adhkarItem={item} showBookmark />
+    );
+
+    expect(getByText("isBookmarked:true")).toBeTruthy();
+  });
+
+  it("reflects isBookmarked false when item is absent", () => {
+    mockIsBookmarked.mockReturnValue(true);
+
+    const { getByText } = render(<TitleBar adhkar_type={"before" as any} />);
+
+    expect(getByText("isBookmarked:false")).toBeTruthy();
   });
 });
