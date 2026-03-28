@@ -13,6 +13,9 @@
     "format:write": "prettier --write .",
     "prepare": "husky",
     "test": "jest",
+    "test:watch": "jest --watch",
+    "test:changed": "jest --onlyChanged --passWithNoTests",
+    "test:related": "jest --findRelatedTests",
     "test:cov": "jest --coverage --watchAll=false",
     "test:prepush": "jest --changedSince=origin/main --passWithNoTests",
     "test:ci": "jest --ci --coverage --coverageReporters=json-summary --coverageReporters=text --coverageReporters=lcov"
