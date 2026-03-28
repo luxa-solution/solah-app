@@ -94,6 +94,7 @@ export default ( { config }: ConfigContext ): ExpoConfig => {
       "expo-font",
       "expo-localization",
       "expo-web-browser",
+      "expo-image",
       [
         "expo-splash-screen",
         {
