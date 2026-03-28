@@ -1,2 +1,5 @@
+echo "🎨 Checking formatting..."
+npm run format
+
 echo "🧪 Tests..."
 npm run test:prepush
