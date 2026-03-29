@@ -50,35 +50,6 @@ jest.mock("expo-router", () => ({
   useRouter: () => ({ back: jest.fn(), push: jest.fn() }),
 }));
 
-jest.mock("react-native-paper", () => {
-  const React = require("react");
-  const { Text, View, Pressable } = require("react-native");
-
-  return {
-    Appbar: {
-      Header: ({ children, ...props }: { children: React.ReactNode; [key: string]: unknown }) =>
-        React.createElement(View, props, children),
-      BackAction: ({ onPress }: { onPress: () => void }) =>
-        React.createElement(Pressable, { onPress, accessibilityLabel: "Back" }, "Back"),
-      Content: ({ title }: { title: string }) => React.createElement(Text, null, title),
-      Action: ({
-        icon,
-        onPress,
-        accessibilityLabel,
-      }: {
-        icon: string;
-        onPress: () => void;
-        accessibilityLabel: string;
-      }) =>
-        React.createElement(
-          Pressable,
-          { onPress, accessibilityLabel },
-          React.createElement(Text, null, icon)
-        ),
-    },
-  };
-});
-
 describe("AdhkarDetails", () => {
   it("renders the title for a known adhkar item", () => {
     const { getByText } = render(<AdhkarDetails adhkar_type="before" id="1" />);

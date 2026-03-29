@@ -1,6 +1,8 @@
 import { render } from "@testing-library/react-native";
 import React from "react";
 
+import { useSettingsStore } from "@/features-settings/store";
+
 jest.mock("@react-native-async-storage/async-storage", () => {
   const { createAsyncStorageMock } = require("@/shared/test");
   return createAsyncStorageMock();
@@ -19,18 +21,15 @@ jest.mock("@/features-solah/hooks", () => ({
 }));
 
 jest.mock("@/features-solah/utils", () => {
-  const React = require("react");
   const { Text } = require("react-native");
   return {
     formatDate: () => "1 Ramadan 1447",
     SolahIcons: {
-      Fajr: (props: object) => React.createElement(Text, props, "FajrIcon"),
-      Dhuhr: (props: object) => React.createElement(Text, props, "DhuhrIcon"),
+      Fajr: (props: object) => <Text {...props}>FajrIcon</Text>,
+      Dhuhr: (props: object) => <Text {...props}>DhuhrIcon</Text>,
     },
   };
 });
-
-import { useSettingsStore } from "@/features-settings/store";
 
 import { CurrentSolahTimes } from "./CurrentSolahTimes";
 

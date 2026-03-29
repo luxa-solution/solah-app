@@ -10,16 +10,6 @@ jest.mock("@react-native-async-storage/async-storage", () => {
   return createAsyncStorageMock();
 });
 
-jest.mock("@expo/vector-icons", () => {
-  const React = require("react");
-  const { Text } = require("react-native");
-
-  return {
-    Ionicons: (props: object) => React.createElement(Text, props, "Ionicon"),
-    MaterialCommunityIcons: (props: object) => React.createElement(Text, props, "MCIcon"),
-  };
-});
-
 const mockOnClose = jest.fn();
 
 const initialSettingsState = useSettingsStore.getState();

@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as Notifications from "expo-notifications";
 import { CalculationMethod } from "adhan";
+import * as Notifications from "expo-notifications";
 
 import {
   syncSolahNotifications,

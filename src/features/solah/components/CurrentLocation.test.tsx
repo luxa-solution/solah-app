@@ -10,14 +10,6 @@ jest.mock("@react-native-async-storage/async-storage", () => {
   return createAsyncStorageMock();
 });
 
-jest.mock("lucide-react-native", () => {
-  const React = require("react");
-  const { Text } = require("react-native");
-  return {
-    ChevronDown: (props: object) => React.createElement(Text, props, "ChevronDown"),
-  };
-});
-
 const initialSettingsState = useSettingsStore.getState();
 const initialDefaultState = useDefaultStore.getState();
 

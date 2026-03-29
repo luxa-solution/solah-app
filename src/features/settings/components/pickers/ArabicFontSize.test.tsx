@@ -5,15 +5,6 @@ import { useSettingsStore } from "@/features-settings/store";
 
 import { ArabicFontSize } from "./ArabicFontSize";
 
-jest.mock("@expo/vector-icons", () => {
-  const React = require("react");
-  const { Text } = require("react-native");
-
-  return {
-    Ionicons: (props: object) => React.createElement(Text, props, "Ionicon"),
-  };
-});
-
 jest.mock("@react-native-async-storage/async-storage", () => {
   const { createAsyncStorageMock } = require("@/shared/test");
   return createAsyncStorageMock();

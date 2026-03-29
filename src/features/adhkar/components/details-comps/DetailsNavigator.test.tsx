@@ -52,8 +52,10 @@ describe("DetailsNavigator (critical behavior)", () => {
   });
 
   it("navigates to next when id < total", () => {
-    const total = totalAdhkarAmt["morning" as any] ?? totalAdhkarAmt["before"];
-    // Use id=1 which is always less than total (there's at least 1 item for any type)
+    const beforeTotal = totalAdhkarAmt.before;
+
+    expect(beforeTotal).toBeGreaterThan(1);
+
     const item: AdhkarItem = {
       id: "1",
       title: "Adhkar 1",
@@ -61,22 +63,18 @@ describe("DetailsNavigator (critical behavior)", () => {
       entries: [],
     } as any;
 
-    const beforeTotal = totalAdhkarAmt["before"];
+    const { getByLabelText } = render(<DetailsNavigator item={item} />);
 
-    if (beforeTotal > 1) {
-      const { getByLabelText } = render(<DetailsNavigator item={item} />);
+    fireEvent.press(getByLabelText("next"));
 
-      fireEvent.press(getByLabelText("next"));
-
-      expect(mockPush).toHaveBeenCalledWith({
-        pathname: "/adhkar/details",
-        params: { adhkar_type: "before", id: "2" },
-      });
-    }
+    expect(mockPush).toHaveBeenCalledWith({
+      pathname: "/adhkar/details",
+      params: { adhkar_type: "before", id: "2" },
+    });
   });
 
   it("does not navigate to next when id equals total", () => {
-    const beforeTotal = totalAdhkarAmt["before"];
+    const beforeTotal = totalAdhkarAmt.before;
     const item: AdhkarItem = {
       id: String(beforeTotal),
       title: "Last Adhkar",

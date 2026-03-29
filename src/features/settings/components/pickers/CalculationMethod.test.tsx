@@ -10,15 +10,6 @@ jest.mock("@react-native-async-storage/async-storage", () => {
   return createAsyncStorageMock();
 });
 
-jest.mock("@expo/vector-icons", () => {
-  const React = require("react");
-  const { Text } = require("react-native");
-
-  return {
-    Ionicons: (props: object) => React.createElement(Text, props, "Ionicon"),
-  };
-});
-
 jest.mock("@/features-settings/constants", () => ({
   calMethods: [
     { name: "Use Default", method: "default", isDefault: true },

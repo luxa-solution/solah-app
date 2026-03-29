@@ -9,35 +9,6 @@ jest.mock("expo-router", () => ({
   useRouter: () => ({ back: jest.fn() }),
 }));
 
-jest.mock("react-native-paper", () => {
-  const React = require("react");
-  const { Text, View, Pressable } = require("react-native");
-
-  return {
-    Appbar: {
-      Header: ({ children, ...props }: { children: React.ReactNode; [key: string]: unknown }) =>
-        React.createElement(View, props, children),
-      BackAction: ({ onPress }: { onPress: () => void }) =>
-        React.createElement(Pressable, { onPress, accessibilityLabel: "Back" }, "Back"),
-      Content: ({ title }: { title: string }) => React.createElement(Text, null, title),
-      Action: ({
-        icon,
-        onPress,
-        accessibilityLabel,
-      }: {
-        icon: string;
-        onPress: () => void;
-        accessibilityLabel: string;
-      }) =>
-        React.createElement(
-          Pressable,
-          { onPress, accessibilityLabel },
-          React.createElement(Text, null, icon)
-        ),
-    },
-  };
-});
-
 jest.mock("@react-native-async-storage/async-storage", () => {
   const { createAsyncStorageMock } = require("@/shared/test");
   return createAsyncStorageMock();

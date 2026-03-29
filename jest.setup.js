@@ -33,6 +33,23 @@ jest.mock("@expo/vector-icons/Ionicons", () => {
   };
 });
 
+jest.mock("lucide-react-native", () => {
+  const React = require("react");
+  const { Text } = require("react-native");
+  const makeIcon = (label) => (props) => React.createElement(Text, props, label);
+
+  return {
+    ChevronDown: makeIcon("ChevronDown"),
+    Clock: makeIcon("Clock"),
+    CloudMoon: makeIcon("CloudMoon"),
+    Sun: makeIcon("Sun"),
+    CloudSun: makeIcon("CloudSun"),
+    Sunset: makeIcon("Sunset"),
+    MoonStar: makeIcon("MoonStar"),
+    Moon: makeIcon("Moon"),
+  };
+});
+
 jest.mock("react-native-paper", () => {
   const React = require("react");
   const { Pressable, Text, View } = require("react-native");
