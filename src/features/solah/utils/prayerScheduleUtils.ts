@@ -103,32 +103,32 @@ export function defaultPrayerScheduleConfig(): AllPrayerScheduleConfig {
     Subhi: {
       adhan: { mode: "at_solah_time" },
       iqamahDelayMinutes: 20,
-      adhanNotificationEnabled: true,
-      iqamahNotificationEnabled: true,
+      adhanNotificationMode: "mute",
+      iqamahNotificationMode: "mute",
     },
     Dhuhr: {
       adhan: { mode: "at_solah_time" },
       iqamahDelayMinutes: 15,
-      adhanNotificationEnabled: true,
-      iqamahNotificationEnabled: true,
+      adhanNotificationMode: "mute",
+      iqamahNotificationMode: "mute",
     },
     Asr: {
       adhan: { mode: "at_solah_time" },
       iqamahDelayMinutes: 15,
-      adhanNotificationEnabled: true,
-      iqamahNotificationEnabled: true,
+      adhanNotificationMode: "mute",
+      iqamahNotificationMode: "mute",
     },
     Maghrib: {
       adhan: { mode: "at_solah_time" },
       iqamahDelayMinutes: 10,
-      adhanNotificationEnabled: true,
-      iqamahNotificationEnabled: true,
+      adhanNotificationMode: "mute",
+      iqamahNotificationMode: "mute",
     },
     Isha: {
       adhan: { mode: "at_solah_time" },
       iqamahDelayMinutes: 15,
-      adhanNotificationEnabled: true,
-      iqamahNotificationEnabled: true,
+      adhanNotificationMode: "mute",
+      iqamahNotificationMode: "mute",
     },
   };
 }

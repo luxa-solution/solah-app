@@ -8,6 +8,7 @@ export {
 } from "./qiblaMath";
 export { getAdhanParams } from "./adhanHelpers";
 export { getCurrentMinutes, parseTimeToMinutes } from "./timeHelpers";
+export { getPrayerTimingDisplay } from "./prayerTimingDisplay";
 export {
   defaultPrayerScheduleConfig,
   deriveAdhanTime,

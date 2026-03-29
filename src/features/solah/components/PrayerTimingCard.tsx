@@ -1,7 +1,9 @@
 import { Sun, Moon } from "lucide-react-native";
 import { View, Text, StyleSheet } from "react-native";
 
+import { useSettingsStore } from "@/features-settings/store";
 import { useNextSolah } from "@/features-solah/hooks";
+import { getPrayerTimingDisplay } from "@/features-solah/utils";
 import { background, borderRadius, spacing, context, font } from "@/shared/styles";
 import { ds } from "@/shared/utils/responsive-dimensions";
 
@@ -28,13 +30,21 @@ function TimingCard({ type, time }: TimingCardProps) {
 
 export function PrayerTimingCard() {
   const { nextSolah } = useNextSolah();
-  const adhanTime = nextSolah.time;
-  const iqaamahTime = adhanTime; // TODO: Implement Iqamah Functionality
+  const prayerSchedule = useSettingsStore((state) => state.prayerSchedule);
+  const timeFormat = useSettingsStore((state) => state.timeFormat.value);
+  const timezone = useSettingsStore((state) => state.timezone.timezone);
+  const { adhanDisplay, iqamahDisplay } = getPrayerTimingDisplay(
+    nextSolah.title,
+    nextSolah.time,
+    prayerSchedule,
+    timeFormat,
+    timezone
+  );
 
   return (
     <View style={styles.container}>
-      <TimingCard type="adhan" time={adhanTime} />
-      <TimingCard type="iqaamah" time={iqaamahTime} />
+      <TimingCard type="adhan" time={adhanDisplay} />
+      <TimingCard type="iqaamah" time={iqamahDisplay} />
     </View>
   );
 }

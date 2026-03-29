@@ -18,8 +18,8 @@ describe("defaultPrayerScheduleConfig", () => {
 
     for (const prayer of Object.values(result)) {
       expect(prayer.adhan.mode).toBe("at_solah_time");
-      expect(prayer.adhanNotificationEnabled).toBe(true);
-      expect(prayer.iqamahNotificationEnabled).toBe(true);
+      expect(prayer.adhanNotificationMode).toBe("mute");
+      expect(prayer.iqamahNotificationMode).toBe("mute");
     }
   });
 });
