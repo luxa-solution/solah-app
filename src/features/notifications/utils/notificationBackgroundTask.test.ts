@@ -26,14 +26,16 @@ jest.mock(
   { virtual: true }
 );
 
-jest.mock("expo-notifications", () => ({
-  getPermissionsAsync: jest.fn(),
-  requestPermissionsAsync: jest.fn(),
-  cancelScheduledNotificationAsync: jest.fn(),
-  scheduleNotificationAsync: jest.fn(),
-  setNotificationChannelAsync: jest.fn(),
-  AndroidImportance: { MAX: 5 },
-  SchedulableTriggerInputTypes: { DATE: "date" },
+jest.mock("./localNotifications", () => ({
+  LocalNotifications: {
+    getPermissionsAsync: jest.fn(),
+    requestPermissionsAsync: jest.fn(),
+    cancelScheduledNotificationAsync: jest.fn(),
+    scheduleNotificationAsync: jest.fn(),
+    setNotificationChannelAsync: jest.fn(),
+    AndroidImportance: { MAX: 5 },
+    SchedulableTriggerInputTypes: { DATE: "date" },
+  },
 }));
 
 const mockSyncSolahNotifications = jest.fn();
@@ -99,32 +101,32 @@ describe("notificationBackgroundTask", () => {
         Subhi: {
           adhan: { mode: "at_solah_time" },
           iqamahDelayMinutes: 20,
-          adhanNotificationEnabled: true,
-          iqamahNotificationEnabled: true,
+          adhanNotificationMode: "sound",
+          iqamahNotificationMode: "vibrate",
         },
         Dhuhr: {
           adhan: { mode: "at_solah_time" },
           iqamahDelayMinutes: 15,
-          adhanNotificationEnabled: true,
-          iqamahNotificationEnabled: true,
+          adhanNotificationMode: "sound",
+          iqamahNotificationMode: "vibrate",
         },
         Asr: {
           adhan: { mode: "at_solah_time" },
           iqamahDelayMinutes: 15,
-          adhanNotificationEnabled: true,
-          iqamahNotificationEnabled: true,
+          adhanNotificationMode: "sound",
+          iqamahNotificationMode: "vibrate",
         },
         Maghrib: {
           adhan: { mode: "at_solah_time" },
           iqamahDelayMinutes: 10,
-          adhanNotificationEnabled: true,
-          iqamahNotificationEnabled: true,
+          adhanNotificationMode: "sound",
+          iqamahNotificationMode: "vibrate",
         },
         Isha: {
           adhan: { mode: "at_solah_time" },
           iqamahDelayMinutes: 15,
-          adhanNotificationEnabled: true,
-          iqamahNotificationEnabled: true,
+          adhanNotificationMode: "sound",
+          iqamahNotificationMode: "vibrate",
         },
       },
     };

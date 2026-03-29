@@ -1,10 +1,15 @@
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+
 import { SolahName } from "@/features-solah/types";
 
 export const NOTIFICATION_DELIVERY_MODES = ["mute", "vibrate", "sound"] as const;
 
 export type NotificationDeliveryMode = (typeof NOTIFICATION_DELIVERY_MODES)[number];
 
-export const NOTIFICATION_DELIVERY_ICON: Record<NotificationDeliveryMode, string> = {
+export const NOTIFICATION_DELIVERY_ICON: Record<
+  NotificationDeliveryMode,
+  keyof typeof MaterialCommunityIcons.glyphMap
+> = {
   mute: "volume-off",
   vibrate: "vibrate",
   sound: "volume-high",

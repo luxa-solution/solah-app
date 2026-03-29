@@ -11,6 +11,7 @@ jest.mock("@react-native-async-storage/async-storage", () => {
 });
 
 jest.mock("@/features-settings/constants", () => ({
+  ...jest.requireActual("@/features-settings/constants"),
   notifications: [
     { label: "Off", value: false },
     { label: "On", value: true },
