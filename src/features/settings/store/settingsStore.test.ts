@@ -1,3 +1,5 @@
+import { defaultPrayerScheduleConfig } from "@/features-solah/utils/prayerScheduleUtils";
+
 import { useSettingsStore } from "./settingsStore";
 
 jest.mock("@react-native-async-storage/async-storage", () => {
@@ -25,6 +27,11 @@ describe("useSettingsStore", () => {
     expect(state.solahTimeNotification).toBe(false);
     expect(state.sound).toBe("Default");
     expect(state.language.value).toBe("Default");
+    expect(state.prayerSchedule).toEqual(defaultPrayerScheduleConfig());
+    expect(state.prayerSchedule.Subhi.adhanNotificationEnabled).toBe(true);
+    expect(state.prayerSchedule.Subhi.iqamahNotificationEnabled).toBe(true);
+    expect(state.prayerSchedule.Maghrib.adhanNotificationEnabled).toBe(true);
+    expect(state.prayerSchedule.Maghrib.iqamahNotificationEnabled).toBe(true);
   });
 
   it("updates each setting through its action", () => {
@@ -55,6 +62,15 @@ describe("useSettingsStore", () => {
     const nextArabicFontSize = { name: "24", value: 24 };
     const nextArabicFontStyle = { name: "Uthmanic", value: "UthmanicHafs" };
     const nextLanguage = { name: "English", value: "English", isDefault: false };
+    const nextPrayerSchedule = {
+      ...defaultPrayerScheduleConfig(),
+      Dhuhr: {
+        adhan: { mode: "relative_after_solah" as const, offsetMinutes: 10 },
+        iqamahDelayMinutes: 20,
+        adhanNotificationEnabled: true,
+        iqamahNotificationEnabled: false,
+      },
+    };
 
     const state = useSettingsStore.getState();
     state.setCalculationMethod(nextCalculationMethod);
@@ -67,6 +83,7 @@ describe("useSettingsStore", () => {
     state.setSolahTimeNotification(true);
     state.setSound("Birds");
     state.setLanguage(nextLanguage);
+    state.setPrayerSchedule("Dhuhr", nextPrayerSchedule.Dhuhr);
 
     const nextState = useSettingsStore.getState();
 
@@ -80,5 +97,6 @@ describe("useSettingsStore", () => {
     expect(nextState.solahTimeNotification).toBe(true);
     expect(nextState.sound).toBe("Birds");
     expect(nextState.language).toEqual(nextLanguage);
+    expect(nextState.prayerSchedule).toEqual(nextPrayerSchedule);
   });
 });

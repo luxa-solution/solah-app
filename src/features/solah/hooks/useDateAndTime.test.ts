@@ -6,6 +6,7 @@ const mockFormatTime = jest.fn();
 const mockFormatDate = jest.fn();
 
 jest.mock("@/features-solah/utils", () => ({
+  ...jest.requireActual("@/features-solah/utils"),
   formatTime: (date: any, tz: any, fmt: any) => mockFormatTime(date, tz, fmt),
   formatDate: (date: any, cal: any, locale: any) => mockFormatDate(date, cal, locale),
 }));

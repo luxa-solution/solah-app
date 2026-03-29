@@ -12,7 +12,13 @@ import type {
   CalendarFormatOption,
   TimeFormatOption,
 } from "@/features-settings/constants";
-import { SoundOptions } from "@/features-settings/types";
+import {
+  AllPrayerScheduleConfig,
+  PrayerScheduleConfig,
+  SoundOptions,
+} from "@/features-settings/types";
+import { SolahName } from "@/features-solah/types";
+import { defaultPrayerScheduleConfig } from "@/features-solah/utils";
 
 type SettingsDataState = {
   calculationMethod: CalculationMethodOptions;
@@ -22,6 +28,7 @@ type SettingsDataState = {
   arabicFontStyle: ArabicFontStyleOption;
   solahTimeNotification: boolean;
   sound: SoundOptions;
+  prayerSchedule: AllPrayerScheduleConfig;
   language: LanguageOption;
   calendarFormat: CalendarFormatOption;
   timeFormat: TimeFormatOption;
@@ -32,6 +39,7 @@ type SettingsDataState = {
   setArabicFontStyle: (arabicFontStyle: ArabicFontStyleOption) => void;
   setSolahTimeNotification: (solahTimeNotification: boolean) => void;
   setSound: (sound: SoundOptions) => void;
+  setPrayerSchedule: (prayer: SolahName, config: PrayerScheduleConfig) => void;
   setLanguage: (language: LanguageOption) => void;
   setCalendarFormat: (calendarFormat: CalendarFormatOption) => void;
   setTimeFormat: (timeFormat: TimeFormatOption) => void;
@@ -74,6 +82,7 @@ export const useSettingsStore = create<SettingsDataState>()(
         arabicFontStyle: { name: "Default", value: "Default" },
         solahTimeNotification: false,
         sound: "Default",
+        prayerSchedule: defaultPrayerScheduleConfig(),
         language: {
           name: "Default",
           value: "Default",
@@ -115,6 +124,15 @@ export const useSettingsStore = create<SettingsDataState>()(
 
         setSound: (sound) => {
           set({ sound: sound });
+        },
+
+        setPrayerSchedule: (prayer, config) => {
+          set((state) => ({
+            prayerSchedule: {
+              ...state.prayerSchedule,
+              [prayer]: config,
+            },
+          }));
         },
 
         setLanguage: (language) => {

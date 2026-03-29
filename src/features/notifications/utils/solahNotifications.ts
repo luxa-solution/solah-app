@@ -2,22 +2,19 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Coordinates, PrayerTimes } from "adhan";
 import * as Notifications from "expo-notifications";
 
-import { SoundOptions, TimeZone } from "@/features-settings/types";
-import { CalculationMethodTypes, LocationData } from "@/features-solah/types";
-import { getAdhanParams } from "@/features-solah/utils";
+import { SoundOptions } from "@/features-settings/types";
+import { SolahName } from "@/features-solah/types";
+import { deriveAdhanTime, deriveIqamahTime, getAdhanParams } from "@/features-solah/utils";
 
-const STORAGE_KEY = "solah-notification-ids-v1";
-const SOLAH_NOTIFICATION_CHANNEL_PREFIX = "solah-times";
+import {
+  LAST_SYNCED_AT_STORAGE_KEY,
+  SOLAH_NOTIFICATION_CHANNEL_PREFIX,
+  SOLAH_NOTIFICATION_IDS_STORAGE_KEY,
+  SYNC_INPUT_STORAGE_KEY,
+} from "../constants";
+import { ScheduleInput } from "../types";
 
 type SolahNotifId = string;
-
-type ScheduleInput = {
-  enabled: boolean;
-  sound: SoundOptions;
-  location: LocationData;
-  timezone: TimeZone;
-  calculationMethod: CalculationMethodTypes;
-};
 
 export async function syncSolahNotifications(
   input: ScheduleInput
@@ -46,6 +43,8 @@ export async function syncSolahNotifications(
   // Always reschedule to reflect latest method/location/sound changes
   await cancelScheduledSolahNotifications();
   await scheduleSolahNotifications(input, channelId);
+  await saveSyncInput(input);
+  await saveLastSyncedAt(Date.now());
   return { permissionOk: true };
 }
 
@@ -64,50 +63,79 @@ export async function cancelScheduledSolahNotifications() {
 }
 
 async function scheduleSolahNotifications(
-  { location, calculationMethod, sound }: ScheduleInput,
+  { location, calculationMethod, sound, prayerSchedule, timezone }: ScheduleInput,
   channelId: string
 ) {
   if (!location?.latitude || !location?.longitude) return;
 
   const now = Date.now();
-  const scheduleItems: { label: string; date: Date }[] = [];
+  const scheduleItems: { title: string; body: string; date: Date }[] = [];
 
-  const today = new Date();
-  const tomorrow = new Date(today);
-  tomorrow.setDate(today.getDate() + 1);
+  const start = new Date();
+  const days = Array.from({ length: 7 }, (_, index) => {
+    const day = new Date(start);
+    day.setDate(start.getDate() + index);
+    return day;
+  });
 
-  for (const d of [today, tomorrow]) {
+  for (const d of days) {
+    let times: PrayerTimes;
+
     try {
       const coords = new Coordinates(location.latitude, location.longitude);
       const params = getAdhanParams(calculationMethod);
-      const times = new PrayerTimes(coords, d, params);
-      scheduleItems.push(
-        { label: "Subhi", date: times.fajr },
-        { label: "Dhuhr", date: times.dhuhr },
-        { label: "Asr", date: times.asr },
-        { label: "Maghrib", date: times.maghrib },
-        { label: "Isha", date: times.isha }
-      );
+      times = new PrayerTimes(coords, d, params);
     } catch {
       // ignore
+      continue;
+    }
+
+    const prayerTimes: { label: SolahName; date: Date }[] = [
+      { label: "Subhi", date: times.fajr },
+      { label: "Dhuhr", date: times.dhuhr },
+      { label: "Asr", date: times.asr },
+      { label: "Maghrib", date: times.maghrib },
+      { label: "Isha", date: times.isha },
+    ];
+
+    for (const prayer of prayerTimes) {
+      try {
+        const config = prayerSchedule[prayer.label];
+        const adhanTime = deriveAdhanTime(prayer.date, config.adhan, timezone);
+
+        if (config.adhanNotificationEnabled) {
+          scheduleItems.push({
+            title: "Solah time",
+            body: `It's time for ${prayer.label}.`,
+            date: adhanTime,
+          });
+        }
+
+        if (config.iqamahNotificationEnabled) {
+          scheduleItems.push({
+            title: "Iqamah time",
+            body: `Iqamah for ${prayer.label} is starting now.`,
+            date: deriveIqamahTime(adhanTime, config.iqamahDelayMinutes),
+          });
+        }
+      } catch {
+        // ignore invalid prayer config for this prayer/day only
+      }
     }
   }
 
   const future = scheduleItems
     .filter((x) => x.date.getTime() > now + 30_000) // avoid immediate past/near-now triggers
     .sort((a, b) => a.date.getTime() - b.date.getTime())
-    .slice(0, 10); // cap: today + tomorrow
+    .slice(0, 64);
 
   const ids: SolahNotifId[] = [];
   for (const item of future) {
-    const title = "Solah time";
-    const body = `It's time for ${item.label}.`;
-
     try {
       const id = await Notifications.scheduleNotificationAsync({
         content: {
-          title,
-          body,
+          title: item.title,
+          body: item.body,
           sound: mapSoundForIOS(sound),
         },
         trigger: {
@@ -177,7 +205,7 @@ function mapSoundForIOS(sound: SoundOptions): string | undefined {
 
 async function loadScheduledIds(): Promise<SolahNotifId[]> {
   try {
-    const raw = await AsyncStorage.getItem(STORAGE_KEY);
+    const raw = await AsyncStorage.getItem(SOLAH_NOTIFICATION_IDS_STORAGE_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
@@ -189,7 +217,44 @@ async function loadScheduledIds(): Promise<SolahNotifId[]> {
 
 async function saveScheduledIds(ids: SolahNotifId[]) {
   try {
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(ids));
+    await AsyncStorage.setItem(SOLAH_NOTIFICATION_IDS_STORAGE_KEY, JSON.stringify(ids));
+  } catch {
+    // ignore
+  }
+}
+
+export async function loadLastSyncedAt(): Promise<number | null> {
+  try {
+    const raw = await AsyncStorage.getItem(LAST_SYNCED_AT_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = Number(raw);
+    return Number.isFinite(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function saveLastSyncedAt(timestamp: number) {
+  try {
+    await AsyncStorage.setItem(LAST_SYNCED_AT_STORAGE_KEY, String(timestamp));
+  } catch {
+    // ignore
+  }
+}
+
+export async function loadSyncInput(): Promise<ScheduleInput | null> {
+  try {
+    const raw = await AsyncStorage.getItem(SYNC_INPUT_STORAGE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as ScheduleInput;
+  } catch {
+    return null;
+  }
+}
+
+async function saveSyncInput(input: ScheduleInput) {
+  try {
+    await AsyncStorage.setItem(SYNC_INPUT_STORAGE_KEY, JSON.stringify(input));
   } catch {
     // ignore
   }

@@ -21,8 +21,10 @@ jest.mock("@/features-solah/hooks", () => ({
 }));
 
 jest.mock("@/features-solah/utils", () => {
+  const actual = jest.requireActual("@/features-solah/utils");
   const { Text } = require("react-native");
   return {
+    ...actual,
     formatDate: () => "1 Ramadan 1447",
     SolahIcons: {
       Fajr: (props: object) => <Text {...props}>FajrIcon</Text>,

@@ -1,11 +1,14 @@
 import { useEffect } from "react";
+import type { AppStateStatus } from "react-native";
 
 import { useSettingsStore } from "@/features-settings/store";
 
-import { useNotificationForegroundRenewal } from "../hooks/useNotificationForegroundRenewal";
-import { syncSolahNotifications } from "../utils";
+import { FOREGROUND_RESYNC_MAX_AGE_MS } from "../constants";
+import { loadLastSyncedAt, syncSolahNotifications } from "../utils";
 
-export function SolahNotificationsEffect() {
+const AppState = require("react-native/Libraries/AppState/AppState");
+
+export function useNotificationForegroundRenewal() {
   const enabled = useSettingsStore((s) => s.solahTimeNotification);
   const sound = useSettingsStore((s) => s.sound);
   const location = useSettingsStore((s) => s.location.location);
@@ -14,12 +17,17 @@ export function SolahNotificationsEffect() {
   const prayerSchedule = useSettingsStore((s) => s.prayerSchedule);
   const setEnabled = useSettingsStore((s) => s.setSolahTimeNotification);
 
-  useNotificationForegroundRenewal();
-
   useEffect(() => {
-    let cancelled = false;
+    const subscription = AppState.addEventListener("change", async (state: AppStateStatus) => {
+      if (state !== "active" || !enabled) {
+        return;
+      }
 
-    (async () => {
+      const lastSyncedAt = await loadLastSyncedAt();
+      if (lastSyncedAt && Date.now() - lastSyncedAt <= FOREGROUND_RESYNC_MAX_AGE_MS) {
+        return;
+      }
+
       const result = await syncSolahNotifications({
         enabled,
         sound,
@@ -29,18 +37,13 @@ export function SolahNotificationsEffect() {
         prayerSchedule,
       });
 
-      if (cancelled) return;
-
-      // If user turned it on but permissions are denied, revert switch to Off.
       if (enabled && !result.permissionOk) {
         setEnabled(false);
       }
-    })();
+    });
 
     return () => {
-      cancelled = true;
+      subscription.remove();
     };
   }, [enabled, sound, location, timezone, calculationMethod, prayerSchedule, setEnabled]);
-
-  return null;
 }

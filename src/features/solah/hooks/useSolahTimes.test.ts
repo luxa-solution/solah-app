@@ -20,6 +20,7 @@ const mockGetCurrentMinutes = jest.fn();
 const mockParseTimeToMinutes = jest.fn();
 
 jest.mock("@/features-solah/utils", () => ({
+  ...jest.requireActual("@/features-solah/utils"),
   formatTime: (date: any, tz: any, fmt: any) => mockFormatTime(date, tz, fmt),
   getAdhanParams: (method: any) => mockGetAdhanParams(method),
   getCurrentMinutes: (tz: any) => mockGetCurrentMinutes(tz),
