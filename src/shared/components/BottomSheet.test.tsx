@@ -6,12 +6,11 @@ import {
   animateBottomSheetWithSpring,
   BottomSheet,
   clampBottomSheetTranslateY,
-  createBottomSheetCloseScheduler,
+  createBottomSheetPanStartHandler,
   createBottomSheetPanEndHandler,
   createBottomSheetPanUpdateHandler,
   createBottomSheetSpringAnimator,
   finishBottomSheetClose,
-  scheduleBottomSheetClose,
   shouldCloseBottomSheet,
   settleBottomSheetPosition,
   updateBottomSheetPosition,
@@ -135,13 +134,13 @@ describe("BottomSheet", () => {
   });
 
   it("clamps pan translation within sheet bounds", () => {
-    expect(clampBottomSheetTranslateY(300, 50, 200, 1000)).toBe(350);
-    expect(clampBottomSheetTranslateY(300, -200, 200, 1000)).toBe(200);
-    expect(clampBottomSheetTranslateY(900, 500, 200, 1000)).toBe(1000);
+    expect(clampBottomSheetTranslateY(300, 50, 200, 1000)).toBe(200);
+    expect(clampBottomSheetTranslateY(100, -200, 200, 1000)).toBe(0);
+    expect(clampBottomSheetTranslateY(100, 500, 200, 1000)).toBe(200);
   });
 
   it("uses the default screen height when one is not provided to the clamp helper", () => {
-    expect(clampBottomSheetTranslateY(100, 25, 50)).toBeGreaterThanOrEqual(125);
+    expect(clampBottomSheetTranslateY(100, 25, 50)).toBe(50);
   });
 
   it("decides when a drag should close the sheet", () => {
@@ -151,122 +150,107 @@ describe("BottomSheet", () => {
 
   it("updates the shared translation value during a drag", () => {
     const translateY = { value: 300 };
+    const startY = { value: 300 };
 
-    expect(updateBottomSheetPosition(translateY, 50, 200, 1000)).toBe(350);
-    expect(translateY.value).toBe(350);
+    expect(updateBottomSheetPosition(translateY, startY, 50, 200, 1000)).toBe(200);
+    expect(translateY.value).toBe(200);
   });
 
   it("uses the default screen height when updating the shared position", () => {
     const translateY = { value: 300 };
+    const startY = { value: 300 };
 
-    expect(updateBottomSheetPosition(translateY, 25, 200)).toBeGreaterThanOrEqual(325);
+    expect(updateBottomSheetPosition(translateY, startY, 25, 200)).toBe(200);
+  });
+
+  it("captures the starting translation before the drag begins", () => {
+    const translateY = { value: 40 };
+    const startY = { value: 0 };
+    const handler = createBottomSheetPanStartHandler(translateY, startY);
+
+    handler();
+
+    expect(startY.value).toBe(40);
   });
 
   it("creates a pan update handler that updates the shared value", () => {
-    const translateY = { value: 250 };
-    const handler = createBottomSheetPanUpdateHandler(translateY, 200, 1000);
+    const translateY = { value: 40 };
+    const startY = { value: 40 };
+    const handler = createBottomSheetPanUpdateHandler(translateY, startY, 200, 1000);
 
     handler({ translationY: 75 });
 
-    expect(translateY.value).toBe(325);
+    expect(translateY.value).toBe(115);
+  });
+
+  it("does not compound cumulative gesture translation across updates", () => {
+    const translateY = { value: 40 };
+    const startY = { value: 40 };
+    const handler = createBottomSheetPanUpdateHandler(translateY, startY, 200, 1000);
+
+    handler({ translationY: 20 });
+    handler({ translationY: 30 });
+
+    expect(translateY.value).toBe(70);
   });
 
   it("settles to closed and calls onClose when threshold is crossed", () => {
-    const translateY = { value: 150 };
+    const translateY = { value: 420 };
     const onClose = jest.fn();
-    const animateTo = jest.fn((value: number, onFinished?: (finished: boolean) => void) => {
-      onFinished?.(true);
-      return value;
-    });
+    const animateTo = jest.fn((value: number) => value);
 
-    expect(settleBottomSheetPosition(translateY, 500, animateTo, onClose)).toBe("closed");
-    expect(animateTo).toHaveBeenCalledWith(500, expect.any(Function));
+    expect(settleBottomSheetPosition(translateY, 250, 500, animateTo, onClose)).toBe("closed");
+    expect(animateTo).not.toHaveBeenCalled();
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it("does not call onClose when the settle animation reports unfinished", () => {
-    const translateY = { value: 150 };
+  it("settles back to the collapsed snap point when the drag ends near the default height", () => {
+    const translateY = { value: 260 };
     const onClose = jest.fn();
-    const animateTo = jest.fn((value: number, onFinished?: (finished: boolean) => void) => {
-      onFinished?.(false);
-      return value;
-    });
+    const animateTo = jest.fn((value: number) => value);
 
-    expect(settleBottomSheetPosition(translateY, 500, animateTo, onClose)).toBe("closed");
+    expect(settleBottomSheetPosition(translateY, 250, 500, animateTo, onClose)).toBe("collapsed");
+    expect(translateY.value).toBe(250);
     expect(onClose).not.toHaveBeenCalled();
+    expect(animateTo).toHaveBeenCalledWith(250);
   });
 
-  it("settles back to open when threshold is not crossed", () => {
+  it("settles up to expanded when the drag ends above the collapsed snap point", () => {
     const translateY = { value: 80 };
     const onClose = jest.fn();
     const animateTo = jest.fn((value: number) => value);
 
-    expect(settleBottomSheetPosition(translateY, 500, animateTo, onClose)).toBe("open");
+    expect(settleBottomSheetPosition(translateY, 250, 500, animateTo, onClose)).toBe("expanded");
     expect(translateY.value).toBe(0);
     expect(onClose).not.toHaveBeenCalled();
+    expect(animateTo).toHaveBeenCalledWith(0);
   });
 
   it("creates a pan end handler that closes through the supplied animation callback", () => {
-    const translateY = { value: 150 };
+    const translateY = { value: 420 };
     const onClose = jest.fn();
-    const animateTo = jest.fn((value: number, onFinished?: (finished: boolean) => void) => {
-      onFinished?.(true);
-      return value;
-    });
-    const handler = createBottomSheetPanEndHandler(translateY, 500, animateTo, onClose);
+    const animateTo = jest.fn((value: number) => value);
+    const handler = createBottomSheetPanEndHandler(translateY, 250, 500, animateTo, onClose);
 
     handler();
 
-    expect(animateTo).toHaveBeenCalledWith(500, expect.any(Function));
+    expect(animateTo).not.toHaveBeenCalled();
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it("wraps the spring callback and forwards the finished state", () => {
-    const spring = jest.fn(
-      (value: number, _config: object, callback?: (finished?: boolean) => void) => {
-        callback?.(true);
-        return value;
-      }
-    );
-    const onFinished = jest.fn();
+  it("animates with the spring helper without passing a completion callback", () => {
+    const spring = jest.fn((value: number) => value);
 
-    expect(animateBottomSheetWithSpring(spring, 320, onFinished)).toBe(320);
-    expect(onFinished).toHaveBeenCalledWith(true);
-  });
-
-  it("schedules the close callback through the provided scheduler", () => {
-    const scheduler = jest.fn((fn: () => void) => fn());
-    const onClose = jest.fn();
-
-    scheduleBottomSheetClose(scheduler, onClose);
-
-    expect(scheduler).toHaveBeenCalledTimes(1);
-    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(animateBottomSheetWithSpring(spring as any, 320)).toBe(320);
+    expect(spring).toHaveBeenCalledWith(320, {});
   });
 
   it("creates a spring animator from the provided spring function", () => {
-    const spring = jest.fn(
-      (value: number, _config: object, callback?: (finished?: boolean) => void) => {
-        callback?.(false);
-        return value;
-      }
-    );
-    const onFinished = jest.fn();
+    const spring = jest.fn((value: number) => value);
     const animator = createBottomSheetSpringAnimator(spring);
 
-    expect(animator(250, onFinished)).toBe(250);
-    expect(onFinished).toHaveBeenCalledWith(false);
-  });
-
-  it("creates a close scheduler wrapper", () => {
-    const scheduler = jest.fn((fn: () => void) => fn());
-    const onClose = jest.fn();
-    const close = createBottomSheetCloseScheduler(scheduler, onClose);
-
-    close();
-
-    expect(scheduler).toHaveBeenCalledTimes(1);
-    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(animator(250)).toBe(250);
+    expect(spring).toHaveBeenCalledWith(250, {});
   });
 
   it("finishes a close only when the animation reports success", () => {
