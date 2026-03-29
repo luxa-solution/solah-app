@@ -1,10 +1,5 @@
-echo "🎨 Fixing formatting..."
-npm run format:write
-
-if ! git diff --quiet; then
-  echo "Formatting fixes were applied. Stage and commit them, then push again."
-  exit 1
-fi
+echo "🎨 Checking formatting..."
+npm run format
 
 echo "🧪 Tests..."
 npm run test:prepush
