@@ -6,7 +6,7 @@ import { CalendarFormat } from "@/features-solah/types";
 import { formatDate, SolahIcons } from "@/features-solah/utils";
 import { colors, spacing, borderRadius, font, fontweight } from "@/shared/styles";
 
-interface CurrentSolahTimesProps {
+export interface CurrentSolahTimesProps {
   selectedDate: Date;
 }
 

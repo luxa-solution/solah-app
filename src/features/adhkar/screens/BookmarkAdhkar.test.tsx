@@ -1,7 +1,9 @@
 import { fireEvent, render } from "@testing-library/react-native";
 import React from "react";
 
-import { BookmarkAdhkar } from "./BookmarkAdhkar"; // adjust path if needed
+import { useAdhkarStore } from "@/features-adhkar/store";
+
+import { BookmarkAdhkar } from "./BookmarkAdhkar";
 
 const mockPush = jest.fn();
 
@@ -11,10 +13,10 @@ jest.mock("expo-router", () => ({
   }),
 }));
 
-const mockUseAdhkarStore = jest.fn();
-jest.mock("@/features-adhkar/store", () => ({
-  useAdhkarStore: () => mockUseAdhkarStore(),
-}));
+jest.mock("@react-native-async-storage/async-storage", () => {
+  const { createAsyncStorageMock } = require("@/shared/test");
+  return createAsyncStorageMock();
+});
 
 jest.mock("@/features-adhkar/data", () => ({
   adhkarData: [
@@ -32,13 +34,16 @@ jest.mock("@/features-adhkar/data", () => ({
   ],
 }));
 
+const initialState = useAdhkarStore.getState();
+
 describe("BookmarkAdhkar (critical behavior)", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    useAdhkarStore.setState(initialState, true);
   });
 
   it("shows empty state when there are no bookmarks", () => {
-    mockUseAdhkarStore.mockReturnValue({ bookmarkIds: [] });
+    useAdhkarStore.setState({ bookmarkIds: [] });
 
     const { getByText } = render(<BookmarkAdhkar />);
 
@@ -47,7 +52,7 @@ describe("BookmarkAdhkar (critical behavior)", () => {
   });
 
   it("renders bookmarked items and navigates on press", () => {
-    mockUseAdhkarStore.mockReturnValue({
+    useAdhkarStore.setState({
       bookmarkIds: ["before-2"], // only one is bookmarked
     });
 

@@ -19,6 +19,8 @@ describe("parseTimeToMinutes", () => {
     expect(parseTimeToMinutes("1")).toBe(0);
     expect(parseTimeToMinutes("1:2")).toBe(0);
     expect(parseTimeToMinutes("99:99")).toBe(0);
+    expect(parseTimeToMinutes("13:00 PM")).toBe(0);
+    expect(parseTimeToMinutes("24:00")).toBe(0);
   });
 });
 
@@ -42,5 +44,13 @@ describe("getCurrentMinutes", () => {
 
   it("returns hour*60 + minute from formatToParts", () => {
     expect(getCurrentMinutes("Asia/Riyadh" as any)).toBe(9 * 60 + 30);
+  });
+
+  it("falls back to 0 when hour and minute parts are missing", () => {
+    (Intl as any).DateTimeFormat = jest.fn(() => ({
+      formatToParts: () => [{ type: "literal", value: ":" }],
+    }));
+
+    expect(getCurrentMinutes("Asia/Riyadh" as any)).toBe(0);
   });
 });

@@ -6,12 +6,12 @@ import { screenStyle } from "@/shared/styles";
 import { SheetBody } from "./SheetBody";
 import { SheetTitle } from "./SheetTitle";
 
-interface SettingsModalProps {
+export interface SettingsSheetProps {
   settings_type: SettingsType;
   onClose?: () => void;
 }
 
-export function SettingsSheet({ settings_type, onClose }: SettingsModalProps) {
+export function SettingsSheet({ settings_type, onClose }: SettingsSheetProps) {
   return (
     <View
       style={{

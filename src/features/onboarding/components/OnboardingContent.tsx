@@ -3,14 +3,19 @@ import { View, Text, StyleSheet } from "react-native";
 
 import { context } from "@/shared/styles";
 
-type Props = {
+export type OnboardingContentProps = {
   imgsrc: any;
   title: string;
   description: string;
   imgPos?: "top" | "middle" | "bottom";
 };
 
-export function OnboardingContent({ imgsrc, title, description, imgPos = "top" }: Props) {
+export function OnboardingContent({
+  imgsrc,
+  title,
+  description,
+  imgPos = "top",
+}: OnboardingContentProps) {
   const Title = () => (
     <View style={styles.textContainer}>
       <Text style={styles.title}>{title}</Text>

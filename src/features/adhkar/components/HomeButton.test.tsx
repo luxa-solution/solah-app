@@ -42,4 +42,13 @@ describe("HomeButton (critical behavior)", () => {
     fireEvent.press(getByText("Morning"));
     expect(mockPush).toHaveBeenCalledWith("/adhkar");
   });
+
+  it("uses default count text and root href when optional props are omitted", () => {
+    const { getByText } = render(<HomeButton category={"Morning" as any} image={1 as any} />);
+
+    expect(getByText("0 Sub-categories • 0 Adhkar")).toBeTruthy();
+
+    fireEvent.press(getByText("Morning"));
+    expect(mockPush).toHaveBeenCalledWith("/");
+  });
 });

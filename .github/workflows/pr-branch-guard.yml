@@ -40,19 +40,15 @@ jobs:
             let explanation = '';
 
             if (base === 'production') {
-              // main: only from staging, hotfix/*, release/*
+              // production: only from staging or hotfix/*
               allowed =
                 head === 'staging' ||
-                head === 'release' ||
-                head.startsWith('hotfix/') ||
-                head.startsWith('release/');
+                head.startsWith('hotfix/');
 
               explanation = [
                 'Allowed PR sources into `production`:',
                 '- `staging`',
-                '- `release`',
                 '- `hotfix/*`',
-                '- `release/*`',
               ].join('\n');
 
             } else if (base === 'staging') {
@@ -65,40 +61,16 @@ jobs:
               ].join('\n');
 
             } else if (base === 'main') {
-              // main: allow common work branches + dependabot
-              const allowedPrefixes = [
-                // common conventional-ish prefixes
-                'feat/',
-                'fix/',
-                'perf/',
-                'style/',
-                'build/',
-                'ci/',
-                'revert/',
-
-                // tooling/bots
-                'dependabot/',
-
-                // your existing patterns
-                'feature/',
-                'bugfix/',
-                'release/',
-                'refactor/',
-                'docs/',
-                'test/',
-                'chore/',
-                'hotfix/',
-              ];
-
-              allowed = startsWithOneOf(head, allowedPrefixes);
+              // main: accepts everything except deployment branches
+              const blockedSources = ['production', 'preview'];
+              allowed = !blockedSources.includes(head);
 
               explanation = [
-                'Allowed PR sources into `main`:',
-                '- `feat/*`, `fix/*`, `perf/*`, `style/*`, `build/*`, `ci/*`, `revert/*` (Conventional work branches)',
-                '- `feature/*`, `bugfix/*`, `refactor/*`, `docs/*`, `test/*`, `chore/*` (Existing work branches)',
-                '- `hotfix/*` (Hotfix propagation)',
-                '- `release/*` (Cross-propagation)',
-                '- `dependabot/*` (Dependency updates)',
+                'Blocked PR sources into `main`:',
+                '- `production`',
+                '- `preview`',
+                '',
+                'All other branches are allowed.',
               ].join('\n');
             } else {
               core.info(`Branch Guard: no rules defined for target "${base}", skipping validation.`);
@@ -119,20 +91,23 @@ jobs:
                 '> Please re-open a PR from an allowed source branch for this target.',
               ].join('\n');
 
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: prNumber,
-                body: message,
+              const { owner, repo } = context.repo;
+              const { data: comments } = await github.rest.issues.listComments({
+                owner, repo, issue_number: prNumber,
               });
 
-              // Auto-close the PR to prevent merge
-              await github.rest.pulls.update({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: prNumber,
-                state: 'closed',
-              });
+              const marker = '[Blocked] **Branch flow violation**';
+              const existing = comments.find(c => c.user?.type === 'Bot' && c.body?.includes(marker));
+
+              if (existing) {
+                await github.rest.issues.updateComment({
+                  owner, repo, comment_id: existing.id, body: message,
+                });
+              } else {
+                await github.rest.issues.createComment({
+                  owner, repo, issue_number: prNumber, body: message,
+                });
+              }
 
               core.setFailed(`Disallowed PR: ${head} -> ${base}`);
             } else {

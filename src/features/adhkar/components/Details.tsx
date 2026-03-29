@@ -6,7 +6,7 @@ import { AdhkarItem, AdhkarType } from "../types";
 
 import { AdhkarDisplay } from "./details-comps";
 
-interface DetailsProps {
+export interface DetailsProps {
   id: string;
   adhkar_type: AdhkarType;
 }

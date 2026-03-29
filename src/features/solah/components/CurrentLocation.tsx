@@ -1,5 +1,5 @@
 import { ChevronDown } from "lucide-react-native";
-import { ActivityIndicator, Pressable, Text, View, StyleSheet } from "react-native";
+import { Pressable, Text, View, StyleSheet } from "react-native";
 
 import { useDefaultStore, useSettingsStore } from "@/features-settings/store";
 import { LocationData } from "@/features-solah/types/index";
@@ -58,21 +58,10 @@ function ChevronLocation({ country }: ChevronLocationProps) {
 }
 
 type ContainerLocationProps = {
-  loading?: boolean;
   location: LocationData | null;
 };
 
-function ContainerLocation({ loading, location }: ContainerLocationProps) {
-  // Loading ui
-  if (loading) {
-    return (
-      <View style={[styles.card, { justifyContent: "center" }]}>
-        <ActivityIndicator size="large" color="#999" />
-        <Text style={{ marginTop: 8, color: "#666" }}>Fetching location...</Text>
-      </View>
-    );
-  }
-
+function ContainerLocation({ location }: ContainerLocationProps) {
   if (!location) {
     return (
       <View style={styles.card}>

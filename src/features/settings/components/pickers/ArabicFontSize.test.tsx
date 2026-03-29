@@ -1,9 +1,14 @@
 import { render, fireEvent } from "@testing-library/react-native";
 import React from "react";
 
+import { useSettingsStore } from "@/features-settings/store";
+
 import { ArabicFontSize } from "./ArabicFontSize";
 
-const mockSetArabicFontSize = jest.fn();
+jest.mock("@react-native-async-storage/async-storage", () => {
+  const { createAsyncStorageMock } = require("@/shared/test");
+  return createAsyncStorageMock();
+});
 
 jest.mock("@/features-settings/constants", () => ({
   arabicFontSizes: [
@@ -12,30 +17,12 @@ jest.mock("@/features-settings/constants", () => ({
   ],
 }));
 
-jest.mock("@/features-settings/store", () => ({
-  useSettingsStore: () => ({
-    arabicFontSize: { name: "Small", value: 1 },
-    setArabicFontSize: mockSetArabicFontSize,
-  }),
-}));
-
-jest.mock("./shared", () => {
-  const { View } = require("react-native");
-  return {
-    SelectedIcon: () => <View testID="selected-icon" />,
-    styles: {
-      container: {},
-      option: {},
-      selectedOption: {},
-      optionText: {},
-      selectedOptionText: {},
-    },
-  };
-});
+const initialSettingsState = useSettingsStore.getState();
 
 describe("ArabicFontSize", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    useSettingsStore.setState(initialSettingsState, true);
   });
 
   it("pressing an option sets the font size and closes", () => {
@@ -44,7 +31,14 @@ describe("ArabicFontSize", () => {
 
     fireEvent.press(getByText("Large"));
 
-    expect(mockSetArabicFontSize).toHaveBeenCalledWith({ name: "Large", value: 2 });
+    expect(useSettingsStore.getState().arabicFontSize).toEqual({ name: "Large", value: 2 });
     expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("renders the list of available font sizes", () => {
+    const { getByText } = render(<ArabicFontSize />);
+
+    expect(getByText("Small")).toBeTruthy();
+    expect(getByText("Large")).toBeTruthy();
   });
 });

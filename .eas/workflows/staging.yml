@@ -2,12 +2,13 @@ name: Staging PR Preview (EAS)
 
 on:
   pull_request:
-    branches: ['staging']
+    branches: ["staging"]
     paths:
       - src/**
+      - assets/**
       - app.config.ts
       - package.json
-      - assets/**
+      - package-lock.json
 
 concurrency:
   cancel_in_progress: true

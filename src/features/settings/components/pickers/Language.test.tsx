@@ -1,9 +1,14 @@
 import { render, fireEvent } from "@testing-library/react-native";
 import React from "react";
 
+import { useDefaultStore, useSettingsStore } from "@/features-settings/store";
+
 import { Language } from "./Language";
 
-const mockSetLanguage = jest.fn();
+jest.mock("@react-native-async-storage/async-storage", () => {
+  const { createAsyncStorageMock } = require("@/shared/test");
+  return createAsyncStorageMock();
+});
 
 jest.mock("@/features-settings/constants", () => ({
   languages: [
@@ -13,45 +18,28 @@ jest.mock("@/features-settings/constants", () => ({
   ],
 }));
 
-jest.mock("@/features-settings/store", () => ({
-  useSettingsStore: () => ({
-    language: { name: "English", value: "en" },
-    setLanguage: mockSetLanguage,
-  }),
-  useDefaultStore: () => ({
-    defaultLanguage: { name: "English", value: "en" },
-  }),
-}));
-
-jest.mock("./shared", () => {
-  const { TextInput, View } = require("react-native");
-
-  return {
-    SearchBar: ({ value, onChange }: any) => (
-      <TextInput testID="searchbar" value={value} onChangeText={onChange} />
-    ),
-    SelectedIcon: () => <View testID="selected-icon" />,
-    styles: {
-      container: {},
-      option: {},
-      selectedOption: {},
-      optionText: {},
-      selectedOptionText: {},
-    },
-  };
-});
+const initialSettingsState = useSettingsStore.getState();
+const initialDefaultState = useDefaultStore.getState();
 
 describe("Language", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    useSettingsStore.setState(initialSettingsState, true);
+    useDefaultStore.setState(initialDefaultState, true);
+    useSettingsStore.setState({
+      language: { name: "English", value: "en" },
+    });
+    useDefaultStore.setState({
+      defaultLanguage: { name: "English", value: "en" },
+    });
   });
 
   it("filters languages by query", () => {
-    const { getByTestId, queryByText, getByText } = render(<Language />);
+    const { getByPlaceholderText, queryByText, getByText } = render(<Language />);
 
     expect(getByText("Arabic")).toBeTruthy();
 
-    fireEvent.changeText(getByTestId("searchbar"), "arab");
+    fireEvent.changeText(getByPlaceholderText("Search"), "arab");
 
     expect(getByText("Arabic")).toBeTruthy();
     expect(queryByText("English")).toBeNull();
@@ -63,7 +51,7 @@ describe("Language", () => {
 
     fireEvent.press(getByText("System Default"));
 
-    expect(mockSetLanguage).toHaveBeenCalledWith({ name: "English", value: "en" });
+    expect(useSettingsStore.getState().language).toEqual({ name: "English", value: "en" });
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
@@ -73,7 +61,7 @@ describe("Language", () => {
 
     fireEvent.press(getByText("Arabic"));
 
-    expect(mockSetLanguage).toHaveBeenCalledWith({ name: "Arabic", value: "ar" });
+    expect(useSettingsStore.getState().language).toEqual({ name: "Arabic", value: "ar" });
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 });

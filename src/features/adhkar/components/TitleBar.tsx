@@ -8,7 +8,7 @@ const titles = {
   after: "After Prayer",
 };
 
-interface TitleBarProps {
+export interface TitleBarProps {
   adhkar_type: AdhkarType;
   adhkarItem?: AdhkarItem;
   showBookmark?: boolean;

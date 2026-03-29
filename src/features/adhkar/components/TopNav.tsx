@@ -13,7 +13,7 @@ type IconComponent = React.ComponentType<{
   strokeWidth?: number;
 }>;
 
-interface TopNavProps {
+export interface TopNavProps {
   value: AdhkarTab;
   onChange: (tab: AdhkarTab) => void;
   favouriteCount?: number;
@@ -59,6 +59,7 @@ export function TopNav({ value, onChange, favouriteCount = 0, bookmarkCount = 0 
           return (
             <TouchableOpacity
               key={item.key}
+              testID={`topnav-tab-${item.key}`}
               onPress={() => onChange(item.key)}
               style={styles.tabButton}
               onLayout={handleTabLayout(index)}
@@ -92,6 +93,7 @@ export function TopNav({ value, onChange, favouriteCount = 0, bookmarkCount = 0 
       <View style={styles.indicatorWrapper} pointerEvents="none">
         {indicatorWidth > 0 && (
           <View
+            testID="topnav-indicator"
             style={[
               styles.indicator,
               {

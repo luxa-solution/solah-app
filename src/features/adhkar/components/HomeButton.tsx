@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { AdhkarCategory } from "@/features-adhkar/types";
 import { background } from "@/shared/styles";
 
-interface Props {
+export interface HomeButtonProps {
   category: AdhkarCategory;
   subCount?: number;
   adhkarCount?: number;
@@ -20,7 +20,7 @@ export function HomeButton({
   image,
   backgroundColor = background.brand.primary,
   href = "/",
-}: Props) {
+}: HomeButtonProps) {
   const router = useRouter();
 
   return (

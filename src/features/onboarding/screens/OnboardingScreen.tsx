@@ -19,7 +19,7 @@ export function OnboardingScreen() {
   const goToNext = () => {
     if (currentIndex < onboardingData.length - 1) {
       const nextIndex = currentIndex + 1;
-      flatListRef.current?.scrollToIndex({ index: nextIndex });
+      flatListRef.current?.scrollToIndex({ index: nextIndex, animated: true });
       setCurrentIndex(nextIndex);
     } else {
       completeOnboarding();
@@ -52,6 +52,14 @@ export function OnboardingScreen() {
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
+        getItemLayout={(_, index) => ({
+          length: windowWidth,
+          offset: windowWidth * index,
+          index,
+        })}
+        onScrollToIndexFailed={() => {
+          // FlatList can fail before measurements complete; the next user interaction will retry.
+        }}
         onMomentumScrollEnd={(event) => {
           const newIndex = Math.round(event.nativeEvent.contentOffset.x / windowWidth);
           setCurrentIndex(newIndex);

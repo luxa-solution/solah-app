@@ -37,7 +37,7 @@ export const useDateAndTime = ({ locale = "en-US" }: UseDateAndTimeOptions = {})
     }, msUntilNextMinute);
 
     return () => {
-      if (timeoutId) clearTimeout(timeoutId);
+      clearTimeout(timeoutId as ReturnType<typeof setTimeout>);
       if (intervalId) clearInterval(intervalId);
     };
   }, []);
@@ -56,13 +56,16 @@ export const useMinuteTick = () => {
   // Small local hook to force re-render on minute boundaries
   const [, setTick] = useState(0);
   useEffect(() => {
+    let intervalId: ReturnType<typeof setInterval> | null = null;
     const bump = () => setTick((x) => x + 1);
     const delay = 60000 - (Date.now() % 60000);
     const t = setTimeout(() => {
       bump();
-      const i = setInterval(bump, 60000);
-      return () => clearInterval(i);
+      intervalId = setInterval(bump, 60000);
     }, delay);
-    return () => clearTimeout(t as unknown as number);
+    return () => {
+      clearTimeout(t as unknown as number);
+      if (intervalId) clearInterval(intervalId);
+    };
   }, []);
 };

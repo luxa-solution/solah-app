@@ -1,0 +1,84 @@
+import { useSettingsStore } from "./settingsStore";
+
+jest.mock("@react-native-async-storage/async-storage", () => {
+  const { createAsyncStorageMock } = require("@/shared/test");
+  return createAsyncStorageMock();
+});
+
+const initialState = useSettingsStore.getState();
+
+describe("useSettingsStore", () => {
+  beforeEach(() => {
+    useSettingsStore.setState(initialState, true);
+  });
+
+  it("starts with the expected defaults", () => {
+    const state = useSettingsStore.getState();
+
+    expect(state.calculationMethod.method).toBe("MoonsightingCommittee");
+    expect(state.timezone.timezone).toBe("Asia/Riyadh");
+    expect(state.location.location.city).toBe("Riyadh");
+    expect(state.calendarFormat.value).toBe("hijri");
+    expect(state.timeFormat.value).toBe("12hr");
+    expect(state.arabicFontSize.value).toBe(20);
+    expect(state.arabicFontStyle.value).toBe("Default");
+    expect(state.solahTimeNotification).toBe(false);
+    expect(state.sound).toBe("Default");
+    expect(state.language.value).toBe("Default");
+  });
+
+  it("updates each setting through its action", () => {
+    const nextCalculationMethod = {
+      name: "Karachi",
+      method: "Karachi" as const,
+      isDefault: false,
+    };
+    const nextTimezone = {
+      name: "UTC",
+      timezone: "UTC",
+      isDefault: false,
+    };
+    const nextLocation = {
+      name: "Madinah",
+      location: {
+        longitude: 39.6111,
+        latitude: 24.5247,
+        city: "Madinah",
+        region: "Madinah Province",
+        country: "Saudi Arabia",
+      },
+      timezone: nextTimezone,
+      isDefault: false,
+    };
+    const nextCalendarFormat = { name: "Gregorian", value: "miladi" as const };
+    const nextTimeFormat = { name: "24-hour", value: "24hr" as const };
+    const nextArabicFontSize = { name: "24", value: 24 };
+    const nextArabicFontStyle = { name: "Uthmanic", value: "UthmanicHafs" };
+    const nextLanguage = { name: "English", value: "English", isDefault: false };
+
+    const state = useSettingsStore.getState();
+    state.setCalculationMethod(nextCalculationMethod);
+    state.setTimeZone(nextTimezone);
+    state.setLocation(nextLocation);
+    state.setCalendarFormat(nextCalendarFormat);
+    state.setTimeFormat(nextTimeFormat);
+    state.setArabicFontSize(nextArabicFontSize);
+    state.setArabicFontStyle(nextArabicFontStyle);
+    state.setSolahTimeNotification(true);
+    state.setSound("Birds");
+    state.setLanguage(nextLanguage);
+
+    const nextState = useSettingsStore.getState();
+
+    expect(nextState.calculationMethod).toEqual(nextCalculationMethod);
+    expect(nextState.timezone).toEqual(nextTimezone);
+    expect(nextState.location).toEqual(nextLocation);
+    expect(nextState.calendarFormat).toEqual(nextCalendarFormat);
+    expect(nextState.timeFormat).toEqual(nextTimeFormat);
+    expect(nextState.arabicFontSize).toEqual(nextArabicFontSize);
+    expect(nextState.arabicFontStyle).toEqual(nextArabicFontStyle);
+    expect(nextState.solahTimeNotification).toBe(true);
+    expect(nextState.sound).toBe("Birds");
+    expect(nextState.language).toEqual(nextLanguage);
+  });
+});

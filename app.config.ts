@@ -72,7 +72,6 @@ export default ( { config }: ConfigContext ): ExpoConfig => {
     icon: IOS_ICON,
     scheme,
     userInterfaceStyle: "automatic",
-    newArchEnabled: true,
     platforms: [ "android", "ios" ],
     ios: {
       supportsTablet: true,
@@ -85,7 +84,6 @@ export default ( { config }: ConfigContext ): ExpoConfig => {
         backgroundImage: ADAPTIVE_ICON.bgImage,
         monochromeImage: ADAPTIVE_ICON.mcImage,
       },
-      edgeToEdgeEnabled: true,
       predictiveBackGestureEnabled: false,
       package: scheme,
     },
@@ -94,6 +92,7 @@ export default ( { config }: ConfigContext ): ExpoConfig => {
       "expo-font",
       "expo-localization",
       "expo-web-browser",
+      "expo-image",
       [
         "expo-splash-screen",
         {

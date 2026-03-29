@@ -1,6 +1,7 @@
 import { fireEvent, render } from "@testing-library/react-native";
 import React from "react";
 
+import { totalAdhkarAmt } from "@/features-adhkar/data";
 import type { AdhkarItem } from "@/features-adhkar/types";
 
 import { DetailsNavigator } from "./DetailsNavigator";
@@ -11,13 +12,6 @@ jest.mock("expo-router", () => ({
   useRouter: () => ({
     push: mockPush,
   }),
-}));
-
-jest.mock("@/features-adhkar/data", () => ({
-  totalAdhkarAmt: {
-    morning: 3,
-    evening: 3,
-  },
 }));
 
 describe("DetailsNavigator (critical behavior)", () => {
@@ -58,10 +52,14 @@ describe("DetailsNavigator (critical behavior)", () => {
   });
 
   it("navigates to next when id < total", () => {
+    const beforeTotal = totalAdhkarAmt.before;
+
+    expect(beforeTotal).toBeGreaterThan(1);
+
     const item: AdhkarItem = {
-      id: "2",
-      title: "Adhkar 2",
-      type: "morning" as any,
+      id: "1",
+      title: "Adhkar 1",
+      type: "before" as any,
       entries: [],
     } as any;
 
@@ -71,15 +69,16 @@ describe("DetailsNavigator (critical behavior)", () => {
 
     expect(mockPush).toHaveBeenCalledWith({
       pathname: "/adhkar/details",
-      params: { adhkar_type: "morning", id: "3" },
+      params: { adhkar_type: "before", id: "2" },
     });
   });
 
-  it("does not navigate to next when id === total", () => {
+  it("does not navigate to next when id equals total", () => {
+    const beforeTotal = totalAdhkarAmt.before;
     const item: AdhkarItem = {
-      id: "3",
-      title: "Adhkar 3",
-      type: "morning" as any,
+      id: String(beforeTotal),
+      title: "Last Adhkar",
+      type: "before" as any,
       entries: [],
     } as any;
 

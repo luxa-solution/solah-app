@@ -120,6 +120,10 @@ export default defineConfig( [
     rules: {
       // Start with the recommended rules for Jest tests
       ...jestPlugin.configs.recommended.rules,
+      '@typescript-eslint/no-require-imports': 'off',
+      '@typescript-eslint/no-shadow': 'off',
+      '@typescript-eslint/array-type': 'off',
+      'import/first': 'off',
     },
   },
 

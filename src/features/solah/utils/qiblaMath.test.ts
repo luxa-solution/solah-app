@@ -12,6 +12,9 @@ describe("qibla math utils", () => {
 
     // x=1,y=0 => atan2(0,1)=0 => heading=270
     expect(magnetometerToHeading(1, 0)).toBeCloseTo(270, 5);
+
+    // x=-1,y=0 => atan2(0,-1)=180 => heading=90 (no wrap branch)
+    expect(magnetometerToHeading(-1, 0)).toBeCloseTo(90, 5);
   });
 
   it("normalizeAngle clamps into [-180, 180)", () => {
@@ -35,5 +38,9 @@ describe("qibla math utils", () => {
 
     // prev 10 -> next 350, shortest delta = -20
     expect(smoothAngle(10, 350, 0.5)).toBeCloseTo(0, 5);
+  });
+
+  it("uses the default alpha when one is not provided", () => {
+    expect(smoothAngle(350, 10)).toBeCloseTo(353, 5);
   });
 });
