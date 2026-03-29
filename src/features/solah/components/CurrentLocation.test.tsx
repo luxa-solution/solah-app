@@ -38,7 +38,7 @@ describe("CurrentLocation", () => {
     const screen = render(<CurrentLocation type="chevron" />);
 
     expect(screen.getByText("Saudi Arabia")).toBeTruthy();
-    expect(screen.getByText("ChevronDown")).toBeTruthy();
+    expect(screen.getByText("ChevronDownIcon")).toBeTruthy();
   });
 
   it("falls back when no selected location exists in chevron mode", () => {
