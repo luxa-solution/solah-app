@@ -48,16 +48,26 @@ describe("SettingsHome", () => {
     const screen = render(<SettingsHome />);
 
     expect(screen.getByText("Solah times")).toBeTruthy();
-    expect(screen.getByText("Fonts")).toBeTruthy();
     expect(screen.getByText("Notifications")).toBeTruthy();
     expect(screen.getByText("General")).toBeTruthy();
+    expect(screen.getByText("Appearance")).toBeTruthy();
   });
 
   it("renders the settings item labels", () => {
     const screen = render(<SettingsHome />);
 
     expect(screen.getByText("Calculation method")).toBeTruthy();
+    expect(screen.getByText("Automatically get time zone")).toBeTruthy();
+    expect(screen.getByText("Adhan settings")).toBeTruthy();
+    expect(screen.getByText("Iqamah settings")).toBeTruthy();
     expect(screen.getByText("Language")).toBeTruthy();
+  });
+
+  it("keeps prayer-specific adhan and iqamah rows out of the home screen", () => {
+    const screen = render(<SettingsHome />);
+
+    expect(screen.queryByText("Dhuhr adhan")).toBeNull();
+    expect(screen.queryByText("Maghrib iqamah")).toBeNull();
   });
 
   it("renders the notification toggle", () => {
@@ -78,5 +88,40 @@ describe("SettingsHome", () => {
 
     // Sheet content should be visible - the search bar for calmethod
     expect(screen.getByPlaceholderText("Search")).toBeTruthy();
+  });
+
+  it("shows read-only time zone text while automatic time zone is enabled", () => {
+    const screen = render(<SettingsHome />);
+
+    expect(screen.getByText("Time zone")).toBeTruthy();
+    expect(screen.queryByText("Manual time zone")).toBeNull();
+  });
+
+  it("shows the manual time zone item when automatic time zone is disabled", () => {
+    act(() => {
+      useSettingsStore.getState().setAutoTimezoneEnabled(false);
+    });
+
+    const screen = render(<SettingsHome />);
+
+    expect(screen.getByText("Manual time zone")).toBeTruthy();
+    expect(screen.queryByText("Time zone")).toBeNull();
+  });
+
+  it("keeps customize notifications hidden while prayer time notifications are off", () => {
+    const screen = render(<SettingsHome />);
+
+    expect(screen.queryByText("Customize notifications")).toBeNull();
+    expect(screen.queryByText("Dhuhr adhan notification")).toBeNull();
+  });
+
+  it("shows the customize notifications action when prayer time notifications are enabled", () => {
+    act(() => {
+      useSettingsStore.getState().setSolahTimeNotification(true);
+    });
+
+    const screen = render(<SettingsHome />);
+
+    expect(screen.getByText("Customize notifications")).toBeTruthy();
   });
 });
