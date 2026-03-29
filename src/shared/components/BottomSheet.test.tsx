@@ -223,8 +223,8 @@ describe("BottomSheet", () => {
 
   it("wraps the spring callback and forwards the finished state", () => {
     const spring = jest.fn(
-      (value: number, _config: object, callback: (finished: boolean) => void) => {
-        callback(true);
+      (value: number, _config: object, callback?: (finished?: boolean) => void) => {
+        callback?.(true);
         return value;
       }
     );
@@ -246,8 +246,8 @@ describe("BottomSheet", () => {
 
   it("creates a spring animator from the provided spring function", () => {
     const spring = jest.fn(
-      (value: number, _config: object, callback: (finished: boolean) => void) => {
-        callback(false);
+      (value: number, _config: object, callback?: (finished?: boolean) => void) => {
+        callback?.(false);
         return value;
       }
     );

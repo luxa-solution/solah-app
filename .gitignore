@@ -2,6 +2,7 @@
 
 # Git worktrees
 .worktrees/
+.agents/
 
 # dependencies
 node_modules/

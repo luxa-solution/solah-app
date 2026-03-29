@@ -33,11 +33,11 @@ describe("FindQiblaButton", () => {
   });
 
   it("uses the pressed style branch", () => {
-    let tree: TestRenderer.ReactTestRenderer;
+    let tree: any;
     TestRenderer.act(() => {
       tree = TestRenderer.create(<FindQiblaButton />);
     });
-    const pressable = tree.root.find((node) => typeof node.props.style === "function");
+    const pressable = tree.root.find((node: any) => typeof node.props.style === "function");
 
     const pressedStyles = pressable.props.style({ pressed: true });
 

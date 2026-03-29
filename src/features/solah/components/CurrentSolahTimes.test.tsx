@@ -46,7 +46,10 @@ describe("CurrentSolahTimes", () => {
           city: "Riyadh",
           region: "Riyadh Region",
           country: "Saudi Arabia",
+          latitude: 24.7136,
+          longitude: 46.6753,
         },
+        timezone: { name: "Riyadh", timezone: "Asia/Riyadh" },
       },
       calendarFormat: { name: "Hijri", value: "hijri" },
     });

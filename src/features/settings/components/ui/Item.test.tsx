@@ -22,11 +22,11 @@ describe("Item", () => {
   });
 
   it("uses the pressed style callback", () => {
-    let tree: TestRenderer.ReactTestRenderer;
+    let tree: any;
     TestRenderer.act(() => {
       tree = TestRenderer.create(<Item label="Language" value="English" />);
     });
-    const pressable = tree.root.find((node) => typeof node.props.style === "function");
+    const pressable = tree.root.find((node: any) => typeof node.props.style === "function");
 
     const pressedStyles = pressable.props.style({ pressed: true });
 

@@ -53,7 +53,7 @@ export const updateBottomSheetPosition = (
 export const settleBottomSheetPosition = (
   translateY: SharedTranslateY,
   sheetHeight: number,
-  animateTo: (value: number, onFinished?: (finished: boolean) => void) => number,
+  animateTo: (value: number, onFinished?: (finished?: boolean) => void) => number,
   onClose: () => void
 ) => {
   if (shouldCloseBottomSheet(translateY.value, sheetHeight)) {
@@ -80,7 +80,7 @@ export const createBottomSheetPanUpdateHandler = (
 export const createBottomSheetPanEndHandler = (
   translateY: SharedTranslateY,
   sheetHeight: number,
-  animateTo: (value: number, onFinished?: (finished: boolean) => void) => number,
+  animateTo: (value: number, onFinished?: (finished?: boolean) => void) => number,
   onClose: () => void
 ) => {
   return () => {
@@ -88,16 +88,16 @@ export const createBottomSheetPanEndHandler = (
   };
 };
 
-export const finishBottomSheetClose = (finished: boolean, onClose: () => void) => {
+export const finishBottomSheetClose = (finished: boolean | undefined, onClose: () => void) => {
   if (finished) {
     onClose();
   }
 };
 
 export const animateBottomSheetWithSpring = (
-  spring: (value: number, config: object, callback: (finished: boolean) => void) => number,
+  spring: (value: number, config: object, callback?: (finished?: boolean) => void) => number,
   value: number,
-  onFinished?: (finished: boolean) => void
+  onFinished?: (finished?: boolean) => void
 ) => {
   return spring(value, {}, (finished) => {
     onFinished?.(finished);
@@ -112,9 +112,9 @@ export const scheduleBottomSheetClose = (
 };
 
 export const createBottomSheetSpringAnimator = (
-  spring: (value: number, config: object, callback: (finished: boolean) => void) => number
+  spring: (value: number, config: object, callback?: (finished?: boolean) => void) => number
 ) => {
-  return (value: number, onFinished?: (finished: boolean) => void) =>
+  return (value: number, onFinished?: (finished?: boolean) => void) =>
     animateBottomSheetWithSpring(spring, value, onFinished);
 };
 

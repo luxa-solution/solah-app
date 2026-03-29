@@ -28,7 +28,10 @@ describe("CurrentLocation", () => {
           city: "Riyadh",
           region: "Riyadh Region",
           country: "Saudi Arabia",
+          latitude: 24.7136,
+          longitude: 46.6753,
         },
+        timezone: { name: "Riyadh", timezone: "Asia/Riyadh" },
       },
     });
 
@@ -40,7 +43,7 @@ describe("CurrentLocation", () => {
 
   it("falls back when no selected location exists in chevron mode", () => {
     useSettingsStore.setState({
-      location: { name: "Unknown", location: null },
+      location: { name: "Unknown", location: null as any } as any,
     });
 
     const screen = render(<CurrentLocation type="chevron" />);
@@ -56,7 +59,10 @@ describe("CurrentLocation", () => {
           city: "Riyadh",
           region: "Riyadh Region",
           country: "Saudi Arabia",
+          latitude: 24.7136,
+          longitude: 46.6753,
         },
+        timezone: { name: "Riyadh", timezone: "Asia/Riyadh" },
       },
     });
 
@@ -68,7 +74,7 @@ describe("CurrentLocation", () => {
 
   it("renders the empty-state message in container mode when no location exists", () => {
     useDefaultStore.setState({
-      defaultLocation: { name: "Default", location: null },
+      defaultLocation: { name: "Default", location: null as any } as any,
     });
 
     const screen = render(<CurrentLocation type="container" />);

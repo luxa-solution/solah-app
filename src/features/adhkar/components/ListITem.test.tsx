@@ -54,14 +54,14 @@ describe("ListItem (critical behavior)", () => {
     } as any;
 
     const { UNSAFE_getByType } = render(<ListItem item={item} />);
-    let tree: TestRenderer.ReactTestRenderer;
+    let tree: any;
     TestRenderer.act(() => {
       tree = TestRenderer.create(<ListItem item={item} />);
     });
 
     expect(UNSAFE_getByType(Image)).toBeTruthy();
 
-    const pressable = tree.root.find((node) => typeof node.props.style === "function");
+    const pressable = tree.root.find((node: any) => typeof node.props.style === "function");
     const pressedStyles = pressable.props.style({ pressed: true });
     expect(pressedStyles[1]).toEqual({ opacity: 0.75 });
   });

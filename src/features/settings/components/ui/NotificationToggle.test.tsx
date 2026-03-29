@@ -41,14 +41,14 @@ describe("NotificationToggle", () => {
     useSettingsStore.setState({ solahTimeNotification: true });
 
     const { getByText } = render(<NotificationToggle />);
-    let tree: TestRenderer.ReactTestRenderer;
+    let tree: any;
     TestRenderer.act(() => {
       tree = TestRenderer.create(<NotificationToggle />);
     });
 
     expect(getByText("On")).toBeTruthy();
 
-    const pressable = tree.root.find((node) => typeof node.props.style === "function");
+    const pressable = tree.root.find((node: any) => typeof node.props.style === "function");
     const pressedStyles = pressable.props.style({ pressed: true });
     expect(Array.isArray(pressedStyles)).toBe(true);
   });

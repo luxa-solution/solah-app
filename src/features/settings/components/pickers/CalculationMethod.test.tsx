@@ -27,10 +27,10 @@ describe("CalculationMethod", () => {
     useSettingsStore.setState(initialSettingsState, true);
     useDefaultStore.setState(initialDefaultState, true);
     useSettingsStore.setState({
-      calculationMethod: { name: "Muslim World League", method: "MWL" },
+      calculationMethod: { name: "Muslim World League", method: "MuslimWorldLeague" },
     });
     useDefaultStore.setState({
-      defaultCalculationMethod: { name: "Umm Al-Qura", method: "UQ" },
+      defaultCalculationMethod: { name: "Umm Al-Qura", method: "UmmAlQura" },
     });
   });
 
@@ -53,7 +53,7 @@ describe("CalculationMethod", () => {
 
     expect(useSettingsStore.getState().calculationMethod).toEqual({
       name: "Umm Al-Qura",
-      method: "UQ",
+      method: "UmmAlQura",
     });
     expect(onClose).toHaveBeenCalledTimes(1);
   });
@@ -66,7 +66,7 @@ describe("CalculationMethod", () => {
 
     expect(useSettingsStore.getState().calculationMethod).toEqual({
       name: "Umm Al-Qura",
-      method: "UQ",
+      method: "UmmAlQura",
     });
     expect(onClose).toHaveBeenCalledTimes(1);
   });

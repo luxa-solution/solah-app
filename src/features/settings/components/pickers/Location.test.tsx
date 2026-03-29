@@ -15,16 +15,35 @@ jest.mock("@/features-settings/constants", () => ({
     {
       name: "Default",
       isDefault: true,
-      location: { city: "Default City", region: "Default Region", country: "Default Country" },
+      location: {
+        city: "Default City",
+        region: "Default Region",
+        country: "Default Country",
+        latitude: 1,
+        longitude: 1,
+      },
+      timezone: { name: "Default", timezone: "Asia/Riyadh" },
     },
     {
       name: "Riyadh",
-      location: { city: "Riyadh", region: "Riyadh Region", country: "Saudi Arabia" },
+      location: {
+        city: "Riyadh",
+        region: "Riyadh Region",
+        country: "Saudi Arabia",
+        latitude: 24.7136,
+        longitude: 46.6753,
+      },
       timezone: { name: "Riyadh", timezone: "Asia/Riyadh" },
     },
     {
       name: "London",
-      location: { city: "London", region: "England", country: "United Kingdom" },
+      location: {
+        city: "London",
+        region: "England",
+        country: "United Kingdom",
+        latitude: 51.5072,
+        longitude: -0.1276,
+      },
       timezone: { name: "London", timezone: "Europe/London" },
     },
   ],
@@ -41,14 +60,27 @@ describe("Location", () => {
     useSettingsStore.setState({
       location: {
         name: "Riyadh",
-        location: { city: "Riyadh", region: "Riyadh Region", country: "Saudi Arabia" },
+        location: {
+          city: "Riyadh",
+          region: "Riyadh Region",
+          country: "Saudi Arabia",
+          latitude: 24.7136,
+          longitude: 46.6753,
+        },
+        timezone: { name: "Riyadh", timezone: "Asia/Riyadh" },
       },
       timezone: { name: "Riyadh", timezone: "Asia/Riyadh" },
     });
     useDefaultStore.setState({
       defaultLocation: {
         name: "London",
-        location: { city: "London", region: "England", country: "United Kingdom" },
+        location: {
+          city: "London",
+          region: "England",
+          country: "United Kingdom",
+          latitude: 51.5072,
+          longitude: -0.1276,
+        },
         timezone: { name: "London", timezone: "Europe/London" },
       },
     });
@@ -73,7 +105,13 @@ describe("Location", () => {
 
     expect(useSettingsStore.getState().location).toEqual({
       name: "London",
-      location: { city: "London", region: "England", country: "United Kingdom" },
+      location: {
+        city: "London",
+        region: "England",
+        country: "United Kingdom",
+        latitude: 51.5072,
+        longitude: -0.1276,
+      },
       timezone: { name: "London", timezone: "Europe/London" },
     });
     expect(onClose).toHaveBeenCalledTimes(1);
@@ -87,7 +125,13 @@ describe("Location", () => {
 
     expect(useSettingsStore.getState().location).toEqual({
       name: "London",
-      location: { city: "London", region: "England", country: "United Kingdom" },
+      location: {
+        city: "London",
+        region: "England",
+        country: "United Kingdom",
+        latitude: 51.5072,
+        longitude: -0.1276,
+      },
       timezone: { name: "London", timezone: "Europe/London" },
     });
     expect(useSettingsStore.getState().timezone).toEqual({
