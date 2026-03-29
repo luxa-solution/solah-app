@@ -1,10 +1,9 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Coordinates, PrayerTimes } from "adhan";
-// Android remote-push/token APIs are unavailable in Expo Go.
-// This module only schedules local notifications and does not use any push-token helpers.
-import * as Notifications from "expo-notifications";
 
+import { NotificationDeliveryMode } from "@/features-settings/constants";
 import { SoundOptions } from "@/features-settings/types";
+import { isNotificationDeliveryEnabled } from "@/features-settings/utils";
 import { SolahName } from "@/features-solah/types";
 import { deriveAdhanTime, deriveIqamahTime, getAdhanParams } from "@/features-solah/utils";
 
@@ -15,6 +14,8 @@ import {
   SYNC_INPUT_STORAGE_KEY,
 } from "../constants";
 import { ScheduleInput } from "../types";
+
+import { LocalNotifications } from "./localNotifications";
 
 type SolahNotifId = string;
 
@@ -29,7 +30,12 @@ export async function syncSolahNotifications(
   }
 
   // If location isn't configured yet, do not prompt for permissions.
-  if (!input.location?.latitude || !input.location?.longitude) {
+  if (
+    input.location?.latitude === null ||
+    input.location?.latitude === undefined ||
+    input.location?.longitude === null ||
+    input.location?.longitude === undefined
+  ) {
     await cancelScheduledSolahNotifications();
     return { permissionOk: true };
   }
@@ -39,12 +45,9 @@ export async function syncSolahNotifications(
     return { permissionOk: false };
   }
 
-  const channelId = getSolahNotificationChannelId(input.sound);
-  await ensureSolahNotificationChannel(channelId, input.sound);
-
   // Always reschedule to reflect latest method/location/sound changes
   await cancelScheduledSolahNotifications();
-  await scheduleSolahNotifications(input, channelId);
+  await scheduleSolahNotifications(input);
   await saveSyncInput(input);
   await saveLastSyncedAt(Date.now());
   return { permissionOk: true };
@@ -55,7 +58,7 @@ export async function cancelScheduledSolahNotifications() {
   await Promise.all(
     ids.map(async (id) => {
       try {
-        await Notifications.cancelScheduledNotificationAsync(id);
+        await LocalNotifications.cancelScheduledNotificationAsync(id);
       } catch {
         // ignore
       }
@@ -64,14 +67,28 @@ export async function cancelScheduledSolahNotifications() {
   await saveScheduledIds([]);
 }
 
-async function scheduleSolahNotifications(
-  { location, calculationMethod, sound, prayerSchedule, timezone }: ScheduleInput,
-  channelId: string
-) {
-  if (!location?.latitude || !location?.longitude) return;
+async function scheduleSolahNotifications({
+  location,
+  calculationMethod,
+  sound,
+  prayerSchedule,
+  timezone,
+}: ScheduleInput) {
+  if (
+    location?.latitude === null ||
+    location?.latitude === undefined ||
+    location?.longitude === null ||
+    location?.longitude === undefined
+  )
+    return;
 
   const now = Date.now();
-  const scheduleItems: { title: string; body: string; date: Date }[] = [];
+  const scheduleItems: {
+    title: string;
+    body: string;
+    date: Date;
+    deliveryMode: NotificationDeliveryMode;
+  }[] = [];
 
   const start = new Date();
   const days = Array.from({ length: 7 }, (_, index) => {
@@ -105,19 +122,21 @@ async function scheduleSolahNotifications(
         const config = prayerSchedule[prayer.label];
         const adhanTime = deriveAdhanTime(prayer.date, config.adhan, timezone);
 
-        if (config.adhanNotificationEnabled) {
+        if (isNotificationDeliveryEnabled(config.adhanNotificationMode)) {
           scheduleItems.push({
             title: "Solah time",
             body: `It's time for ${prayer.label}.`,
             date: adhanTime,
+            deliveryMode: config.adhanNotificationMode,
           });
         }
 
-        if (config.iqamahNotificationEnabled) {
+        if (isNotificationDeliveryEnabled(config.iqamahNotificationMode)) {
           scheduleItems.push({
             title: "Iqamah time",
             body: `Iqamah for ${prayer.label} is starting now.`,
             date: deriveIqamahTime(adhanTime, config.iqamahDelayMinutes),
+            deliveryMode: config.iqamahNotificationMode,
           });
         }
       } catch {
@@ -131,19 +150,20 @@ async function scheduleSolahNotifications(
     .sort((a, b) => a.date.getTime() - b.date.getTime())
     .slice(0, 64);
 
+  const channelIdsByMode = await ensureNotificationChannels(sound, future);
   const ids: SolahNotifId[] = [];
   for (const item of future) {
     try {
-      const id = await Notifications.scheduleNotificationAsync({
+      const id = await LocalNotifications.scheduleNotificationAsync({
         content: {
           title: item.title,
           body: item.body,
-          sound: mapSoundForIOS(sound),
+          sound: mapSoundForIOS(item.deliveryMode, sound),
         },
         trigger: {
-          type: Notifications.SchedulableTriggerInputTypes.DATE,
+          type: LocalNotifications.SchedulableTriggerInputTypes.DATE,
           date: item.date,
-          channelId,
+          channelId: channelIdsByMode[item.deliveryMode],
         },
       });
       ids.push(id);
@@ -157,9 +177,9 @@ async function scheduleSolahNotifications(
 
 async function ensureNotificationPermission() {
   try {
-    const perms = await Notifications.getPermissionsAsync();
+    const perms = await LocalNotifications.getPermissionsAsync();
     if (perms.granted) return true;
-    const req = await Notifications.requestPermissionsAsync();
+    const req = await LocalNotifications.requestPermissionsAsync();
     return req.granted;
   } catch {
     return false;
@@ -167,7 +187,7 @@ async function ensureNotificationPermission() {
 }
 
 export function getSolahNotificationChannelId(sound: SoundOptions): string {
-  if (!sound || sound === "Default") return `${SOLAH_NOTIFICATION_CHANNEL_PREFIX}-default`;
+  if (!sound || sound === "Short Adhan") return `${SOLAH_NOTIFICATION_CHANNEL_PREFIX}-default`;
   const slug = sound
     .toLowerCase()
     .replace(/['’]/g, "")
@@ -176,32 +196,72 @@ export function getSolahNotificationChannelId(sound: SoundOptions): string {
   return `${SOLAH_NOTIFICATION_CHANNEL_PREFIX}-${slug || "custom"}`;
 }
 
-async function ensureSolahNotificationChannel(channelId: string, sound: SoundOptions) {
+function getNotificationChannelIdForMode(
+  mode: NotificationDeliveryMode,
+  sound: SoundOptions
+): string {
+  if (mode === "sound") {
+    return getSolahNotificationChannelId(sound);
+  }
+
+  return `${SOLAH_NOTIFICATION_CHANNEL_PREFIX}-${mode}`;
+}
+
+async function ensureNotificationChannels(
+  sound: SoundOptions,
+  scheduleItems: { deliveryMode: NotificationDeliveryMode }[]
+) {
+  const modes = Array.from(new Set(scheduleItems.map((item) => item.deliveryMode)));
+  const channelIdsByMode = Object.fromEntries(
+    modes.map((mode) => [mode, getNotificationChannelIdForMode(mode, sound)])
+  ) as Record<NotificationDeliveryMode, string>;
+
+  await Promise.all(
+    modes.map((mode) => ensureSolahNotificationChannel(channelIdsByMode[mode], sound, mode))
+  );
+
+  return channelIdsByMode;
+}
+
+async function ensureSolahNotificationChannel(
+  channelId: string,
+  sound: SoundOptions,
+  mode: NotificationDeliveryMode
+) {
   // Android-only; safe to call elsewhere
   try {
-    await Notifications.setNotificationChannelAsync(channelId, {
+    await LocalNotifications.setNotificationChannelAsync(channelId, {
       name: "Solah Times",
-      importance: Notifications.AndroidImportance.MAX,
-      vibrationPattern: [0, 250, 250, 250],
-      enableVibrate: true,
+      importance: LocalNotifications.AndroidImportance.MAX,
+      vibrationPattern: mode === "mute" ? undefined : [0, 250, 250, 250],
+      enableVibrate: mode !== "mute",
       enableLights: true,
-      sound: mapSoundForAndroidChannel(sound),
+      sound: mapSoundForAndroidChannel(mode, sound),
     });
   } catch {
     // ignore
   }
 }
 
-function mapSoundForAndroidChannel(sound: SoundOptions): string | null | undefined {
+function mapSoundForAndroidChannel(
+  mode: NotificationDeliveryMode,
+  sound: SoundOptions
+): string | null | undefined {
   // Android channels: sound is a raw resource name (no extension) or null to disable.
   // App doesn't ship custom audio yet, so keep platform default for now.
-  if (!sound || sound === "Default") return undefined;
+  if (mode !== "sound") return null;
+  if (!sound || sound === "Beep") return undefined;
+  if (sound === "Short Adhan") return "takbir-only.mp3";
+  if (sound === "Full Adhan") return "full-adhan.mp3";
   return undefined;
 }
 
-function mapSoundForIOS(sound: SoundOptions): string | undefined {
+function mapSoundForIOS(mode: NotificationDeliveryMode, sound: SoundOptions): string | undefined {
   // expo-notifications uses iOS UNNotificationSound; "default" is the standard value.
-  if (!sound || sound === "Default") return "default";
+  if (mode !== "sound") return undefined;
+  if (!sound || sound === "Beep") return "default";
+  if (sound === "Short Adhan") return "takbir-only.mp3";
+  if (sound === "Full Adhan") return "full-adhan.mp3";
   return "default";
 }
 

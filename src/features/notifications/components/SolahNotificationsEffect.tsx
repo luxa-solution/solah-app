@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useSettingsStore } from "@/features-settings/store";
 
 import { useNotificationForegroundRenewal } from "../hooks/useNotificationForegroundRenewal";
-import { syncSolahNotifications } from "../utils";
+import { registerNotificationBackgroundTaskAsync, syncSolahNotifications } from "../utils";
 
 export function SolahNotificationsEffect() {
   const enabled = useSettingsStore((s) => s.solahTimeNotification);
@@ -15,6 +15,10 @@ export function SolahNotificationsEffect() {
   const setEnabled = useSettingsStore((s) => s.setSolahTimeNotification);
 
   useNotificationForegroundRenewal();
+
+  useEffect(() => {
+    void registerNotificationBackgroundTaskAsync();
+  }, []);
 
   useEffect(() => {
     let cancelled = false;

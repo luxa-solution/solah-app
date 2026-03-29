@@ -1,12 +1,10 @@
 import { useEffect } from "react";
-import type { AppStateStatus } from "react-native";
+import { AppState, type AppStateStatus } from "react-native";
 
 import { useSettingsStore } from "@/features-settings/store";
 
 import { FOREGROUND_RESYNC_MAX_AGE_MS } from "../constants";
 import { loadLastSyncedAt, syncSolahNotifications } from "../utils";
-
-const AppState = require("react-native/Libraries/AppState/AppState");
 
 export function useNotificationForegroundRenewal() {
   const enabled = useSettingsStore((s) => s.solahTimeNotification);
