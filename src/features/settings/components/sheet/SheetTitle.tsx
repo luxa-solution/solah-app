@@ -1,9 +1,10 @@
 import { View, Text, StyleSheet } from "react-native";
 
 import { SettingsType } from "@/features-settings/types";
+import { getPrayerSheetTitle } from "@/features-settings/utils";
 import { colors, font } from "@/shared/styles";
 
-const titles: Record<SettingsType, string> = {
+const titles: Record<string, string> = {
   calmethod: "Calculation Method",
   timezone: "Time Zone",
   location: "Location",
@@ -11,15 +12,18 @@ const titles: Record<SettingsType, string> = {
   arabicfontstyle: "Arabic Font Style",
   solahtimenotif: "Solah Time Notification",
   sound: "Sound",
+  customizenotifications: "Customize Notifications",
   language: "Language",
   calendarformat: "Calendar Format",
   timeformat: "Time Format",
 };
 
 export function SheetTitle({ settings_type }: { settings_type: SettingsType }) {
+  const prayerTitle = getPrayerSheetTitle(settings_type);
+
   return (
     <View>
-      <Text style={styles.title}>{titles[settings_type]}</Text>
+      <Text style={styles.title}>{prayerTitle ?? titles[settings_type]}</Text>
     </View>
   );
 }
