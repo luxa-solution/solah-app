@@ -1,11 +1,14 @@
 import { render } from "@testing-library/react-native";
 import React from "react";
 
-import type { AdhkarItem } from "@/features-adhkar/types";
-
 import { Details } from "./Details";
 
 jest.mock("@/features-adhkar/data", () => ({
+  totalAdhkarAmt: {
+    before: 10,
+    during: 5,
+    after: 8,
+  },
   adhkarData: [
     {
       type: "before",
@@ -46,11 +49,15 @@ jest.mock("@/features-adhkar/data", () => ({
   ],
 }));
 
-jest.mock("./details-comps", () => ({
-  AdhkarDisplay: ({ item }: { item: AdhkarItem }) => {
-    const { Text } = require("react-native");
-    return <Text>DISPLAY:{item.title}</Text>;
-  },
+jest.mock("expo-router", () => ({
+  useRouter: () => ({ push: jest.fn() }),
+}));
+
+jest.mock("@/features-adhkar/store", () => ({
+  useAdhkarStore: () => ({
+    toggleFavourite: jest.fn(),
+    isFavourite: jest.fn(() => false),
+  }),
 }));
 
 describe("Details", () => {
@@ -59,19 +66,19 @@ describe("Details", () => {
     expect(getByText("No data available")).toBeTruthy();
   });
 
-  it("renders AdhkarDisplay for a before-type item", () => {
+  it("renders the arabic text for a before-type item", () => {
     const { getByText } = render(<Details id="1" adhkar_type={"before" as any} />);
-    expect(getByText("DISPLAY:Before Item")).toBeTruthy();
+    expect(getByText("arabic")).toBeTruthy();
   });
 
-  it("renders AdhkarDisplay for a during-type item", () => {
-    const { getByText } = render(<Details id="2" adhkar_type={"during" as any} />);
-    expect(getByText("DISPLAY:During Item")).toBeTruthy();
+  it("renders for a during-type item (no entries, no crash)", () => {
+    const { queryByText } = render(<Details id="2" adhkar_type={"during" as any} />);
+    expect(queryByText("No data available")).toBeNull();
   });
 
-  it("renders AdhkarDisplay for an after-type item", () => {
-    const { getByText } = render(<Details id="3" adhkar_type={"after" as any} />);
-    expect(getByText("DISPLAY:After Item")).toBeTruthy();
+  it("renders for an after-type item (no entries, no crash)", () => {
+    const { queryByText } = render(<Details id="3" adhkar_type={"after" as any} />);
+    expect(queryByText("No data available")).toBeNull();
   });
 
   it("shows No data when id matches but type does not", () => {

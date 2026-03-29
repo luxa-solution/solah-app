@@ -1,9 +1,6 @@
 import { render } from "@testing-library/react-native";
 import React from "react";
 
-import type { DetailsProps } from "@/features-adhkar/components/Details";
-import type { TitleBarProps } from "@/features-adhkar/components/TitleBar";
-
 import { AdhkarDetails } from "./AdhkarDetails";
 
 jest.mock("react-native-safe-area-context", () => ({
@@ -11,6 +8,11 @@ jest.mock("react-native-safe-area-context", () => ({
 }));
 
 jest.mock("@/features-adhkar/data", () => ({
+  totalAdhkarAmt: {
+    before: 10,
+    during: 5,
+    after: 8,
+  },
   adhkarData: [
     {
       type: "before",
@@ -39,48 +41,72 @@ jest.mock("@/features-adhkar/data", () => ({
   ],
 }));
 
-jest.mock("@/features-adhkar/store", () => ({
-  useAdhkarStore: () => ({
-    toggleBookmark: jest.fn(),
-    isBookmarked: jest.fn(() => false),
-  }),
+jest.mock("@react-native-async-storage/async-storage", () => {
+  const { createAsyncStorageMock } = require("@/shared/test");
+  return createAsyncStorageMock();
+});
+
+jest.mock("expo-router", () => ({
+  useRouter: () => ({ back: jest.fn(), push: jest.fn() }),
 }));
 
-jest.mock("@/features-adhkar/components", () => {
-  const { Text } = require("react-native");
+jest.mock("react-native-paper", () => {
+  const React = require("react");
+  const { Text, View, Pressable } = require("react-native");
+
   return {
-    TitleBar: ({ adhkar_type, adhkarItem, showBookmark }: TitleBarProps) => (
-      <Text>
-        TitleBar:{adhkar_type}:{adhkarItem?.title ?? "none"}:{showBookmark ? "bm" : "no-bm"}
-      </Text>
-    ),
-    Details: ({ id, adhkar_type }: DetailsProps) => (
-      <Text>
-        Details:{id}:{adhkar_type}
-      </Text>
-    ),
+    Appbar: {
+      Header: ({ children, ...props }: { children: React.ReactNode; [key: string]: unknown }) =>
+        React.createElement(View, props, children),
+      BackAction: ({ onPress }: { onPress: () => void }) =>
+        React.createElement(Pressable, { onPress, accessibilityLabel: "Back" }, "Back"),
+      Content: ({ title }: { title: string }) => React.createElement(Text, null, title),
+      Action: ({
+        icon,
+        onPress,
+        accessibilityLabel,
+      }: {
+        icon: string;
+        onPress: () => void;
+        accessibilityLabel: string;
+      }) =>
+        React.createElement(
+          Pressable,
+          { onPress, accessibilityLabel },
+          React.createElement(Text, null, icon)
+        ),
+    },
   };
 });
 
 describe("AdhkarDetails", () => {
-  it("renders TitleBar and Details for a known adhkar item", () => {
+  it("renders the title for a known adhkar item", () => {
     const { getByText } = render(<AdhkarDetails adhkar_type="before" id="1" />);
 
-    expect(getByText("TitleBar:before:Before Prayer Adhkar:bm")).toBeTruthy();
-    expect(getByText("Details:1:before")).toBeTruthy();
+    expect(getByText("Before Prayer")).toBeTruthy();
   });
 
-  it("renders TitleBar with no item when adhkar not found", () => {
+  it("shows arabic text content when item has entries", () => {
+    const { getByText } = render(<AdhkarDetails adhkar_type="before" id="1" />);
+
+    expect(getByText("بِسْمِ اللَّهِ")).toBeTruthy();
+  });
+
+  it("renders title bar when adhkar not found", () => {
     const { getByText } = render(<AdhkarDetails adhkar_type="before" id="999" />);
 
-    expect(getByText("TitleBar:before:none:bm")).toBeTruthy();
-    expect(getByText("Details:999:before")).toBeTruthy();
+    expect(getByText("Before Prayer")).toBeTruthy();
+  });
+
+  it("shows No data available when item not found", () => {
+    const { getByText } = render(<AdhkarDetails adhkar_type="before" id="999" />);
+
+    expect(getByText("No data available")).toBeTruthy();
   });
 
   it("renders correctly for after prayer type", () => {
     const { getByText } = render(<AdhkarDetails adhkar_type="after" id="2" />);
 
-    expect(getByText("TitleBar:after:After Prayer Adhkar:bm")).toBeTruthy();
-    expect(getByText("Details:2:after")).toBeTruthy();
+    expect(getByText("After Prayer")).toBeTruthy();
   });
 });

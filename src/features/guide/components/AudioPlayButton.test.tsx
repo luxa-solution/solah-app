@@ -1,5 +1,6 @@
 import { fireEvent, render } from "@testing-library/react-native";
 import React from "react";
+import TestRenderer from "react-test-renderer";
 
 import { AudioPlayButton } from "./AudioPlayButton";
 
@@ -25,5 +26,18 @@ describe("AudioPlayButton", () => {
   it("can be pressed without throwing", () => {
     const { getByText } = render(<AudioPlayButton />);
     expect(() => fireEvent.press(getByText("Play audio"))).not.toThrow();
+  });
+
+  it("uses the pressed style branch", () => {
+    let tree: TestRenderer.ReactTestRenderer;
+    TestRenderer.act(() => {
+      tree = TestRenderer.create(<AudioPlayButton />);
+    });
+    const pressable = tree.root.find((node) => typeof node.props.style === "function");
+
+    const pressedStyles = pressable.props.style({ pressed: true });
+
+    expect(Array.isArray(pressedStyles)).toBe(true);
+    expect(pressedStyles[1]).toBeTruthy();
   });
 });

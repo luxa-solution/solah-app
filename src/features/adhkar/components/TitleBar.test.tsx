@@ -1,48 +1,54 @@
 import { fireEvent, render } from "@testing-library/react-native";
 import React from "react";
 
+import { useAdhkarStore } from "@/features-adhkar/store";
+
 import { TitleBar } from "./TitleBar";
 
-const mockToggleBookmark = jest.fn();
-const mockIsBookmarked = jest.fn();
-
-jest.mock("../store/adhkarStore", () => ({
-  useAdhkarStore: () => ({
-    toggleBookmark: mockToggleBookmark,
-    isBookmarked: mockIsBookmarked,
-  }),
+jest.mock("expo-router", () => ({
+  useRouter: () => ({ back: jest.fn() }),
 }));
 
-jest.mock("@/shared/components", () => ({
-  TitleBar: ({
-    title,
-    showBookmark,
-    onBookmark,
-    isBookmarked,
-  }: {
-    title: string;
-    showBookmark: boolean;
-    onBookmark?: () => void;
-    isBookmarked?: boolean;
-  }) => {
-    const { Text, Pressable, View } = require("react-native");
-    return (
-      <View>
-        <Text>{title}</Text>
-        <Text>showBookmark:{String(showBookmark)}</Text>
-        <Text>isBookmarked:{String(isBookmarked)}</Text>
-        <Pressable accessibilityLabel="bookmark" onPress={onBookmark}>
-          <Text>bookmark-btn</Text>
-        </Pressable>
-      </View>
-    );
-  },
-}));
+jest.mock("react-native-paper", () => {
+  const React = require("react");
+  const { Text, View, Pressable } = require("react-native");
+
+  return {
+    Appbar: {
+      Header: ({ children, ...props }: { children: React.ReactNode; [key: string]: unknown }) =>
+        React.createElement(View, props, children),
+      BackAction: ({ onPress }: { onPress: () => void }) =>
+        React.createElement(Pressable, { onPress, accessibilityLabel: "Back" }, "Back"),
+      Content: ({ title }: { title: string }) => React.createElement(Text, null, title),
+      Action: ({
+        icon,
+        onPress,
+        accessibilityLabel,
+      }: {
+        icon: string;
+        onPress: () => void;
+        accessibilityLabel: string;
+      }) =>
+        React.createElement(
+          Pressable,
+          { onPress, accessibilityLabel },
+          React.createElement(Text, null, icon)
+        ),
+    },
+  };
+});
+
+jest.mock("@react-native-async-storage/async-storage", () => {
+  const { createAsyncStorageMock } = require("@/shared/test");
+  return createAsyncStorageMock();
+});
+
+const initialState = useAdhkarStore.getState();
 
 describe("Adhkar TitleBar wrapper", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockIsBookmarked.mockReturnValue(false);
+    useAdhkarStore.setState(initialState, true);
   });
 
   it("renders 'Before Prayer' title for before type", () => {
@@ -61,30 +67,35 @@ describe("Adhkar TitleBar wrapper", () => {
   });
 
   it("does not show bookmark when adhkarItem is missing", () => {
-    const { getByText } = render(<TitleBar adhkar_type={"before" as any} showBookmark />);
+    const { getByText, queryByLabelText } = render(
+      <TitleBar adhkar_type={"before" as any} showBookmark />
+    );
 
     expect(getByText("Before Prayer")).toBeTruthy();
-    expect(getByText("showBookmark:false")).toBeTruthy();
+    // No bookmark button because adhkarItem is absent
+    expect(queryByLabelText("Add bookmark")).toBeNull();
+    expect(queryByLabelText("Remove bookmark")).toBeNull();
   });
 
   it("does not show bookmark when showBookmark is false even with item", () => {
     const item = { id: "1", type: "before", title: "T", entries: [], illustration: null } as any;
 
-    const { getByText } = render(
+    const { queryByLabelText } = render(
       <TitleBar adhkar_type={"before" as any} adhkarItem={item} showBookmark={false} />
     );
 
-    expect(getByText("showBookmark:false")).toBeTruthy();
+    expect(queryByLabelText("Add bookmark")).toBeNull();
+    expect(queryByLabelText("Remove bookmark")).toBeNull();
   });
 
   it("shows bookmark when item is provided and showBookmark is true", () => {
     const item = { id: "1", type: "before", title: "T", entries: [], illustration: null } as any;
 
-    const { getByText } = render(
+    const { getByLabelText } = render(
       <TitleBar adhkar_type={"before" as any} adhkarItem={item} showBookmark />
     );
 
-    expect(getByText("showBookmark:true")).toBeTruthy();
+    expect(getByLabelText("Add bookmark")).toBeTruthy();
   });
 
   it("toggles bookmark when item is provided and showBookmark is true", () => {
@@ -94,33 +105,33 @@ describe("Adhkar TitleBar wrapper", () => {
       <TitleBar adhkar_type={"before" as any} adhkarItem={item} showBookmark />
     );
 
-    fireEvent.press(getByLabelText("bookmark"));
-    expect(mockToggleBookmark).toHaveBeenCalledWith(item);
+    fireEvent.press(getByLabelText("Add bookmark"));
+    expect(useAdhkarStore.getState().bookmarkIds).toContain("before-1");
   });
 
   it("does not call toggleBookmark when no item is provided", () => {
-    const { getByLabelText } = render(<TitleBar adhkar_type={"before" as any} showBookmark />);
+    const { queryByLabelText } = render(<TitleBar adhkar_type={"before" as any} showBookmark />);
 
-    fireEvent.press(getByLabelText("bookmark"));
-    expect(mockToggleBookmark).not.toHaveBeenCalled();
+    expect(queryByLabelText("Add bookmark")).toBeNull();
   });
 
   it("reflects isBookmarked true from store", () => {
-    mockIsBookmarked.mockReturnValue(true);
     const item = { id: "1", type: "before", title: "T", entries: [], illustration: null } as any;
+    useAdhkarStore.setState({ bookmarkIds: ["before-1"] });
 
-    const { getByText } = render(
+    const { getByLabelText } = render(
       <TitleBar adhkar_type={"before" as any} adhkarItem={item} showBookmark />
     );
 
-    expect(getByText("isBookmarked:true")).toBeTruthy();
+    expect(getByLabelText("Remove bookmark")).toBeTruthy();
   });
 
   it("reflects isBookmarked false when item is absent", () => {
-    mockIsBookmarked.mockReturnValue(true);
+    useAdhkarStore.setState({ bookmarkIds: ["before-1"] });
 
-    const { getByText } = render(<TitleBar adhkar_type={"before" as any} />);
+    const { queryByLabelText } = render(<TitleBar adhkar_type={"before" as any} />);
 
-    expect(getByText("isBookmarked:false")).toBeTruthy();
+    expect(queryByLabelText("Remove bookmark")).toBeNull();
+    expect(queryByLabelText("Add bookmark")).toBeNull();
   });
 });

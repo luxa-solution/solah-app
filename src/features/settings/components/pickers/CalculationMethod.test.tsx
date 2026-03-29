@@ -1,9 +1,23 @@
 import { render, fireEvent } from "@testing-library/react-native";
 import React from "react";
 
+import { useDefaultStore, useSettingsStore } from "@/features-settings/store";
+
 import { CalculationMethod } from "./CalculationMethod";
 
-const mockSetCalculationMethod = jest.fn();
+jest.mock("@react-native-async-storage/async-storage", () => {
+  const { createAsyncStorageMock } = require("@/shared/test");
+  return createAsyncStorageMock();
+});
+
+jest.mock("@expo/vector-icons", () => {
+  const React = require("react");
+  const { Text } = require("react-native");
+
+  return {
+    Ionicons: (props: object) => React.createElement(Text, props, "Ionicon"),
+  };
+});
 
 jest.mock("@/features-settings/constants", () => ({
   calMethods: [
@@ -13,45 +27,28 @@ jest.mock("@/features-settings/constants", () => ({
   ],
 }));
 
-jest.mock("@/features-settings/store", () => ({
-  useSettingsStore: () => ({
-    calculationMethod: { name: "Muslim World League", method: "MWL" },
-    setCalculationMethod: mockSetCalculationMethod,
-  }),
-  useDefaultStore: () => ({
-    defaultCalculationMethod: { name: "Umm Al-Qura", method: "UQ" },
-  }),
-}));
-
-jest.mock("./shared", () => {
-  const { TextInput, View } = require("react-native");
-
-  return {
-    SearchBar: ({ value, onChange }: any) => (
-      <TextInput testID="searchbar" value={value} onChangeText={onChange} />
-    ),
-    SelectedIcon: () => <View testID="selected-icon" />,
-    styles: {
-      container: {},
-      option: {},
-      selectedOption: {},
-      optionText: {},
-      selectedOptionText: {},
-    },
-  };
-});
+const initialSettingsState = useSettingsStore.getState();
+const initialDefaultState = useDefaultStore.getState();
 
 describe("CalculationMethod", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    useSettingsStore.setState(initialSettingsState, true);
+    useDefaultStore.setState(initialDefaultState, true);
+    useSettingsStore.setState({
+      calculationMethod: { name: "Muslim World League", method: "MWL" },
+    });
+    useDefaultStore.setState({
+      defaultCalculationMethod: { name: "Umm Al-Qura", method: "UQ" },
+    });
   });
 
   it("filters methods by query (name or key)", () => {
-    const { getByTestId, queryByText, getByText } = render(<CalculationMethod />);
+    const { getByPlaceholderText, queryByText, getByText } = render(<CalculationMethod />);
 
     expect(getByText("Muslim World League")).toBeTruthy();
 
-    fireEvent.changeText(getByTestId("searchbar"), "uq");
+    fireEvent.changeText(getByPlaceholderText("Search"), "uq");
 
     expect(getByText("Umm Al-Qura")).toBeTruthy();
     expect(queryByText("Muslim World League")).toBeNull();
@@ -63,7 +60,10 @@ describe("CalculationMethod", () => {
 
     fireEvent.press(getByText("Use Default"));
 
-    expect(mockSetCalculationMethod).toHaveBeenCalledWith({ name: "Umm Al-Qura", method: "UQ" });
+    expect(useSettingsStore.getState().calculationMethod).toEqual({
+      name: "Umm Al-Qura",
+      method: "UQ",
+    });
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
@@ -73,7 +73,10 @@ describe("CalculationMethod", () => {
 
     fireEvent.press(getByText("Umm Al-Qura"));
 
-    expect(mockSetCalculationMethod).toHaveBeenCalledWith({ name: "Umm Al-Qura", method: "UQ" });
+    expect(useSettingsStore.getState().calculationMethod).toEqual({
+      name: "Umm Al-Qura",
+      method: "UQ",
+    });
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 });

@@ -15,41 +15,6 @@ jest.mock("expo-router", () => ({
   }),
 }));
 
-jest.mock("expo-image", () => {
-  const { Image } = require("react-native");
-
-  return {
-    Image: (props: any) => <Image {...props} />,
-  };
-});
-
-jest.mock("react-native-paper", () => {
-  const { Pressable, Text, View } = require("react-native");
-
-  return {
-    Appbar: {
-      Header: ({ children }: { children: React.ReactNode }) => <View>{children}</View>,
-      BackAction: ({ onPress }: { onPress: () => void }) => (
-        <Pressable accessibilityLabel="Back" onPress={onPress}>
-          <Text>Back</Text>
-        </Pressable>
-      ),
-      Content: ({ title }: { title: string }) => <Text>{title}</Text>,
-      Action: ({
-        accessibilityLabel,
-        onPress,
-      }: {
-        accessibilityLabel: string;
-        onPress: () => void;
-      }) => (
-        <Pressable accessibilityLabel={accessibilityLabel} onPress={onPress}>
-          <Text>{accessibilityLabel}</Text>
-        </Pressable>
-      ),
-    },
-  };
-});
-
 jest.mock("@/features-solah/data", () => ({
   solahGuides: {
     Fajr: {

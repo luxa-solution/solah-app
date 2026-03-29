@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Notifications from "expo-notifications";
+import { CalculationMethod } from "adhan";
 
 import {
   syncSolahNotifications,
@@ -296,5 +297,33 @@ describe("syncSolahNotifications", () => {
   it("uses correct channel ID for non-default sound", async () => {
     await syncSolahNotifications({ ...baseInput, sound: "Adhan Makkah" });
     expect(mockSetChannel).toHaveBeenCalledWith("solah-times-adhan_makkah", expect.any(Object));
+  });
+
+  it.each([
+    ["MuslimWorldLeague", "MuslimWorldLeague"],
+    ["Egyptian", "Egyptian"],
+    ["Karachi", "Karachi"],
+    ["UmmAlQura", "UmmAlQura"],
+    ["Dubai", "Dubai"],
+    ["Qatar", "Qatar"],
+    ["Kuwait", "Kuwait"],
+    ["MoonsightingCommittee", "MoonsightingCommittee"],
+    ["Singapore", "Singapore"],
+    ["Turkey", "Turkey"],
+    ["Tehran", "Tehran"],
+    ["NorthAmerica", "NorthAmerica"],
+  ] as const)("uses the %s adhan calculation method", async (method, factoryName) => {
+    await syncSolahNotifications({ ...baseInput, calculationMethod: method });
+
+    expect((CalculationMethod as any)[factoryName]).toHaveBeenCalled();
+  });
+
+  it("falls back to MoonsightingCommittee for unknown calculation methods", async () => {
+    await syncSolahNotifications({
+      ...baseInput,
+      calculationMethod: "UnknownMethod" as any,
+    });
+
+    expect(CalculationMethod.MoonsightingCommittee).toHaveBeenCalled();
   });
 });

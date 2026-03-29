@@ -45,6 +45,18 @@ describe("useSyncDefaultLocation", () => {
     expect(mockSetDefaultLocation).not.toHaveBeenCalled();
   });
 
+  it("does nothing when location is unavailable", () => {
+    mockUseCurrentLocation.mockReturnValue({
+      loading: false,
+      error: null,
+      location: null,
+    });
+
+    renderHook(() => useSyncDefaultLocation());
+
+    expect(mockSetDefaultLocation).not.toHaveBeenCalled();
+  });
+
   it("syncs latest location when ready", () => {
     const location = {
       latitude: 24.7136,

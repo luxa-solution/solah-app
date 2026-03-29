@@ -2,31 +2,28 @@ import { fireEvent, render } from "@testing-library/react-native";
 import React from "react";
 import { Share } from "react-native";
 
+import { useAdhkarStore } from "@/features-adhkar/store";
 import type { AdhkarItem } from "@/features-adhkar/types";
 
 import { DetailsActionBar } from "./DetailsActionBar";
 
-const mockToggleFavourite = jest.fn();
-const mockIsFavourite = jest.fn();
+jest.mock("@react-native-async-storage/async-storage", () => {
+  const { createAsyncStorageMock } = require("@/shared/test");
+  return createAsyncStorageMock();
+});
 
-jest.mock("@/features-adhkar/store", () => ({
-  useAdhkarStore: () => ({
-    toggleFavourite: mockToggleFavourite,
-    isFavourite: mockIsFavourite,
-  }),
-}));
+const initialState = useAdhkarStore.getState();
 
 describe("DetailsActionBar (critical behavior)", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    useAdhkarStore.setState(initialState, true);
   });
 
   it("shares a composed message when item has at least one entry", async () => {
     const shareSpy = jest
       .spyOn(Share, "share")
       .mockResolvedValueOnce({ action: "sharedAction" } as any);
-
-    mockIsFavourite.mockReturnValue(false);
 
     const item: AdhkarItem = {
       id: "1",
@@ -60,8 +57,6 @@ describe("DetailsActionBar (critical behavior)", () => {
   it("shares just the title when there are no entries", async () => {
     jest.spyOn(Share, "share").mockResolvedValueOnce({ action: "sharedAction" } as any);
 
-    mockIsFavourite.mockReturnValue(false);
-
     const item: AdhkarItem = {
       id: "1",
       title: "Empty Adhkar",
@@ -80,8 +75,6 @@ describe("DetailsActionBar (critical behavior)", () => {
   });
 
   it("toggles favourite when pressing favorite", () => {
-    mockIsFavourite.mockReturnValue(false);
-
     const item: AdhkarItem = {
       id: "2",
       title: "Evening Adhkar",
@@ -93,7 +86,37 @@ describe("DetailsActionBar (critical behavior)", () => {
 
     fireEvent.press(getByLabelText("favorite"));
 
-    expect(mockToggleFavourite).toHaveBeenCalledTimes(1);
-    expect(mockToggleFavourite).toHaveBeenCalledWith(item);
+    expect(useAdhkarStore.getState().favouriteIds).toContain("evening-2");
+  });
+
+  it("swallows share failures without throwing", async () => {
+    jest.spyOn(Share, "share").mockRejectedValueOnce(new Error("share failed"));
+
+    const item: AdhkarItem = {
+      id: "3",
+      title: "Broken Share",
+      type: "evening" as any,
+      entries: [],
+    } as any;
+
+    const { getByLabelText } = render(<DetailsActionBar item={item} />);
+
+    await expect(async () => {
+      fireEvent.press(getByLabelText("share"));
+      await Promise.resolve();
+    }).not.toThrow();
+  });
+
+  it("allows pressing the play button", () => {
+    const item: AdhkarItem = {
+      id: "4",
+      title: "Playable",
+      type: "evening" as any,
+      entries: [],
+    } as any;
+
+    const { getByLabelText } = render(<DetailsActionBar item={item} />);
+
+    expect(() => fireEvent.press(getByLabelText("play"))).not.toThrow();
   });
 });

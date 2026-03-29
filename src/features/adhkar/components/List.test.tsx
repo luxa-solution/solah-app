@@ -48,4 +48,11 @@ describe("adhkar/List", () => {
       expect(getAllByText(item.title).length).toBeGreaterThanOrEqual(1);
     });
   });
+
+  it("renders an empty list for an unknown type", () => {
+    // @ts-expect-error intentionally covering the fallback branch
+    const { queryAllByText } = render(<List type="unknown" />);
+
+    expect(queryAllByText(/\(.+\)/).length).toBe(0);
+  });
 });

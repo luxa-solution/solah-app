@@ -1,4 +1,4 @@
-import { fireEvent, render, waitFor } from "@testing-library/react-native";
+import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
 import React from "react";
 
 import { useOnboardingStore } from "@/features-onboarding/store";
@@ -34,6 +34,7 @@ const initialState = useOnboardingStore.getState();
 describe("OnboardingScreen integration", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.useFakeTimers();
     useOnboardingStore.setState(initialState, true);
     jest.spyOn(require("react-native"), "useWindowDimensions").mockReturnValue({
       width: 320,
@@ -47,6 +48,10 @@ describe("OnboardingScreen integration", () => {
   });
 
   afterEach(() => {
+    act(() => {
+      jest.runOnlyPendingTimers();
+    });
+    jest.useRealTimers();
     jest.restoreAllMocks();
   });
 
@@ -58,11 +63,17 @@ describe("OnboardingScreen integration", () => {
     expect(screen.getByText("Continue")).toBeTruthy();
     expect(screen.getByText("Skip")).toBeTruthy();
 
-    fireEvent.press(screen.getByText("Continue"));
+    act(() => {
+      fireEvent.press(screen.getByText("Continue"));
+      jest.runOnlyPendingTimers();
+    });
 
     expect(screen.getByText("Get Started")).toBeTruthy();
 
-    fireEvent.press(screen.getByText("Get Started"));
+    act(() => {
+      fireEvent.press(screen.getByText("Get Started"));
+      jest.runOnlyPendingTimers();
+    });
 
     await waitFor(() => {
       expect(useOnboardingStore.getState().hasOnboarded).toBe(true);

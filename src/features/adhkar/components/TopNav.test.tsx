@@ -95,4 +95,24 @@ describe("TopNav", () => {
 
     expect(queryByText("0")).toBeNull();
   });
+
+  it("captures tab layouts and renders the active indicator", () => {
+    const onChange = jest.fn();
+
+    const { getByTestId } = render(
+      <TopNav value={"fav" as any} onChange={onChange} />
+    );
+
+    fireEvent(getByTestId("topnav-tab-all"), "layout", {
+      nativeEvent: { layout: { x: 0, width: 80, height: 44 } },
+    });
+    fireEvent(getByTestId("topnav-tab-fav"), "layout", {
+      nativeEvent: { layout: { x: 80, width: 90, height: 44 } },
+    });
+    fireEvent(getByTestId("topnav-tab-bm"), "layout", {
+      nativeEvent: { layout: { x: 170, width: 70, height: 44 } },
+    });
+
+    expect(getByTestId("topnav-indicator")).toBeTruthy();
+  });
 });

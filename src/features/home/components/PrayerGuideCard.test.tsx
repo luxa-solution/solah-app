@@ -10,26 +10,15 @@ jest.mock("expo-router", () => ({
   }),
 }));
 
-jest.mock("@/shared/components", () => {
-  const { Pressable, Text } = require("react-native");
-  return {
-    AppButton: ({ title, onPress }: any) => (
-      <Pressable onPress={onPress} accessibilityLabel={title}>
-        <Text>{title}</Text>
-      </Pressable>
-    ),
-  };
-});
-
 describe("PrayerGuideCard", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   it("navigates to guide when pressing Get started", () => {
-    const { getByLabelText } = render(<PrayerGuideCard />);
+    const { getByText } = render(<PrayerGuideCard />);
 
-    fireEvent.press(getByLabelText("Get started"));
+    fireEvent.press(getByText("Get started"));
 
     expect(mockPush).toHaveBeenCalledWith("/(tabs)/guide");
   });

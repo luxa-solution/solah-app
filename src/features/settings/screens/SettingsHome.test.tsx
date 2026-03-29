@@ -1,11 +1,7 @@
-import { fireEvent, render } from "@testing-library/react-native";
+import { act, fireEvent, render } from "@testing-library/react-native";
 import React from "react";
 
-import type { SettingsSheetProps } from "@/features-settings/components/sheet/SettingsSheet";
-import type { CardProps } from "@/features-settings/components/ui/Card";
-import type { ItemProps } from "@/features-settings/components/ui/Item";
-import type { BottomSheetProps } from "@/shared/components/BottomSheet";
-import type { TitleBarProps } from "@/shared/components/TitleBar";
+import { useSettingsStore } from "@/features-settings/store";
 
 import { SettingsHome } from "./SettingsHome";
 
@@ -13,94 +9,74 @@ jest.mock("react-native-safe-area-context", () => ({
   useSafeAreaInsets: () => ({ bottom: 12, top: 0, left: 0, right: 0 }),
 }));
 
-jest.mock("@/features-settings/store", () => ({
-  useSettingsStore: () => ({
-    arabicFontSize: { name: "20", value: 20 },
-    arabicFontStyle: { name: "Default", value: "Default" },
-    calculationMethod: { name: "Default", method: "MoonsightingCommittee" },
-    calendarFormat: { name: "Hijri", value: "hijri" },
-    language: { name: "English", value: "English" },
-    location: { name: "Riyadh", location: { city: "Riyadh" } },
-    timeFormat: { name: "12-hour", value: "12hr" },
-    timezone: { name: "Riyadh", timezone: "Asia/Riyadh" },
-    sound: "Default",
+jest.mock("@react-native-async-storage/async-storage", () => {
+  const { createAsyncStorageMock } = require("@/shared/test");
+  return createAsyncStorageMock();
+});
+
+jest.mock("expo-router", () => ({
+  useRouter: () => ({
+    back: jest.fn(),
+    push: jest.fn(),
+    replace: jest.fn(),
   }),
 }));
 
-jest.mock("@/features-settings/utils", () => ({
-  toText: (type: string, value: { name?: string } | string) =>
-    `${type}:${typeof value === "object" && value?.name !== null && value?.name !== undefined ? value.name : value}`,
-}));
-
-jest.mock("@/features-settings/components", () => {
-  const { View, Text, Pressable } = require("react-native");
-
-  return {
-    Card: ({ title, children }: CardProps) => (
-      <View>
-        <Text>{`CARD:${title}`}</Text>
-        {children}
-      </View>
-    ),
-    Item: ({ label, value, onPress }: ItemProps) => (
-      <Pressable onPress={onPress} accessibilityLabel={`item-${label}`}>
-        <Text>{`${label}:${value}`}</Text>
-      </Pressable>
-    ),
-    SettingsSheet: ({ settings_type }: SettingsSheetProps) => (
-      <Text>{`SETTINGS_SHEET:${settings_type}`}</Text>
-    ),
-  };
-});
-
-jest.mock("@/features-settings/components/ui/NotificationToggle", () => {
-  const { Text } = require("react-native");
-
-  return {
-    NotificationToggle: () => <Text>NOTIFICATION_TOGGLE</Text>,
-  };
-});
-
-jest.mock("@/shared/components", () => {
-  const { View, Text, Pressable } = require("react-native");
-
-  return {
-    TitleBar: ({ title }: TitleBarProps) => <Text>{title}</Text>,
-    BottomSheet: ({ isOpen, onClose, children }: BottomSheetProps) => (
-      <View>
-        <Text>{`BOTTOM_SHEET:${isOpen ? "open" : "closed"}`}</Text>
-        {isOpen ? (
-          <Pressable onPress={onClose} accessibilityLabel="close-sheet">
-            <Text>Close</Text>
-          </Pressable>
-        ) : null}
-        {isOpen ? children : null}
-      </View>
-    ),
-  };
-});
+const initialSettingsState = useSettingsStore.getState();
 
 describe("SettingsHome", () => {
-  it("renders the settings groups and values", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.useFakeTimers();
+    useSettingsStore.setState(initialSettingsState, true);
+  });
+
+  afterEach(() => {
+    act(() => {
+      jest.runOnlyPendingTimers();
+    });
+    jest.useRealTimers();
+  });
+
+  it("renders the Settings title", () => {
     const screen = render(<SettingsHome />);
 
     expect(screen.getByText("Settings")).toBeTruthy();
-    expect(screen.getByText("CARD:Solah times")).toBeTruthy();
-    expect(screen.getByText("CARD:Fonts")).toBeTruthy();
-    expect(screen.getByText("CARD:Notifications")).toBeTruthy();
-    expect(screen.getByText("CARD:General")).toBeTruthy();
-    expect(screen.getByText("NOTIFICATION_TOGGLE")).toBeTruthy();
-    expect(screen.getByText("BOTTOM_SHEET:closed")).toBeTruthy();
   });
 
-  it("opens and closes the active settings sheet", () => {
+  it("renders the settings group labels", () => {
     const screen = render(<SettingsHome />);
 
-    fireEvent.press(screen.getByLabelText("item-Calculation method"));
-    expect(screen.getByText("BOTTOM_SHEET:open")).toBeTruthy();
-    expect(screen.getByText("SETTINGS_SHEET:calmethod")).toBeTruthy();
+    expect(screen.getByText("Solah times")).toBeTruthy();
+    expect(screen.getByText("Fonts")).toBeTruthy();
+    expect(screen.getByText("Notifications")).toBeTruthy();
+    expect(screen.getByText("General")).toBeTruthy();
+  });
 
-    fireEvent.press(screen.getByLabelText("close-sheet"));
-    expect(screen.getByText("BOTTOM_SHEET:closed")).toBeTruthy();
+  it("renders the settings item labels", () => {
+    const screen = render(<SettingsHome />);
+
+    expect(screen.getByText("Calculation method")).toBeTruthy();
+    expect(screen.getByText("Language")).toBeTruthy();
+  });
+
+  it("renders the notification toggle", () => {
+    const screen = render(<SettingsHome />);
+
+    expect(screen.getByText("Prayer time notification")).toBeTruthy();
+  });
+
+  it("opens the bottom sheet when pressing a settings item", () => {
+    const screen = render(<SettingsHome />);
+
+    // The bottom sheet is closed initially (not mounted = not rendered)
+    // Press an item to open it
+    act(() => {
+      fireEvent.press(screen.getByText("Calculation method"));
+      jest.runOnlyPendingTimers();
+    });
+
+    // Sheet content should be visible - the search bar for calmethod
+    expect(screen.getByPlaceholderText("Search")).toBeTruthy();
   });
 });

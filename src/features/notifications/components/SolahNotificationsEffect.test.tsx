@@ -1,4 +1,4 @@
-import { render } from "@testing-library/react-native";
+import { act, render, waitFor } from "@testing-library/react-native";
 import React from "react";
 
 import { useSettingsStore } from "@/features-settings/store";
@@ -48,7 +48,10 @@ describe("SolahNotificationsEffect", () => {
       sound: defaultStoreState.sound,
     });
 
-    resolveFn();
+    await act(async () => {
+      resolveFn();
+      await Promise.resolve();
+    });
   });
 
   it("re-calls syncSolahNotifications when solahTimeNotification changes", async () => {
@@ -63,46 +66,84 @@ describe("SolahNotificationsEffect", () => {
     render(<SolahNotificationsEffect />);
     const callCountAfterMount = mockSyncSolahNotifications.mock.calls.length;
 
-    resolveFn({ permissionOk: true });
+    await act(async () => {
+      resolveFn({ permissionOk: true });
+      await Promise.resolve();
+    });
 
     mockSyncSolahNotifications.mockResolvedValue({ permissionOk: true });
 
-    useSettingsStore.setState({ solahTimeNotification: true });
-
-    await new Promise((r) => setTimeout(r, 50));
+    await act(async () => {
+      useSettingsStore.setState({ solahTimeNotification: true });
+      await Promise.resolve();
+    });
 
     expect(mockSyncSolahNotifications.mock.calls.length).toBeGreaterThan(callCountAfterMount);
   });
 
   it("calls setEnabled(false) when enabled=true but permission is denied", async () => {
     mockSyncSolahNotifications.mockResolvedValue({ permissionOk: false });
-    useSettingsStore.setState({ solahTimeNotification: true });
+    await act(async () => {
+      useSettingsStore.setState({ solahTimeNotification: true });
+      await Promise.resolve();
+    });
 
     render(<SolahNotificationsEffect />);
 
-    await new Promise((r) => setTimeout(r, 50));
-
-    expect(useSettingsStore.getState().solahTimeNotification).toBe(false);
+    await waitFor(() => {
+      expect(useSettingsStore.getState().solahTimeNotification).toBe(false);
+    });
   });
 
   it("does NOT revert enabled when already false and permission is denied", async () => {
     mockSyncSolahNotifications.mockResolvedValue({ permissionOk: false });
-    useSettingsStore.setState({ solahTimeNotification: false });
+    await act(async () => {
+      useSettingsStore.setState({ solahTimeNotification: false });
+      await Promise.resolve();
+    });
 
     render(<SolahNotificationsEffect />);
 
-    await new Promise((r) => setTimeout(r, 50));
-
-    expect(useSettingsStore.getState().solahTimeNotification).toBe(false);
+    await waitFor(() => {
+      expect(useSettingsStore.getState().solahTimeNotification).toBe(false);
+    });
   });
 
   it("leaves enabled=true unchanged when permission is OK", async () => {
     mockSyncSolahNotifications.mockResolvedValue({ permissionOk: true });
-    useSettingsStore.setState({ solahTimeNotification: true });
+    await act(async () => {
+      useSettingsStore.setState({ solahTimeNotification: true });
+      await Promise.resolve();
+    });
 
     render(<SolahNotificationsEffect />);
 
-    await new Promise((r) => setTimeout(r, 50));
+    await waitFor(() => {
+      expect(useSettingsStore.getState().solahTimeNotification).toBe(true);
+    });
+  });
+
+  it("does not update state after unmount when the sync finishes later", async () => {
+    let resolveFn!: (value: { permissionOk: boolean }) => void;
+    mockSyncSolahNotifications.mockImplementation(
+      () =>
+        new Promise<{ permissionOk: boolean }>((resolve) => {
+          resolveFn = resolve;
+        })
+    );
+
+    await act(async () => {
+      useSettingsStore.setState({ solahTimeNotification: true });
+      await Promise.resolve();
+    });
+
+    const { unmount } = render(<SolahNotificationsEffect />);
+    unmount();
+
+    await act(async () => {
+      resolveFn({ permissionOk: false });
+      await Promise.resolve();
+    });
 
     expect(useSettingsStore.getState().solahTimeNotification).toBe(true);
   });

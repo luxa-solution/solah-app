@@ -47,4 +47,36 @@ describe("Adhkar Card (critical behavior)", () => {
 
     expect(mockPush).toHaveBeenCalledWith("/adhkar/details?adhkar_type=before&id=7");
   });
+
+  it("falls back to an empty type label for unknown types", () => {
+    const item = {
+      id: "8",
+      title: "Unknown",
+      type: "other",
+      entries: [],
+      illustration: undefined,
+    } as any as AdhkarItem;
+
+    const { queryByText, getByText } = render(<Card data={item} />);
+
+    expect(queryByText("Before Prayer")).toBeNull();
+    expect(getByText("Unknown")).toBeTruthy();
+  });
+
+  it("prefers cardTitle over title and renders the illustration", () => {
+    const item = {
+      id: "9",
+      title: "Title",
+      cardTitle: "Card Title",
+      type: "before",
+      entries: [],
+      illustration: 1,
+    } as any as AdhkarItem;
+
+    const { getByText, UNSAFE_getByType } = render(<Card data={item} variant="large" />);
+    const { Image } = require("react-native");
+
+    expect(getByText("Card Title")).toBeTruthy();
+    expect(UNSAFE_getByType(Image)).toBeTruthy();
+  });
 });

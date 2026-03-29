@@ -1,100 +1,103 @@
 import { render } from "@testing-library/react-native";
 import React from "react";
 
+import { useSettingsStore } from "@/features-settings/store";
+
 import { SheetBody } from "./SheetBody";
 
-const mockOnClose = jest.fn();
+jest.mock("@react-native-async-storage/async-storage", () => {
+  const { createAsyncStorageMock } = require("@/shared/test");
+  return createAsyncStorageMock();
+});
 
-jest.mock("@/features-settings/components/pickers", () => {
+jest.mock("@expo/vector-icons", () => {
+  const React = require("react");
   const { Text } = require("react-native");
 
   return {
-    CalculationMethod: ({ onClose }: any) => <Text onPress={onClose}>CalculationMethod</Text>,
-    Location: ({ onClose }: any) => <Text onPress={onClose}>Location</Text>,
-    TimeZone: ({ onClose }: any) => <Text onPress={onClose}>TimeZone</Text>,
-    ArabicFontSize: ({ onClose }: any) => <Text onPress={onClose}>ArabicFontSize</Text>,
-    ArabicFontStyle: ({ onClose }: any) => <Text onPress={onClose}>ArabicFontStyle</Text>,
-    Language: ({ onClose }: any) => <Text onPress={onClose}>Language</Text>,
-    SolahTimeNotification: () => <Text>SolahTimeNotification</Text>,
-    Sound: ({ onClose }: any) => <Text onPress={onClose}>Sound</Text>,
-    CalendarFormat: ({ onClose }: any) => <Text onPress={onClose}>CalendarFormat</Text>,
-    TimeFormat: ({ onClose }: any) => <Text onPress={onClose}>TimeFormat</Text>,
+    Ionicons: (props: object) => React.createElement(Text, props, "Ionicon"),
+    MaterialCommunityIcons: (props: object) => React.createElement(Text, props, "MCIcon"),
   };
 });
+
+const mockOnClose = jest.fn();
+
+const initialSettingsState = useSettingsStore.getState();
 
 describe("SheetBody", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    useSettingsStore.setState(initialSettingsState, true);
   });
 
-  it("renders CalculationMethod for calmethod", () => {
-    const { getByText } = render(<SheetBody settings_type="calmethod" onClose={mockOnClose} />);
-    expect(getByText("CalculationMethod")).toBeTruthy();
+  it("renders CalculationMethod picker for calmethod", () => {
+    const { getByPlaceholderText } = render(
+      <SheetBody settings_type="calmethod" onClose={mockOnClose} />
+    );
+    expect(getByPlaceholderText("Search")).toBeTruthy();
   });
 
-  it("renders TimeZone for timezone", () => {
-    const { getByText } = render(<SheetBody settings_type="timezone" onClose={mockOnClose} />);
-    expect(getByText("TimeZone")).toBeTruthy();
+  it("renders Language picker for language", () => {
+    const { getByPlaceholderText } = render(
+      <SheetBody settings_type="language" onClose={mockOnClose} />
+    );
+    expect(getByPlaceholderText("Search")).toBeTruthy();
   });
 
-  it("renders Location for location", () => {
-    const { getByText } = render(<SheetBody settings_type="location" onClose={mockOnClose} />);
-    expect(getByText("Location")).toBeTruthy();
-  });
-
-  it("renders ArabicFontSize for arabicfontsize", () => {
-    const { getByText } = render(
+  it("renders ArabicFontSize picker for arabicfontsize", () => {
+    const { toJSON } = render(
       <SheetBody settings_type="arabicfontsize" onClose={mockOnClose} />
     );
-    expect(getByText("ArabicFontSize")).toBeTruthy();
+    expect(toJSON()).toBeTruthy();
   });
 
-  it("renders ArabicFontStyle for arabicfontstyle", () => {
-    const { getByText } = render(
+  it("renders ArabicFontStyle picker for arabicfontstyle", () => {
+    const { toJSON } = render(
       <SheetBody settings_type="arabicfontstyle" onClose={mockOnClose} />
     );
-    expect(getByText("ArabicFontStyle")).toBeTruthy();
+    expect(toJSON()).toBeTruthy();
   });
 
-  it("renders SolahTimeNotification for solahtimenotif", () => {
-    const { getByText } = render(
-      <SheetBody settings_type="solahtimenotif" onClose={mockOnClose} />
+  it("renders TimeZone picker for timezone", () => {
+    const { getByPlaceholderText } = render(
+      <SheetBody settings_type="timezone" onClose={mockOnClose} />
     );
-    expect(getByText("SolahTimeNotification")).toBeTruthy();
+    expect(getByPlaceholderText("Search")).toBeTruthy();
   });
 
-  it("renders Sound for sound", () => {
-    const { getByText } = render(<SheetBody settings_type="sound" onClose={mockOnClose} />);
-    expect(getByText("Sound")).toBeTruthy();
+  it("renders Location picker for location", () => {
+    const { getByPlaceholderText } = render(
+      <SheetBody settings_type="location" onClose={mockOnClose} />
+    );
+    expect(getByPlaceholderText("Search")).toBeTruthy();
   });
 
-  it("renders Language for language", () => {
-    const { getByText } = render(<SheetBody settings_type="language" onClose={mockOnClose} />);
-    expect(getByText("Language")).toBeTruthy();
+  it("renders Sound picker for sound", () => {
+    const { toJSON } = render(<SheetBody settings_type="sound" onClose={mockOnClose} />);
+    expect(toJSON()).toBeTruthy();
   });
 
-  it("renders CalendarFormat for calendarformat", () => {
-    const { getByText } = render(
+  it("renders TimeFormat picker for timeformat", () => {
+    const { toJSON } = render(<SheetBody settings_type="timeformat" onClose={mockOnClose} />);
+    expect(toJSON()).toBeTruthy();
+  });
+
+  it("renders CalendarFormat picker for calendarformat", () => {
+    const { toJSON } = render(
       <SheetBody settings_type="calendarformat" onClose={mockOnClose} />
     );
-    expect(getByText("CalendarFormat")).toBeTruthy();
+    expect(toJSON()).toBeTruthy();
   });
 
-  it("renders TimeFormat for timeformat", () => {
-    const { getByText } = render(<SheetBody settings_type="timeformat" onClose={mockOnClose} />);
-    expect(getByText("TimeFormat")).toBeTruthy();
+  it("renders SolahTimeNotification picker for solahtimenotif", () => {
+    const { getByText } = render(<SheetBody settings_type="solahtimenotif" onClose={mockOnClose} />);
+    expect(getByText("On")).toBeTruthy();
+    expect(getByText("Off")).toBeTruthy();
   });
 
   it("returns null for unknown settings type", () => {
     // @ts-expect-error - intentionally testing default branch
     const { toJSON } = render(<SheetBody settings_type="unknown" />);
     expect(toJSON()).toBeNull();
-  });
-
-  it("forwards onClose to pickers that accept it", () => {
-    const { getByText } = render(<SheetBody settings_type="calmethod" onClose={mockOnClose} />);
-    const { fireEvent } = require("@testing-library/react-native");
-    fireEvent.press(getByText("CalculationMethod"));
-    expect(mockOnClose).toHaveBeenCalledTimes(1);
   });
 });

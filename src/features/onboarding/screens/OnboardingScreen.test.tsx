@@ -1,15 +1,12 @@
-import { fireEvent, render } from "@testing-library/react-native";
+import { act, fireEvent, render } from "@testing-library/react-native";
 import React from "react";
 import { FlatList } from "react-native";
 
-import type { OnboardingContentProps } from "@/features-onboarding/components/OnboardingContent";
-import type { ButtonProps } from "@/shared/components/Button";
-import type { ProgressBarProps } from "@/shared/components/ProgressBar";
+import { useOnboardingStore } from "@/features-onboarding/store";
 
 import { OnboardingScreen } from "./OnboardingScreen";
 
 const mockReplace = jest.fn();
-const mockSetHasOnboarded = jest.fn();
 
 jest.mock("expo-router", () => ({
   useRouter: () => ({
@@ -17,12 +14,14 @@ jest.mock("expo-router", () => ({
   }),
 }));
 
-jest.mock("@/features-onboarding/store", () => ({
-  useOnboardingStore: (selector: (s: any) => unknown) =>
-    selector({
-      setHasOnboarded: mockSetHasOnboarded,
-    }),
+jest.mock("expo-image", () => ({
+  Image: require("react-native").Image,
 }));
+
+jest.mock("@react-native-async-storage/async-storage", () => {
+  const { createAsyncStorageMock } = require("@/shared/test");
+  return createAsyncStorageMock();
+});
 
 jest.mock("@/features-onboarding/data", () => ({
   onboardingData: [
@@ -32,32 +31,13 @@ jest.mock("@/features-onboarding/data", () => ({
   ],
 }));
 
-jest.mock("@/features-onboarding/components", () => {
-  const { Text } = require("react-native");
-
-  return {
-    OnboardingContent: ({ title }: OnboardingContentProps) => <Text>{`CONTENT:${title}`}</Text>,
-  };
-});
-
-jest.mock("@/shared/components", () => {
-  const { Text, Pressable, View } = require("react-native");
-
-  return {
-    ProgressBar: ({ percent }: ProgressBarProps) => <Text>{`PROGRESS:${percent}`}</Text>,
-    AppButton: ({ title, onPress, disabled }: ButtonProps) => (
-      <Pressable onPress={onPress} disabled={disabled} accessibilityLabel={title}>
-        <View>
-          <Text>{title}</Text>
-        </View>
-      </Pressable>
-    ),
-  };
-});
+const initialState = useOnboardingStore.getState();
 
 describe("OnboardingScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.useFakeTimers();
+    useOnboardingStore.setState(initialState, true);
     jest.spyOn(require("react-native"), "useWindowDimensions").mockReturnValue({
       width: 100,
       height: 800,
@@ -67,43 +47,58 @@ describe("OnboardingScreen", () => {
   });
 
   afterEach(() => {
+    act(() => {
+      jest.runOnlyPendingTimers();
+    });
+    jest.useRealTimers();
     jest.restoreAllMocks();
   });
 
-  it("renders the initial onboarding state", () => {
+  it("renders the initial onboarding state with first slide content", () => {
     const screen = render(<OnboardingScreen />);
 
-    expect(screen.getByText("CONTENT:One")).toBeTruthy();
-    expect(screen.getByText("PROGRESS:0")).toBeTruthy();
-    expect(screen.getByLabelText("Continue")).toBeTruthy();
-    expect(screen.getByLabelText("Skip")).toBeTruthy();
+    expect(screen.getByText("One")).toBeTruthy();
+    expect(screen.getByText("Desc 1")).toBeTruthy();
+    expect(screen.getByText("Continue")).toBeTruthy();
+    expect(screen.getByText("Skip")).toBeTruthy();
   });
 
   it("advances through slides and completes onboarding", () => {
     const screen = render(<OnboardingScreen />);
     const list = screen.UNSAFE_getByType(FlatList);
 
-    fireEvent(list, "momentumScrollEnd", {
-      nativeEvent: { contentOffset: { x: 100 } },
+    act(() => {
+      fireEvent(list, "momentumScrollEnd", {
+        nativeEvent: { contentOffset: { x: 100 } },
+      });
+      jest.runOnlyPendingTimers();
     });
-    expect(screen.getByText("PROGRESS:50")).toBeTruthy();
 
-    fireEvent(list, "momentumScrollEnd", {
-      nativeEvent: { contentOffset: { x: 200 } },
+    act(() => {
+      fireEvent(list, "momentumScrollEnd", {
+        nativeEvent: { contentOffset: { x: 200 } },
+      });
+      jest.runOnlyPendingTimers();
     });
-    expect(screen.getByLabelText("Get Started")).toBeTruthy();
+    expect(screen.getByText("Get Started")).toBeTruthy();
 
-    fireEvent.press(screen.getByLabelText("Get Started"));
-    expect(mockSetHasOnboarded).toHaveBeenCalledWith(true);
+    act(() => {
+      fireEvent.press(screen.getByText("Get Started"));
+      jest.runOnlyPendingTimers();
+    });
+    expect(useOnboardingStore.getState().hasOnboarded).toBe(true);
     expect(mockReplace).toHaveBeenCalledWith("/");
   });
 
   it("skips onboarding immediately", () => {
     const screen = render(<OnboardingScreen />);
 
-    fireEvent.press(screen.getByLabelText("Skip"));
+    act(() => {
+      fireEvent.press(screen.getByText("Skip"));
+      jest.runOnlyPendingTimers();
+    });
 
-    expect(mockSetHasOnboarded).toHaveBeenCalledWith(true);
+    expect(useOnboardingStore.getState().hasOnboarded).toBe(true);
     expect(mockReplace).toHaveBeenCalledWith("/");
   });
 });
