@@ -17,7 +17,11 @@ import {
   PrayerScheduleConfig,
   SoundOptions,
 } from "@/features-settings/types";
-import { createAutomaticLocationOption, resolveAutomaticTimeZone } from "@/features-settings/utils";
+import {
+  applyNotificationDefaultsForEnabledState,
+  createAutomaticLocationOption,
+  resolveAutomaticTimeZone,
+} from "@/features-settings/utils";
 import { SolahName } from "@/features-solah/types";
 import { defaultPrayerScheduleConfig } from "@/features-solah/utils";
 
@@ -68,7 +72,7 @@ export const useSettingsStore = create<SettingsDataState>()(
           arabicFontStyle: { name: "Default", value: "Default" },
           autoTimezoneEnabled: true,
           solahTimeNotification: false,
-          sound: "Default",
+          sound: "Short Adhan",
           prayerSchedule: defaultPrayerScheduleConfig(),
           language: {
             name: "Default",
@@ -100,7 +104,12 @@ export const useSettingsStore = create<SettingsDataState>()(
             set({ autoTimezoneEnabled });
           },
           setSolahTimeNotification: (solahTimeNotification) => {
-            set({ solahTimeNotification });
+            set((state) => ({
+              solahTimeNotification,
+              prayerSchedule: solahTimeNotification
+                ? applyNotificationDefaultsForEnabledState(state.prayerSchedule)
+                : state.prayerSchedule,
+            }));
           },
           setSound: (sound) => {
             set({ sound });
