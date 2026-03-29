@@ -556,12 +556,13 @@ describe("responsive-dimensions", () => {
       const callback = jest.fn();
       let capturedHandler: ((payload: any) => void) | undefined;
 
-      const addEventListenerSpy = jest
-        .spyOn(Dimensions, "addEventListener")
-        .mockImplementation(((_event: string, handler: any) => {
-          capturedHandler = handler;
-          return { remove: jest.fn() } as any;
-        }) as any);
+      const addEventListenerSpy = jest.spyOn(Dimensions, "addEventListener").mockImplementation(((
+        _event: string,
+        handler: any
+      ) => {
+        capturedHandler = handler;
+        return { remove: jest.fn() } as any;
+      }) as any);
 
       const unsubscribe = responsiveInstance.subscribe(callback);
 

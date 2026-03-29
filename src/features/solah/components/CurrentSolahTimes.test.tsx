@@ -54,7 +54,9 @@ describe("CurrentSolahTimes", () => {
   });
 
   it("renders the formatted date, location, and prayer rows", () => {
-    const screen = render(<CurrentSolahTimes selectedDate={new Date("2026-03-29T10:00:00.000Z")} />);
+    const screen = render(
+      <CurrentSolahTimes selectedDate={new Date("2026-03-29T10:00:00.000Z")} />
+    );
 
     expect(screen.getByText(/1 Ramadan 1447/)).toBeTruthy();
     expect(screen.getByText("Saudi Arabia")).toBeTruthy();

@@ -99,9 +99,7 @@ describe("TopNav", () => {
   it("captures tab layouts and renders the active indicator", () => {
     const onChange = jest.fn();
 
-    const { getByTestId } = render(
-      <TopNav value={"fav" as any} onChange={onChange} />
-    );
+    const { getByTestId } = render(<TopNav value={"fav" as any} onChange={onChange} />);
 
     fireEvent(getByTestId("topnav-tab-all"), "layout", {
       nativeEvent: { layout: { x: 0, width: 80, height: 44 } },

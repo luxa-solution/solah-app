@@ -146,7 +146,6 @@ describe("useDateAndTime", () => {
     expect(clearTimeoutSpy).toHaveBeenCalled();
     jest.useRealTimers();
   });
-
 });
 
 describe("useMinuteTick", () => {

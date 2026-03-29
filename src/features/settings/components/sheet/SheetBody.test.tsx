@@ -45,16 +45,12 @@ describe("SheetBody", () => {
   });
 
   it("renders ArabicFontSize picker for arabicfontsize", () => {
-    const { toJSON } = render(
-      <SheetBody settings_type="arabicfontsize" onClose={mockOnClose} />
-    );
+    const { toJSON } = render(<SheetBody settings_type="arabicfontsize" onClose={mockOnClose} />);
     expect(toJSON()).toBeTruthy();
   });
 
   it("renders ArabicFontStyle picker for arabicfontstyle", () => {
-    const { toJSON } = render(
-      <SheetBody settings_type="arabicfontstyle" onClose={mockOnClose} />
-    );
+    const { toJSON } = render(<SheetBody settings_type="arabicfontstyle" onClose={mockOnClose} />);
     expect(toJSON()).toBeTruthy();
   });
 
@@ -83,14 +79,14 @@ describe("SheetBody", () => {
   });
 
   it("renders CalendarFormat picker for calendarformat", () => {
-    const { toJSON } = render(
-      <SheetBody settings_type="calendarformat" onClose={mockOnClose} />
-    );
+    const { toJSON } = render(<SheetBody settings_type="calendarformat" onClose={mockOnClose} />);
     expect(toJSON()).toBeTruthy();
   });
 
   it("renders SolahTimeNotification picker for solahtimenotif", () => {
-    const { getByText } = render(<SheetBody settings_type="solahtimenotif" onClose={mockOnClose} />);
+    const { getByText } = render(
+      <SheetBody settings_type="solahtimenotif" onClose={mockOnClose} />
+    );
     expect(getByText("On")).toBeTruthy();
     expect(getByText("Off")).toBeTruthy();
   });
