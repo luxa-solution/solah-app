@@ -4,7 +4,7 @@ import { CalculationMethodTypes, LocationData } from "@/features-solah/types";
 export type ScheduleInput = {
   enabled: boolean;
   sound: SoundOptions;
-  location: LocationData;
+  location: LocationData | null;
   timezone: TimeZone;
   calculationMethod: CalculationMethodTypes;
   prayerSchedule: AllPrayerScheduleConfig;

@@ -1,5 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Coordinates, PrayerTimes } from "adhan";
+// Android remote-push/token APIs are unavailable in Expo Go.
+// This module only schedules local notifications and does not use any push-token helpers.
 import * as Notifications from "expo-notifications";
 
 import { SoundOptions } from "@/features-settings/types";
