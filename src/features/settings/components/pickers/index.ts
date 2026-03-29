@@ -8,3 +8,5 @@ export { Sound } from "./Sound";
 export { Language } from "./Language";
 export { CalendarFormat } from "./CalendarFormat";
 export { TimeFormat } from "./TimeFormat";
+export { PrayerAdhanSettings } from "./PrayerAdhanSettings";
+export { PrayerIqamahSettings } from "./PrayerIqamahSettings";
