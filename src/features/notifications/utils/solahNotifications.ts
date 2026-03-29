@@ -1,9 +1,10 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Coordinates, CalculationMethod, PrayerTimes } from "adhan";
+import { Coordinates, PrayerTimes } from "adhan";
 import * as Notifications from "expo-notifications";
 
 import { SoundOptions, TimeZone } from "@/features-settings/types";
 import { CalculationMethodTypes, LocationData } from "@/features-solah/types";
+import { getAdhanParams } from "@/features-solah/utils";
 
 const STORAGE_KEY = "solah-notification-ids-v1";
 const SOLAH_NOTIFICATION_CHANNEL_PREFIX = "solah-times";
@@ -193,34 +194,3 @@ async function saveScheduledIds(ids: SolahNotifId[]) {
     // ignore
   }
 }
-
-const getAdhanParams = (m: CalculationMethodTypes) => {
-  switch (m) {
-    case "MuslimWorldLeague":
-      return CalculationMethod.MuslimWorldLeague();
-    case "Egyptian":
-      return CalculationMethod.Egyptian();
-    case "Karachi":
-      return CalculationMethod.Karachi();
-    case "UmmAlQura":
-      return CalculationMethod.UmmAlQura();
-    case "Dubai":
-      return CalculationMethod.Dubai();
-    case "Qatar":
-      return CalculationMethod.Qatar();
-    case "Kuwait":
-      return CalculationMethod.Kuwait();
-    case "MoonsightingCommittee":
-      return CalculationMethod.MoonsightingCommittee();
-    case "Singapore":
-      return CalculationMethod.Singapore();
-    case "Turkey":
-      return CalculationMethod.Turkey();
-    case "Tehran":
-      return CalculationMethod.Tehran();
-    case "NorthAmerica":
-      return CalculationMethod.NorthAmerica();
-    default:
-      return CalculationMethod.MoonsightingCommittee();
-  }
-};

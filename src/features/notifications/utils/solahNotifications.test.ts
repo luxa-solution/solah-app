@@ -327,3 +327,63 @@ describe("syncSolahNotifications", () => {
     expect(CalculationMethod.MoonsightingCommittee).toHaveBeenCalled();
   });
 });
+
+describe("getAdhanParams deduplication", () => {
+  afterEach(() => {
+    jest.resetModules();
+  });
+
+  it("uses the shared getAdhanParams helper", async () => {
+    const sharedGetAdhanParams = jest.fn(() => ({ mocked: true }));
+
+    jest.doMock("@/features-solah/utils", () => ({
+      getAdhanParams: sharedGetAdhanParams,
+    }));
+
+    jest.doMock("@react-native-async-storage/async-storage", () => ({
+      __esModule: true,
+      default: {
+        getItem: jest.fn().mockResolvedValue(null),
+        setItem: jest.fn().mockResolvedValue(undefined),
+        removeItem: jest.fn(),
+        clear: jest.fn(),
+      },
+    }));
+
+    jest.doMock("expo-notifications", () => ({
+      getPermissionsAsync: jest.fn().mockResolvedValue({ granted: true }),
+      requestPermissionsAsync: jest.fn().mockResolvedValue({ granted: true }),
+      cancelScheduledNotificationAsync: jest.fn().mockResolvedValue(undefined),
+      scheduleNotificationAsync: jest.fn().mockResolvedValue("notif-id-1"),
+      setNotificationChannelAsync: jest.fn().mockResolvedValue(undefined),
+      AndroidImportance: { MAX: 5 },
+      SchedulableTriggerInputTypes: { DATE: "date" },
+    }));
+
+    jest.doMock("adhan", () => ({
+      Coordinates: jest.fn().mockImplementation(() => ({})),
+      PrayerTimes: jest.fn().mockImplementation(() => ({
+        fajr: new Date(Date.now() + 1 * 3600_000),
+        dhuhr: new Date(Date.now() + 2 * 3600_000),
+        asr: new Date(Date.now() + 3 * 3600_000),
+        maghrib: new Date(Date.now() + 4 * 3600_000),
+        isha: new Date(Date.now() + 5 * 3600_000),
+      })),
+      CalculationMethod: {
+        MoonsightingCommittee: jest.fn(() => ({ mocked: "fallback" })),
+      },
+    }));
+
+    let isolatedSyncSolahNotifications!: typeof syncSolahNotifications;
+
+    jest.isolateModules(() => {
+      ({
+        syncSolahNotifications: isolatedSyncSolahNotifications,
+      } = require("./solahNotifications"));
+    });
+
+    await isolatedSyncSolahNotifications(baseInput);
+
+    expect(sharedGetAdhanParams).toHaveBeenCalledWith(baseInput.calculationMethod);
+  });
+});

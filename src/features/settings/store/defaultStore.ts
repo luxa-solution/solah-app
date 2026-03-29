@@ -81,7 +81,7 @@ export const useDefaultStore = create<DefaultDataState>()(
         // Add more above as needed
       }),
       {
-        name: "settings-storage",
+        name: "defaults-storage",
         storage: createJSONStorage(() => AsyncStorage),
       }
     )

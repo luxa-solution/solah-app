@@ -1,4 +1,5 @@
 import { useDefaultStore } from "./defaultStore";
+import { useSettingsStore } from "./settingsStore";
 
 jest.mock("@react-native-async-storage/async-storage", () => {
   const { createAsyncStorageMock } = require("@/shared/test");
@@ -10,6 +11,14 @@ const initialState = useDefaultStore.getState();
 describe("useDefaultStore", () => {
   beforeEach(() => {
     useDefaultStore.setState(initialState, true);
+  });
+
+  it("uses separate storage keys for defaults and active settings", () => {
+    expect(useDefaultStore.persist.getOptions().name).toBe("defaults-storage");
+    expect(useSettingsStore.persist.getOptions().name).toBe("settings-storage");
+    expect(useDefaultStore.persist.getOptions().name).not.toBe(
+      useSettingsStore.persist.getOptions().name
+    );
   });
 
   it("starts with the expected defaults", () => {
