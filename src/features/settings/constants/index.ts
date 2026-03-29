@@ -1,4 +1,5 @@
 export { calMethods, type CalculationMethodOptions } from "./calMethod";
+export { AUTOMATIC_LOCATION_NAME, AUTOMATIC_TIMEZONE_FALLBACK } from "./automaticDefaults";
 export { timezones, type TimeZoneOption } from "./timeZone";
 export { locations, LocationOption } from "./locations";
 export { notifications, sounds } from "./notificationsAndSound";

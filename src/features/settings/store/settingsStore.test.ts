@@ -2,11 +2,6 @@ import { defaultPrayerScheduleConfig } from "@/features-solah/utils/prayerSchedu
 
 import { useSettingsStore } from "./settingsStore";
 
-jest.mock("@react-native-async-storage/async-storage", () => {
-  const { createAsyncStorageMock } = require("@/shared/test");
-  return createAsyncStorageMock();
-});
-
 const initialState = useSettingsStore.getState();
 
 describe("useSettingsStore", () => {
@@ -18,8 +13,10 @@ describe("useSettingsStore", () => {
     const state = useSettingsStore.getState();
 
     expect(state.calculationMethod.method).toBe("MoonsightingCommittee");
-    expect(state.timezone.timezone).toBe("Asia/Riyadh");
-    expect(state.location.location.city).toBe("Riyadh");
+    expect(state.timezone.isDefault).toBe(true);
+    expect(state.location.isDefault).toBe(true);
+    expect(state.location.location).toBeNull();
+    expect(state.autoTimezoneEnabled).toBe(true);
     expect(state.calendarFormat.value).toBe("hijri");
     expect(state.timeFormat.value).toBe("12hr");
     expect(state.arabicFontSize.value).toBe(20);
@@ -84,6 +81,7 @@ describe("useSettingsStore", () => {
     state.setSound("Birds");
     state.setLanguage(nextLanguage);
     state.setPrayerSchedule("Dhuhr", nextPrayerSchedule.Dhuhr);
+    state.setAutoTimezoneEnabled(false);
 
     const nextState = useSettingsStore.getState();
 
@@ -98,5 +96,6 @@ describe("useSettingsStore", () => {
     expect(nextState.sound).toBe("Birds");
     expect(nextState.language).toEqual(nextLanguage);
     expect(nextState.prayerSchedule).toEqual(nextPrayerSchedule);
+    expect(nextState.autoTimezoneEnabled).toBe(false);
   });
 });

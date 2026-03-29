@@ -101,12 +101,12 @@ describe("useSolahTimes", () => {
     expect(result.current.loading).toBe(false);
   });
 
-  it("returns loading true when no location and no cached times", () => {
+  it("returns loading true when no location and no cached times are available yet", () => {
     setupStores({ location: null, lastKnownTimes: [] });
 
     const { result } = renderHook(() => useSolahTimes());
 
-    expect(result.current.loading).toBe(false);
+    expect(result.current.loading).toBe(true);
     expect(result.current.times).toEqual([]);
   });
 
@@ -139,13 +139,13 @@ describe("useSolahTimes", () => {
     );
   });
 
-  it("returns no formatted times when location has zero coordinates", () => {
+  it("treats zero coordinates as a real location instead of an unresolved placeholder", () => {
     setupStores({ location: { latitude: 0, longitude: 0 }, lastKnownTimes: [] });
 
     const { result } = renderHook(() => useSolahTimes());
 
-    expect(result.current.times).toEqual([]);
-    expect(MockPrayerTimes).not.toHaveBeenCalled();
+    expect(result.current.times).not.toEqual([]);
+    expect(MockPrayerTimes).toHaveBeenCalled();
   });
 
   it("falls back to lastKnownTimes when PrayerTimes constructor throws", () => {

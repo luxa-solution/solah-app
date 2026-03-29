@@ -1,62 +1,101 @@
-// useCurrentLocation.ts
 import * as Location from "expo-location";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
+import { MEANINGFUL_DISTANCE_METERS } from "@/features-solah/constants/location";
 import { LocationData } from "@/features-solah/types/index";
+import {
+  getDistanceMeters,
+  getFreshPosition,
+  resolveLocationData,
+} from "@/features-solah/utils/currentLocation";
 
-export function useCurrentLocation() {
-  // Temporary static value (to be replaced later)
+type LocationSource = "cached" | "fresh" | null;
+
+type CurrentLocationState = {
+  loading: boolean;
+  location: LocationData | null;
+  error: string | null;
+  source: LocationSource;
+  lastUpdated: number | null;
+};
+
+export function useCurrentLocation(): CurrentLocationState {
   const [loading, setLoading] = useState(false);
   const [location, setLocation] = useState<LocationData | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [source, setSource] = useState<LocationSource>(null);
+  const [lastUpdated, setLastUpdated] = useState<number | null>(null);
 
   useEffect(() => {
     let isMounted = true;
 
     async function fetchCurrentLocation() {
+      let hasCachedLocation = false;
+
       try {
         setLoading(true);
+        setError(null);
 
-        // Check existing foreground permission
-        const existing = await Location.getForegroundPermissionsAsync();
-
-        let status = existing.status;
-
-        // Request permission only if needed
+        let status = (await Location.getForegroundPermissionsAsync()).status;
         if (status !== "granted") {
-          const request = await Location.requestForegroundPermissionsAsync();
-          status = request.status;
+          status = (await Location.requestForegroundPermissionsAsync()).status;
         }
 
-        // Abort if permission still not granted
         if (status !== "granted") {
           throw new Error("Location permission not granted");
         }
 
-        // Get user coordinates
-        const loc = await Location.getCurrentPositionAsync({});
-        const [place] = await Location.reverseGeocodeAsync(loc.coords);
-
-        if (!isMounted) return;
-
-        if (!place) {
-          throw new Error("Unable to resolve location name");
+        const lastKnown = await Location.getLastKnownPositionAsync();
+        if (lastKnown) {
+          const cachedLocation = await resolveLocationData(lastKnown.coords);
+          if (isMounted) {
+            hasCachedLocation = true;
+            setLocation(cachedLocation);
+            setSource("cached");
+            setLastUpdated(lastKnown.timestamp ?? Date.now());
+            setLoading(false);
+          }
         }
 
-        // Set formatted location
-        setLocation({
-          latitude: loc.coords.latitude,
-          longitude: loc.coords.longitude,
-          city: place.city ?? "",
-          region: place.region ?? "",
-          country: place.country ?? "",
-        });
+        const freshPosition = await getFreshPosition();
+        if (!isMounted || !freshPosition) {
+          if (!hasCachedLocation) {
+            throw new Error("Location lookup timed out");
+          }
+          return;
+        }
+
+        if (
+          hasCachedLocation &&
+          lastKnown &&
+          getDistanceMeters(lastKnown.coords, freshPosition.coords) <= MEANINGFUL_DISTANCE_METERS
+        ) {
+          if (isMounted) {
+            setLoading(false);
+          }
+          return;
+        }
+
+        const freshLocation = await resolveLocationData(freshPosition.coords);
+        if (!isMounted) return;
+
+        setLocation(freshLocation);
+        setSource("fresh");
+        setLastUpdated(freshPosition.timestamp ?? Date.now());
+        setError(null);
       } catch (err) {
         if (!isMounted) return;
-        setError(err instanceof Error ? err.message : "Unable to get current location");
-        setLocation(null);
+
+        if (!hasCachedLocation) {
+          setError(err instanceof Error ? err.message : "Unable to get current location");
+          setLocation(null);
+          setSource(null);
+          setLastUpdated(null);
+        }
       } finally {
-        if (isMounted) setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     }
 
@@ -67,5 +106,5 @@ export function useCurrentLocation() {
     };
   }, []);
 
-  return { loading, location, error };
+  return { loading, location, error, source, lastUpdated };
 }
