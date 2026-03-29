@@ -66,7 +66,7 @@ describe("CalculationMethod", () => {
 
     expect(useSettingsStore.getState().calculationMethod).toEqual({
       name: "Umm Al-Qura",
-      method: "UmmAlQura",
+      method: "UQ",
     });
     expect(onClose).toHaveBeenCalledTimes(1);
   });
