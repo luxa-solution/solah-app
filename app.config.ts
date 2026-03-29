@@ -29,8 +29,8 @@ const SPLASH_ICON = {
   darkBgColor: appIcons.darkBg,
 };
 const NOTIFICATION_AUDIOS = {
-  short: "./assets/notification_sounds/takbir-only.mp3",
-  full: "./assets/notification_sounds/full-adhan.mp3",
+  short: "./assets/notification/takbir-only.mp3",
+  full: "./assets/notification/full-adhan.mp3",
 } as const;
 
 // Environment-specific overrides
