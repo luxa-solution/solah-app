@@ -8,7 +8,7 @@ import type {
   CalendarFormatOption,
   TimeFormatOption,
 } from "@/features-settings/constants";
-import { SettingsType, SoundOptions } from "@/features-settings/types";
+import { SettingsType, SoundOptions, PrayerAdhanConfig } from "@/features-settings/types";
 
 export function toText(type: SettingsType, value: any): string {
   switch (type) {
@@ -43,6 +43,12 @@ export function toText(type: SettingsType, value: any): string {
       return processTimeFormat(value as TimeFormatOption);
 
     default:
+      if (type.startsWith("adhan_")) {
+        return processAdhanConfig(value as PrayerAdhanConfig);
+      }
+      if (type.startsWith("iqamah_")) {
+        return processIqamahDelay(value as number);
+      }
       return "";
   }
 }
@@ -58,6 +64,9 @@ function processTimeZone(option: TimeZoneOption) {
 }
 
 function processLocation(option: LocationOption) {
+  if (option.isDefault && !option.location) {
+    return "Detecting location...";
+  }
   return option.name;
 }
 
@@ -87,4 +96,31 @@ function processCalendarFormat(option: CalendarFormatOption) {
 
 function processTimeFormat(option: TimeFormatOption) {
   return option.name;
+}
+
+export function processAdhanConfig(config: PrayerAdhanConfig) {
+  switch (config.mode) {
+    case "at_solah_time":
+      return "At solah time";
+    case "relative_after_solah":
+      return `${config.offsetMinutes ?? 0} min after solah`;
+    case "fixed_time":
+      return `Fixed at ${formatFixedTime(config.fixedTime ?? "00:00")}`;
+    default:
+      return "";
+  }
+}
+
+export function processIqamahDelay(minutes: number) {
+  return `${minutes} min`;
+}
+
+function formatFixedTime(value: string) {
+  const [rawHour = "0", rawMinute = "00"] = value.split(":");
+  const hour = Number(rawHour);
+  const minute = Number(rawMinute);
+  const suffix = hour >= 12 ? "PM" : "AM";
+  const normalizedHour = hour % 12 || 12;
+  const normalizedMinute = String(minute).padStart(2, "0");
+  return `${normalizedHour}:${normalizedMinute} ${suffix}`;
 }
