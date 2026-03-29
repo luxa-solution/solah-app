@@ -20,6 +20,111 @@ const SNAP_HEIGHT_MAP: Record<SnapPoint, number> = {
   "75%": SCREEN_HEIGHT * 0.75,
 };
 
+export const clampBottomSheetTranslateY = (
+  currentY: number,
+  translationY: number,
+  sheetHeight: number,
+  screenHeight: number = SCREEN_HEIGHT
+) => {
+  return Math.min(screenHeight, Math.max(sheetHeight, currentY + translationY));
+};
+
+export const shouldCloseBottomSheet = (translateY: number, sheetHeight: number) => {
+  return translateY > sheetHeight * 0.2;
+};
+
+type SharedTranslateY = { value: number };
+
+export const updateBottomSheetPosition = (
+  translateY: SharedTranslateY,
+  translationY: number,
+  sheetHeight: number,
+  screenHeight: number = SCREEN_HEIGHT
+) => {
+  translateY.value = clampBottomSheetTranslateY(
+    translateY.value,
+    translationY,
+    sheetHeight,
+    screenHeight
+  );
+  return translateY.value;
+};
+
+export const settleBottomSheetPosition = (
+  translateY: SharedTranslateY,
+  sheetHeight: number,
+  animateTo: (value: number, onFinished?: (finished: boolean) => void) => number,
+  onClose: () => void
+) => {
+  if (shouldCloseBottomSheet(translateY.value, sheetHeight)) {
+    translateY.value = animateTo(sheetHeight, (finished) => {
+      finishBottomSheetClose(finished, onClose);
+    });
+    return "closed";
+  }
+
+  translateY.value = animateTo(0);
+  return "open";
+};
+
+export const createBottomSheetPanUpdateHandler = (
+  translateY: SharedTranslateY,
+  sheetHeight: number,
+  screenHeight: number = SCREEN_HEIGHT
+) => {
+  return (event: { translationY: number }) => {
+    updateBottomSheetPosition(translateY, event.translationY, sheetHeight, screenHeight);
+  };
+};
+
+export const createBottomSheetPanEndHandler = (
+  translateY: SharedTranslateY,
+  sheetHeight: number,
+  animateTo: (value: number, onFinished?: (finished: boolean) => void) => number,
+  onClose: () => void
+) => {
+  return () => {
+    settleBottomSheetPosition(translateY, sheetHeight, animateTo, onClose);
+  };
+};
+
+export const finishBottomSheetClose = (finished: boolean, onClose: () => void) => {
+  if (finished) {
+    onClose();
+  }
+};
+
+export const animateBottomSheetWithSpring = (
+  spring: (value: number, config: object, callback: (finished: boolean) => void) => number,
+  value: number,
+  onFinished?: (finished: boolean) => void
+) => {
+  return spring(value, {}, (finished) => {
+    onFinished?.(finished);
+  });
+};
+
+export const scheduleBottomSheetClose = (
+  scheduler: (fn: () => void) => void,
+  onClose: () => void
+) => {
+  scheduler(onClose);
+};
+
+export const createBottomSheetSpringAnimator = (
+  spring: (value: number, config: object, callback: (finished: boolean) => void) => number
+) => {
+  return (value: number, onFinished?: (finished: boolean) => void) =>
+    animateBottomSheetWithSpring(spring, value, onFinished);
+};
+
+export const createBottomSheetCloseScheduler = (
+  scheduler: (fn: () => void) => void,
+  onClose: () => void
+) => {
+  return () => scheduleBottomSheetClose(scheduler, onClose);
+};
+
 export interface BottomSheetProps {
   isOpen: boolean;
   onClose: () => void;
@@ -38,29 +143,20 @@ export function BottomSheet({ isOpen, onClose, children, snapPoint = "50%" }: Bo
       translateY.value = withSpring(0, {});
     } else {
       translateY.value = withSpring(sheetHeight, {}, (finished) => {
-        if (finished) {
-          scheduleOnRN(setMounted, false);
-        }
+        finishBottomSheetClose(finished, () => scheduleOnRN(setMounted, false));
       });
     }
   }, [isOpen, sheetHeight, translateY]);
 
-  const panGesture = Gesture.Pan()
-    .onUpdate((event) => {
-      const nextY = translateY.value + event.translationY;
-      translateY.value = Math.min(SCREEN_HEIGHT, Math.max(sheetHeight, nextY));
-    })
-    .onEnd(() => {
-      if (translateY.value > sheetHeight * 0.2) {
-        translateY.value = withSpring(sheetHeight, {}, (finished) => {
-          if (finished) {
-            scheduleOnRN(onClose);
-          }
-        });
-      } else {
-        translateY.value = withSpring(0, {});
-      }
-    });
+  const handlePanUpdate = createBottomSheetPanUpdateHandler(translateY, sheetHeight);
+  const handlePanEnd = createBottomSheetPanEndHandler(
+    translateY,
+    sheetHeight,
+    createBottomSheetSpringAnimator(withSpring),
+    createBottomSheetCloseScheduler(scheduleOnRN, onClose)
+  );
+
+  const panGesture = Gesture.Pan().onUpdate(handlePanUpdate).onEnd(handlePanEnd);
 
   const sheetStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: translateY.value }],

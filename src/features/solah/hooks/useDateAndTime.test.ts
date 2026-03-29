@@ -119,14 +119,46 @@ describe("useDateAndTime", () => {
     unmount();
     jest.useRealTimers();
   });
+
+  it("clears the repeating interval on unmount after the first tick", async () => {
+    jest.useFakeTimers();
+    const clearIntervalSpy = jest.spyOn(global, "clearInterval");
+
+    const { unmount } = renderHook(() => useDateAndTime());
+
+    await act(async () => {
+      jest.advanceTimersByTime(70000);
+    });
+
+    unmount();
+
+    expect(clearIntervalSpy).toHaveBeenCalled();
+    jest.useRealTimers();
+  });
+
+  it("clears the alignment timeout when unmounted before the first minute tick", () => {
+    jest.useFakeTimers();
+    const clearTimeoutSpy = jest.spyOn(global, "clearTimeout");
+
+    const { unmount } = renderHook(() => useDateAndTime());
+    unmount();
+
+    expect(clearTimeoutSpy).toHaveBeenCalled();
+    jest.useRealTimers();
+  });
+
 });
 
 describe("useMinuteTick", () => {
   it("renders without error", () => {
+    jest.useFakeTimers();
+
     expect(() => {
       const { unmount } = renderHook(() => useMinuteTick());
       unmount();
     }).not.toThrow();
+
+    jest.useRealTimers();
   });
 
   it("triggers re-render at minute boundary", async () => {
@@ -161,6 +193,22 @@ describe("useMinuteTick", () => {
 
     expect(clearTimeoutSpy).toHaveBeenCalled();
 
+    jest.useRealTimers();
+  });
+
+  it("clears the repeating interval after the first tick has started", async () => {
+    jest.useFakeTimers();
+    const clearIntervalSpy = jest.spyOn(global, "clearInterval");
+
+    const { unmount } = renderHook(() => useMinuteTick());
+
+    await act(async () => {
+      jest.advanceTimersByTime(65000);
+    });
+
+    unmount();
+
+    expect(clearIntervalSpy).toHaveBeenCalled();
     jest.useRealTimers();
   });
 });

@@ -1,4 +1,4 @@
-import { renderHook, act } from "@testing-library/react-native";
+import { act, renderHook } from "@testing-library/react-native";
 
 import { useCurrentLocation } from "./useCurrentLocation";
 
@@ -17,15 +17,25 @@ jest.mock("expo-location", () => ({
 const mockCoords = { latitude: 24.7136, longitude: 46.6753 };
 const mockPlace = { city: "Riyadh", region: "Riyadh Region", country: "Saudi Arabia" };
 
+function deferred<T>() {
+  let resolve!: (value: T) => void;
+  let reject!: (reason?: unknown) => void;
+
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+
+  return { promise, resolve, reject };
+}
+
 describe("useCurrentLocation", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   it("starts with null location and null error on initial state", () => {
-    mockGetForegroundPermissionsAsync.mockResolvedValue({ status: "granted" });
-    mockGetCurrentPositionAsync.mockResolvedValue({ coords: mockCoords });
-    mockReverseGeocodeAsync.mockResolvedValue([mockPlace]);
+    mockGetForegroundPermissionsAsync.mockReturnValue(new Promise(() => {}));
 
     const { result } = renderHook(() => useCurrentLocation());
 
@@ -34,13 +44,24 @@ describe("useCurrentLocation", () => {
   });
 
   it("sets location after successful fetch with existing permission", async () => {
-    mockGetForegroundPermissionsAsync.mockResolvedValue({ status: "granted" });
-    mockGetCurrentPositionAsync.mockResolvedValue({ coords: mockCoords });
-    mockReverseGeocodeAsync.mockResolvedValue([mockPlace]);
+    const permissions = deferred<{ status: string }>();
+    const position = deferred<{ coords: typeof mockCoords }>();
+    const geocode = deferred<Array<typeof mockPlace>>();
+
+    mockGetForegroundPermissionsAsync.mockReturnValue(permissions.promise);
+    mockGetCurrentPositionAsync.mockReturnValue(position.promise);
+    mockReverseGeocodeAsync.mockReturnValue(geocode.promise);
 
     const { result } = renderHook(() => useCurrentLocation());
 
-    await act(async () => {});
+    await act(async () => {
+      permissions.resolve({ status: "granted" });
+      await Promise.resolve();
+      position.resolve({ coords: mockCoords });
+      await Promise.resolve();
+      geocode.resolve([mockPlace]);
+      await Promise.resolve();
+    });
 
     expect(result.current.loading).toBe(false);
     expect(result.current.location).toEqual({
@@ -54,14 +75,28 @@ describe("useCurrentLocation", () => {
   });
 
   it("requests permission when not already granted and succeeds", async () => {
-    mockGetForegroundPermissionsAsync.mockResolvedValue({ status: "undetermined" });
-    mockRequestForegroundPermissionsAsync.mockResolvedValue({ status: "granted" });
-    mockGetCurrentPositionAsync.mockResolvedValue({ coords: mockCoords });
-    mockReverseGeocodeAsync.mockResolvedValue([mockPlace]);
+    const permissions = deferred<{ status: string }>();
+    const requestPermission = deferred<{ status: string }>();
+    const position = deferred<{ coords: typeof mockCoords }>();
+    const geocode = deferred<Array<typeof mockPlace>>();
+
+    mockGetForegroundPermissionsAsync.mockReturnValue(permissions.promise);
+    mockRequestForegroundPermissionsAsync.mockReturnValue(requestPermission.promise);
+    mockGetCurrentPositionAsync.mockReturnValue(position.promise);
+    mockReverseGeocodeAsync.mockReturnValue(geocode.promise);
 
     const { result } = renderHook(() => useCurrentLocation());
 
-    await act(async () => {});
+    await act(async () => {
+      permissions.resolve({ status: "undetermined" });
+      await Promise.resolve();
+      requestPermission.resolve({ status: "granted" });
+      await Promise.resolve();
+      position.resolve({ coords: mockCoords });
+      await Promise.resolve();
+      geocode.resolve([mockPlace]);
+      await Promise.resolve();
+    });
 
     expect(mockRequestForegroundPermissionsAsync).toHaveBeenCalledTimes(1);
     expect(result.current.location).not.toBeNull();
@@ -69,12 +104,20 @@ describe("useCurrentLocation", () => {
   });
 
   it("sets error when existing permission is denied and request is also denied", async () => {
-    mockGetForegroundPermissionsAsync.mockResolvedValue({ status: "denied" });
-    mockRequestForegroundPermissionsAsync.mockResolvedValue({ status: "denied" });
+    const permissions = deferred<{ status: string }>();
+    const requestPermission = deferred<{ status: string }>();
+
+    mockGetForegroundPermissionsAsync.mockReturnValue(permissions.promise);
+    mockRequestForegroundPermissionsAsync.mockReturnValue(requestPermission.promise);
 
     const { result } = renderHook(() => useCurrentLocation());
 
-    await act(async () => {});
+    await act(async () => {
+      permissions.resolve({ status: "denied" });
+      await Promise.resolve();
+      requestPermission.resolve({ status: "denied" });
+      await Promise.resolve();
+    });
 
     expect(result.current.error).toBe("Location permission not granted");
     expect(result.current.location).toBeNull();
@@ -82,25 +125,48 @@ describe("useCurrentLocation", () => {
   });
 
   it("does not request permission when already granted", async () => {
-    mockGetForegroundPermissionsAsync.mockResolvedValue({ status: "granted" });
-    mockGetCurrentPositionAsync.mockResolvedValue({ coords: mockCoords });
-    mockReverseGeocodeAsync.mockResolvedValue([mockPlace]);
+    const permissions = deferred<{ status: string }>();
+    const position = deferred<{ coords: typeof mockCoords }>();
+    const geocode = deferred<Array<typeof mockPlace>>();
 
-    renderHook(() => useCurrentLocation());
-
-    await act(async () => {});
-
-    expect(mockRequestForegroundPermissionsAsync).not.toHaveBeenCalled();
-  });
-
-  it("sets error when reverseGeocode returns no place", async () => {
-    mockGetForegroundPermissionsAsync.mockResolvedValue({ status: "granted" });
-    mockGetCurrentPositionAsync.mockResolvedValue({ coords: mockCoords });
-    mockReverseGeocodeAsync.mockResolvedValue([]);
+    mockGetForegroundPermissionsAsync.mockReturnValue(permissions.promise);
+    mockGetCurrentPositionAsync.mockReturnValue(position.promise);
+    mockReverseGeocodeAsync.mockReturnValue(geocode.promise);
 
     const { result } = renderHook(() => useCurrentLocation());
 
-    await act(async () => {});
+    await act(async () => {
+      permissions.resolve({ status: "granted" });
+      await Promise.resolve();
+      position.resolve({ coords: mockCoords });
+      await Promise.resolve();
+      geocode.resolve([mockPlace]);
+      await Promise.resolve();
+    });
+
+    expect(mockRequestForegroundPermissionsAsync).not.toHaveBeenCalled();
+    expect(result.current.location).not.toBeNull();
+  });
+
+  it("sets error when reverseGeocode returns no place", async () => {
+    const permissions = deferred<{ status: string }>();
+    const position = deferred<{ coords: typeof mockCoords }>();
+    const geocode = deferred<Array<typeof mockPlace>>();
+
+    mockGetForegroundPermissionsAsync.mockReturnValue(permissions.promise);
+    mockGetCurrentPositionAsync.mockReturnValue(position.promise);
+    mockReverseGeocodeAsync.mockReturnValue(geocode.promise);
+
+    const { result } = renderHook(() => useCurrentLocation());
+
+    await act(async () => {
+      permissions.resolve({ status: "granted" });
+      await Promise.resolve();
+      position.resolve({ coords: mockCoords });
+      await Promise.resolve();
+      geocode.resolve([]);
+      await Promise.resolve();
+    });
 
     expect(result.current.error).toBe("Unable to resolve location name");
     expect(result.current.location).toBeNull();
@@ -108,12 +174,20 @@ describe("useCurrentLocation", () => {
   });
 
   it("sets error when getCurrentPositionAsync throws", async () => {
-    mockGetForegroundPermissionsAsync.mockResolvedValue({ status: "granted" });
-    mockGetCurrentPositionAsync.mockRejectedValue(new Error("GPS unavailable"));
+    const permissions = deferred<{ status: string }>();
+    const position = deferred<{ coords: typeof mockCoords }>();
+
+    mockGetForegroundPermissionsAsync.mockReturnValue(permissions.promise);
+    mockGetCurrentPositionAsync.mockReturnValue(position.promise);
 
     const { result } = renderHook(() => useCurrentLocation());
 
-    await act(async () => {});
+    await act(async () => {
+      permissions.resolve({ status: "granted" });
+      await Promise.resolve();
+      position.reject(new Error("GPS unavailable"));
+      await Promise.resolve();
+    });
 
     expect(result.current.error).toBe("GPS unavailable");
     expect(result.current.location).toBeNull();
@@ -121,36 +195,98 @@ describe("useCurrentLocation", () => {
   });
 
   it("handles null/undefined city and region gracefully", async () => {
-    mockGetForegroundPermissionsAsync.mockResolvedValue({ status: "granted" });
-    mockGetCurrentPositionAsync.mockResolvedValue({ coords: mockCoords });
-    mockReverseGeocodeAsync.mockResolvedValue([
-      { city: null, region: null, country: "Saudi Arabia" },
-    ]);
+    const permissions = deferred<{ status: string }>();
+    const position = deferred<{ coords: typeof mockCoords }>();
+    const geocode = deferred<Array<{ city: null; region: null; country: string }>>();
+
+    mockGetForegroundPermissionsAsync.mockReturnValue(permissions.promise);
+    mockGetCurrentPositionAsync.mockReturnValue(position.promise);
+    mockReverseGeocodeAsync.mockReturnValue(geocode.promise);
 
     const { result } = renderHook(() => useCurrentLocation());
 
-    await act(async () => {});
+    await act(async () => {
+      permissions.resolve({ status: "granted" });
+      await Promise.resolve();
+      position.resolve({ coords: mockCoords });
+      await Promise.resolve();
+      geocode.resolve([{ city: null, region: null, country: "Saudi Arabia" }]);
+      await Promise.resolve();
+    });
 
     expect(result.current.location?.city).toBe("");
     expect(result.current.location?.region).toBe("");
     expect(result.current.location?.country).toBe("Saudi Arabia");
   });
 
-  it("does not update state after unmount", async () => {
-    let resolvePosition: (v: any) => void;
-    const positionPromise = new Promise((res) => {
-      resolvePosition = res;
+  it("falls back to empty strings for all nullable place fields", async () => {
+    const permissions = deferred<{ status: string }>();
+    const position = deferred<{ coords: typeof mockCoords }>();
+    const geocode = deferred<Array<{ city: null; region: null; country: null }>>();
+
+    mockGetForegroundPermissionsAsync.mockReturnValue(permissions.promise);
+    mockGetCurrentPositionAsync.mockReturnValue(position.promise);
+    mockReverseGeocodeAsync.mockReturnValue(geocode.promise);
+
+    const { result } = renderHook(() => useCurrentLocation());
+
+    await act(async () => {
+      permissions.resolve({ status: "granted" });
+      await Promise.resolve();
+      position.resolve({ coords: mockCoords });
+      await Promise.resolve();
+      geocode.resolve([{ city: null, region: null, country: null }]);
+      await Promise.resolve();
     });
 
-    mockGetForegroundPermissionsAsync.mockResolvedValue({ status: "granted" });
-    mockGetCurrentPositionAsync.mockReturnValue(positionPromise);
+    expect(result.current.location).toEqual({
+      latitude: 24.7136,
+      longitude: 46.6753,
+      city: "",
+      region: "",
+      country: "",
+    });
+  });
+
+  it("uses the generic error when a non-Error is thrown", async () => {
+    const permissions = deferred<{ status: string }>();
+    const position = deferred<{ coords: typeof mockCoords }>();
+
+    mockGetForegroundPermissionsAsync.mockReturnValue(permissions.promise);
+    mockGetCurrentPositionAsync.mockReturnValue(position.promise);
+
+    const { result } = renderHook(() => useCurrentLocation());
+
+    await act(async () => {
+      permissions.resolve({ status: "granted" });
+      await Promise.resolve();
+      position.reject("unexpected");
+      await Promise.resolve();
+    });
+
+    expect(result.current.error).toBe("Unable to get current location");
+    expect(result.current.location).toBeNull();
+  });
+
+  it("does not update state after unmount", async () => {
+    const permissions = deferred<{ status: string }>();
+    const position = deferred<{ coords: typeof mockCoords }>();
+
+    mockGetForegroundPermissionsAsync.mockReturnValue(permissions.promise);
+    mockGetCurrentPositionAsync.mockReturnValue(position.promise);
 
     const { result, unmount } = renderHook(() => useCurrentLocation());
+
+    await act(async () => {
+      permissions.resolve({ status: "granted" });
+      await Promise.resolve();
+    });
 
     unmount();
 
     await act(async () => {
-      resolvePosition!({ coords: mockCoords });
+      position.resolve({ coords: mockCoords });
+      await Promise.resolve();
     });
 
     expect(result.current.location).toBeNull();

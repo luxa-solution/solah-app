@@ -225,6 +225,31 @@ describe("useCurrentSolah", () => {
     expect(typeof result.current.currentSolah).toBe("string");
   });
 
+  it("returns the last prayer as current before the first prayer of the day", async () => {
+    const times = [
+      { title: "Subhi", time: "300" },
+      { title: "Dhuhr", time: "720" },
+      { title: "Asr", time: "930" },
+      { title: "Maghrib", time: "1080" },
+      { title: "Isha", time: "1170" },
+    ];
+
+    setupStores();
+    mockUseSolahStore.mockReturnValue({
+      lastKnownTimes: times,
+      setLastKnownTimes: mockSetLastKnownTimes,
+    });
+
+    mockGetCurrentMinutes.mockReturnValue(100);
+    mockParseTimeToMinutes.mockImplementation((t: string) => parseInt(t, 10));
+
+    const { result } = renderHook(() => useCurrentSolah());
+
+    await act(async () => {});
+
+    expect(result.current.currentSolah).toBe("Isha");
+  });
+
   it("falls back to Subhi when times list is empty", async () => {
     setupStores({ location: null, lastKnownTimes: [] });
 
@@ -266,6 +291,31 @@ describe("useNextSolah", () => {
 
     expect(result.current.nextSolah).toHaveProperty("title");
     expect(result.current.nextSolah).toHaveProperty("time");
+  });
+
+  it("returns the next prayer in the normal middle-of-day case", async () => {
+    const times = [
+      { title: "Subhi", time: "300" },
+      { title: "Dhuhr", time: "720" },
+      { title: "Asr", time: "930" },
+      { title: "Maghrib", time: "1080" },
+      { title: "Isha", time: "1170" },
+    ];
+
+    setupStores({ location: null });
+    mockUseSolahStore.mockReturnValue({
+      lastKnownTimes: times,
+      setLastKnownTimes: mockSetLastKnownTimes,
+    });
+
+    mockGetCurrentMinutes.mockReturnValue(800);
+    mockParseTimeToMinutes.mockImplementation((t: string) => parseInt(t, 10));
+
+    const { result } = renderHook(() => useNextSolah());
+
+    await act(async () => {});
+
+    expect(result.current.nextSolah).toEqual({ title: "Asr", time: "930" });
   });
 
   it("returns Subhi as fallback when times list is empty", async () => {
