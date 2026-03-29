@@ -5,7 +5,7 @@ import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { SolahGroup } from "@/features-solah/types";
 import { colors, spacing, borderRadius, effect, borderWidth, font } from "@/shared/styles";
 
-interface SolahButtonProps {
+export interface SolahButtonProps {
   data: SolahGroup;
 }
 

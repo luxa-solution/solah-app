@@ -20,7 +20,7 @@ const SNAP_HEIGHT_MAP: Record<SnapPoint, number> = {
   "75%": SCREEN_HEIGHT * 0.75,
 };
 
-interface BottomSheetProps {
+export interface BottomSheetProps {
   isOpen: boolean;
   onClose: () => void;
   children: ReactNode;

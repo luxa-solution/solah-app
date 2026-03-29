@@ -3,7 +3,7 @@ import { View, StyleSheet, Animated } from "react-native";
 
 import { background, border } from "@/shared/styles";
 
-interface ProgressBarProps {
+export interface ProgressBarProps {
   percent: number;
 }
 

@@ -1,7 +1,7 @@
 import { useRouter } from "expo-router";
 import { Appbar } from "react-native-paper";
 
-interface TitleBarProps {
+export interface TitleBarProps {
   title: string;
   showBack?: boolean;
   showBookmark?: boolean;

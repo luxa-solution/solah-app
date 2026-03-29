@@ -13,7 +13,7 @@ type IconComponent = React.ComponentType<{
   strokeWidth?: number;
 }>;
 
-interface TopNavProps {
+export interface TopNavProps {
   value: AdhkarTab;
   onChange: (tab: AdhkarTab) => void;
   favouriteCount?: number;
