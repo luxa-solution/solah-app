@@ -34,43 +34,6 @@ export interface ButtonProps {
   fullWidth?: boolean;
 }
 
-/**
- * AppButton — A reusable, theme-aware button component.
- *
- * This component supports multiple visual styles (variants), loading and disabled states,
- * optional left-side icons, and full-width or inline rendering. It is built with React Native's
- * `Pressable` for smooth press feedback.
- *
- * ## Variants
- * - **filled** — Solid background using the primary color.
- * - **outline** — Transparent background with a primary-colored border.
- * - **ghost** — Minimal button with no border or background, typically used for subtle actions.
- *
- * ## Example
- * ```tsx
- * <AppButton
- *   title="Continue"
- *   variant="filled"
- *   onPress={handleSubmit}
- *   loading={submitting}
- *   leftIcon={<Icon name="arrow-right" />}
- * />
- * ```
- *
- * @component
- * @param {string} title - The text to display inside the button.
- * @param {() => void} [onPress] - Callback function triggered when the button is pressed.
- * @param {"filled" | "outline" | "ghost"} [variant="filled"] - Defines the button's visual style.
- * @param {boolean} [disabled=false] - Disables the button and lowers opacity.
- * @param {boolean} [loading=false] - Shows a loading spinner instead of the text when true.
- * @param {React.ReactNode} [leftIcon] - Optional icon displayed to the left of the text.
- * @param {StyleProp<ViewStyle>} [style] - Additional container styles.
- * @param {StyleProp<TextStyle>} [textStyle] - Additional text styles.
- * @param {boolean} [fullWidth=true] - Whether the button should stretch to the container's width.
- *
- * @returns {JSX.Element} A styled button component with built-in loading and variant handling.
- */
-
 export function AppButton({
   title,
   onPress,
@@ -83,7 +46,6 @@ export function AppButton({
   fullWidth = true,
 }: ButtonProps) {
   const backgroundColor = variant === "filled" ? background.brand.secondary : "transparent";
-
   const borderColor = variant === "outline" ? border.brand.secondary : "transparent";
 
   let textColor: string;

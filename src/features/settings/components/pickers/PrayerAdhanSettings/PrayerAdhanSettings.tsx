@@ -1,8 +1,6 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useMemo, useState } from "react";
-import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { Pressable, ScrollView, Text } from "react-native";
 
-import { PRAYER_ADHAN_MODE_OPTIONS } from "@/features-settings/constants";
 import { useSettingsStore } from "@/features-settings/store";
 import { PrayerAdhanConfig } from "@/features-settings/types";
 import {
@@ -15,8 +13,10 @@ import {
 } from "@/features-settings/utils";
 import { SolahName } from "@/features-solah/types";
 import { formatTime, validateAdhanConfig } from "@/features-solah/utils";
-import { colors } from "@/shared/styles";
 
+import { FixedTimeFields } from "./parts/FixedTimeFields";
+import { ModeSelector } from "./parts/ModeSelector";
+import { RelativeTimeFields } from "./parts/RelativeTimeFields";
 import { prayerAdhanSettingsStyles as styles } from "./PrayerAdhanSettings.styles";
 
 type PrayerAdhanSettingsProps = {
@@ -54,6 +54,10 @@ export function PrayerAdhanSettings({ prayer, onClose, onDone }: PrayerAdhanSett
       ),
     [calculationMethod, currentConfig.iqamahDelayMinutes, location, prayer]
   );
+
+  const latestAllowedTimeLabel = prayerWindow
+    ? formatTime(prayerWindow.latestAllowedTime, timezone, timeFormat)
+    : null;
 
   const handleSave = () => {
     const relativeOffset = buildRelativeOffsetMinutes(offsetHours, offsetMinutes);
@@ -103,104 +107,35 @@ export function PrayerAdhanSettings({ prayer, onClose, onDone }: PrayerAdhanSett
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.modeRow}>
-        {PRAYER_ADHAN_MODE_OPTIONS.map((option) => {
-          const selected = option.value === mode;
-          return (
-            <Pressable
-              accessibilityLabel={option.label}
-              key={option.value}
-              onPress={() => {
-                setMode(option.value);
-                setError(null);
-              }}
-              style={[styles.modeOption, selected && styles.selectedOption]}
-            >
-              <MaterialCommunityIcons
-                color={selected ? colors.context.default.inverted : colors.context.brand.primary}
-                name={option.icon}
-                size={24}
-              />
-              <Text style={[styles.optionText, selected && styles.selectedOptionText]}>
-                {option.label}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
+      <ModeSelector
+        mode={mode}
+        onSelect={(nextMode) => {
+          setMode(nextMode);
+          setError(null);
+        }}
+      />
 
       {mode === "relative_after_solah" ? (
-        <View style={styles.editorBlock}>
-          <Text style={styles.helperText}>Relative offset</Text>
-          <View style={styles.timeRow}>
-            <TextInput
-              keyboardType="number-pad"
-              onChangeText={setOffsetHours}
-              placeholder="Hours"
-              style={styles.timeInput}
-              value={offsetHours}
-            />
-            <TextInput
-              keyboardType="number-pad"
-              onChangeText={setOffsetMinutes}
-              placeholder="Minutes"
-              style={styles.timeInput}
-              value={offsetMinutes}
-            />
-          </View>
-          {prayerWindow ? (
-            <Text style={styles.helperCaption}>
-              Must stay before {formatTime(prayerWindow.latestAllowedTime, timezone, timeFormat)}
-            </Text>
-          ) : null}
-        </View>
+        <RelativeTimeFields
+          hours={offsetHours}
+          latestAllowedTimeLabel={latestAllowedTimeLabel}
+          minutes={offsetMinutes}
+          onChangeHours={setOffsetHours}
+          onChangeMinutes={setOffsetMinutes}
+        />
       ) : null}
 
       {mode === "fixed_time" ? (
-        <View style={styles.editorBlock}>
-          <Text style={styles.helperText}>Fixed time</Text>
-          <View style={styles.timeRow}>
-            <TextInput
-              keyboardType="number-pad"
-              onChangeText={setFixedHour}
-              placeholder={timeFormat === "24hr" ? "HH" : "Hour"}
-              style={styles.timeInput}
-              value={fixedHour}
-            />
-            <TextInput
-              keyboardType="number-pad"
-              onChangeText={setFixedMinute}
-              placeholder={timeFormat === "24hr" ? "MM" : "Minute"}
-              style={styles.timeInput}
-              value={fixedMinute}
-            />
-            {timeFormat === "12hr" ? (
-              <View style={styles.periodRow}>
-                {(["AM", "PM"] as const).map((period) => (
-                  <Pressable
-                    key={period}
-                    onPress={() => setFixedPeriod(period)}
-                    style={[styles.periodButton, fixedPeriod === period && styles.selectedOption]}
-                  >
-                    <Text
-                      style={[
-                        styles.optionText,
-                        fixedPeriod === period && styles.selectedOptionText,
-                      ]}
-                    >
-                      {period}
-                    </Text>
-                  </Pressable>
-                ))}
-              </View>
-            ) : null}
-          </View>
-          {prayerWindow ? (
-            <Text style={styles.helperCaption}>
-              Must stay before {formatTime(prayerWindow.latestAllowedTime, timezone, timeFormat)}
-            </Text>
-          ) : null}
-        </View>
+        <FixedTimeFields
+          fixedHour={fixedHour}
+          fixedMinute={fixedMinute}
+          fixedPeriod={fixedPeriod}
+          latestAllowedTimeLabel={latestAllowedTimeLabel}
+          onChangeFixedHour={setFixedHour}
+          onChangeFixedMinute={setFixedMinute}
+          onChangeFixedPeriod={setFixedPeriod}
+          timeFormat={timeFormat}
+        />
       ) : null}
 
       {error ? <Text style={styles.error}>{error}</Text> : null}

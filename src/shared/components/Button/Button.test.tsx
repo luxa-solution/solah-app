@@ -30,11 +30,9 @@ describe("AppButton (critical behavior)", () => {
       <AppButton title="Continue" onPress={onPress} loading />
     );
 
-    // text is replaced by spinner
     expect(queryByText("Continue")).toBeNull();
     expect(UNSAFE_getByType(ActivityIndicator)).toBeTruthy();
 
-    // press is blocked
     fireEvent.press(getByTestId("app-button"));
     expect(onPress).not.toHaveBeenCalled();
   });

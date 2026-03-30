@@ -7,27 +7,6 @@ export interface ProgressBarProps {
   percent: number;
 }
 
-/**
- * ProgressBar — A lightweight animated progress indicator.
- *
- * Visually represents a percentage value (0–100%) as a horizontal bar that fills smoothly
- * using React Native’s Animated API. The animation runs whenever the `percent` value changes.
- *
- * ## Behavior
- * - Clamps input values between 0 and 100.
- * - Animates width transitions with a 500ms ease.
- *
- * ## Example
- * ```tsx
- * <ProgressBar percent={65} />
- * ```
- *
- * @component
- * @param {number} percent - The progress value to display, as a percentage between 0 and 100.
- *
- * @returns {JSX.Element} An animated progress bar that fills proportionally to the `percent` value.
- */
-
 export const ProgressBar = ({ percent }: ProgressBarProps) => {
   const clampedPercent = Math.min(Math.max(percent, 0), 100);
   const animation = useRef(new Animated.Value(0)).current;
@@ -36,10 +15,9 @@ export const ProgressBar = ({ percent }: ProgressBarProps) => {
     Animated.timing(animation, {
       toValue: clampedPercent,
       duration: 500,
-      useNativeDriver: false, // can't animate width with native driver
+      useNativeDriver: false,
     }).start();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [clampedPercent]);
+  }, [animation, clampedPercent]);
 
   const widthInterpolated = animation.interpolate({
     inputRange: [0, 100],
@@ -47,7 +25,7 @@ export const ProgressBar = ({ percent }: ProgressBarProps) => {
   });
 
   return (
-    <View style={[styles.container]}>
+    <View style={styles.container}>
       <Animated.View
         style={[
           styles.filled,
