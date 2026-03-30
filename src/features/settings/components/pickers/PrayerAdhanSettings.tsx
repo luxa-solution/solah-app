@@ -1,7 +1,8 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useMemo, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 
+import { PRAYER_ADHAN_MODE_OPTIONS } from "@/features-settings/constants";
 import { useSettingsStore } from "@/features-settings/store";
 import { PrayerAdhanConfig } from "@/features-settings/types";
 import {
@@ -14,25 +15,15 @@ import {
 } from "@/features-settings/utils";
 import { SolahName } from "@/features-solah/types";
 import { formatTime, validateAdhanConfig } from "@/features-solah/utils";
-import { colors, font, spacing } from "@/shared/styles";
+import { colors } from "@/shared/styles";
+
+import { prayerAdhanSettingsStyles as styles } from "./PrayerAdhanSettings.styles";
 
 type PrayerAdhanSettingsProps = {
   prayer: SolahName;
   onClose?: () => void;
   onDone?: () => void;
 };
-
-type IconName = keyof typeof MaterialCommunityIcons.glyphMap;
-
-const MODE_OPTIONS: {
-  label: string;
-  icon: IconName;
-  value: PrayerAdhanConfig["mode"];
-}[] = [
-  { label: "At solah time", icon: "clock-check-outline", value: "at_solah_time" },
-  { label: "Relative after solah", icon: "timeline-clock-outline", value: "relative_after_solah" },
-  { label: "Fixed time", icon: "clock-outline", value: "fixed_time" },
-];
 
 export function PrayerAdhanSettings({ prayer, onClose, onDone }: PrayerAdhanSettingsProps) {
   const currentConfig = useSettingsStore((state) => state.prayerSchedule[prayer]);
@@ -113,7 +104,7 @@ export function PrayerAdhanSettings({ prayer, onClose, onDone }: PrayerAdhanSett
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.modeRow}>
-        {MODE_OPTIONS.map((option) => {
+        {PRAYER_ADHAN_MODE_OPTIONS.map((option) => {
           const selected = option.value === mode;
           return (
             <Pressable
@@ -220,86 +211,3 @@ export function PrayerAdhanSettings({ prayer, onClose, onDone }: PrayerAdhanSett
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    gap: spacing.sm,
-    paddingVertical: spacing.sm,
-  },
-  modeRow: {
-    flexDirection: "row",
-    gap: spacing.xs,
-  },
-  modeOption: {
-    flex: 1,
-    alignItems: "center",
-    gap: spacing.xs,
-    paddingHorizontal: spacing.xs,
-    paddingVertical: spacing.sm,
-    borderWidth: 1,
-    borderColor: colors.border.default.tertiary,
-    borderRadius: 16,
-  },
-  selectedOption: {
-    backgroundColor: colors.background.brand.primary,
-    borderColor: colors.background.brand.primary,
-  },
-  optionText: {
-    ...font.body.small,
-    color: colors.context.default.primary,
-    textAlign: "center",
-  },
-  selectedOptionText: {
-    color: colors.context.default.inverted,
-  },
-  editorBlock: {
-    gap: spacing.xs,
-  },
-  helperText: {
-    ...font.label.large,
-    color: colors.context.default.primary,
-  },
-  helperCaption: {
-    ...font.body.xsmall,
-    color: colors.context.default.secondary,
-  },
-  timeRow: {
-    flexDirection: "row",
-    gap: spacing.xs,
-    alignItems: "center",
-  },
-  timeInput: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: colors.border.default.tertiary,
-    borderRadius: 10,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.sm,
-  },
-  periodRow: {
-    flexDirection: "row",
-    gap: spacing.xs,
-  },
-  periodButton: {
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.sm,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: colors.border.default.tertiary,
-  },
-  error: {
-    ...font.body.xsmall,
-    color: "red",
-  },
-  saveButton: {
-    marginTop: spacing.sm,
-    borderRadius: 10,
-    backgroundColor: colors.background.brand.primary,
-    paddingVertical: spacing.sm,
-    alignItems: "center",
-  },
-  saveText: {
-    ...font.label.large,
-    color: colors.context.default.inverted,
-  },
-});
