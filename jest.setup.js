@@ -1,5 +1,10 @@
 jest.mock("react-native-worklets", () => require("react-native-worklets/lib/module/mock"));
 
+jest.mock("@react-native-async-storage/async-storage", () => {
+  const { createAsyncStorageMock } = require("@/shared/test");
+  return createAsyncStorageMock();
+});
+
 jest.mock("react-native-reanimated", () => require("react-native-reanimated/mock"));
 
 require("react-native-reanimated").setUpTests();

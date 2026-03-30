@@ -1,9 +1,5 @@
 import { useDefaultStore } from "./defaultStore";
-
-jest.mock("@react-native-async-storage/async-storage", () => {
-  const { createAsyncStorageMock } = require("@/shared/test");
-  return createAsyncStorageMock();
-});
+import { useSettingsStore } from "./settingsStore";
 
 const initialState = useDefaultStore.getState();
 
@@ -12,12 +8,21 @@ describe("useDefaultStore", () => {
     useDefaultStore.setState(initialState, true);
   });
 
+  it("uses separate storage keys for defaults and active settings", () => {
+    expect(useDefaultStore.persist.getOptions().name).toBe("defaults-storage");
+    expect(useSettingsStore.persist.getOptions().name).toBe("settings-storage");
+    expect(useDefaultStore.persist.getOptions().name).not.toBe(
+      useSettingsStore.persist.getOptions().name
+    );
+  });
+
   it("starts with the expected defaults", () => {
     const state = useDefaultStore.getState();
 
     expect(state.defaultCalculationMethod.method).toBe("MoonsightingCommittee");
-    expect(state.defaultTimezone.timezone).toBe("Asia/Riyadh");
-    expect(state.defaultLocation.location.city).toBe("Riyadh");
+    expect(state.defaultTimezone.isDefault).toBe(true);
+    expect(state.defaultLocation.isDefault).toBe(true);
+    expect(state.defaultLocation.location).toBeNull();
     expect(state.defaultLanguage.value).toBe("Default");
   });
 

@@ -52,4 +52,23 @@ describe("SheetTitle", () => {
     const { getByText } = render(<SheetTitle settings_type="timeformat" />);
     expect(getByText("Time Format")).toBeTruthy();
   });
+
+  it("shows 'Customize Notifications' for customizenotifications", () => {
+    const { getByText } = render(<SheetTitle settings_type="customizenotifications" />);
+    expect(getByText("Customize Notifications")).toBeTruthy();
+  });
+
+  it("shows prayer adhan and iqamah titles", () => {
+    const adhanSettings = render(<SheetTitle settings_type="adhansettings" />);
+    expect(adhanSettings.getByText("Adhan Settings")).toBeTruthy();
+
+    const iqamahSettings = render(<SheetTitle settings_type="iqamahsettings" />);
+    expect(iqamahSettings.getByText("Iqamah Settings")).toBeTruthy();
+
+    const adhan = render(<SheetTitle settings_type="adhan_dhuhr" />);
+    expect(adhan.getByText("Dhuhr Adhan")).toBeTruthy();
+
+    const iqamah = render(<SheetTitle settings_type="iqamah_maghrib" />);
+    expect(iqamah.getByText("Maghrib Iqamah")).toBeTruthy();
+  });
 });

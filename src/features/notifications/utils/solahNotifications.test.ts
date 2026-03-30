@@ -1,11 +1,15 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CalculationMethod } from "adhan";
-import * as Notifications from "expo-notifications";
 
+import { defaultPrayerScheduleConfig } from "@/features-solah/utils/prayerScheduleUtils";
+
+import { LocalNotifications } from "./localNotifications";
 import {
   syncSolahNotifications,
   cancelScheduledSolahNotifications,
   getSolahNotificationChannelId,
+  loadLastSyncedAt,
+  loadSyncInput,
 } from "./solahNotifications";
 
 jest.mock("@react-native-async-storage/async-storage", () => ({
@@ -15,27 +19,28 @@ jest.mock("@react-native-async-storage/async-storage", () => ({
   clear: jest.fn(),
 }));
 
-jest.mock("expo-notifications", () => ({
-  getPermissionsAsync: jest.fn(),
-  requestPermissionsAsync: jest.fn(),
-  cancelScheduledNotificationAsync: jest.fn(),
-  scheduleNotificationAsync: jest.fn(),
-  setNotificationChannelAsync: jest.fn(),
-  AndroidImportance: { MAX: 5 },
-  SchedulableTriggerInputTypes: { DATE: "date" },
+jest.mock("./localNotifications", () => ({
+  LocalNotifications: {
+    getPermissionsAsync: jest.fn(),
+    requestPermissionsAsync: jest.fn(),
+    cancelScheduledNotificationAsync: jest.fn(),
+    scheduleNotificationAsync: jest.fn(),
+    setNotificationChannelAsync: jest.fn(),
+    AndroidImportance: { MAX: 5 },
+    SchedulableTriggerInputTypes: { DATE: "date" },
+  },
 }));
 
 jest.mock("adhan", () => {
-  const fakeFutureTimes = {
-    fajr: new Date(Date.now() + 1 * 3600_000),
-    dhuhr: new Date(Date.now() + 2 * 3600_000),
-    asr: new Date(Date.now() + 3 * 3600_000),
-    maghrib: new Date(Date.now() + 4 * 3600_000),
-    isha: new Date(Date.now() + 5 * 3600_000),
-  };
   return {
     Coordinates: jest.fn().mockImplementation(() => ({})),
-    PrayerTimes: jest.fn().mockImplementation(() => fakeFutureTimes),
+    PrayerTimes: jest.fn().mockImplementation((_, date: Date) => ({
+      fajr: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 5, 0, 0, 0),
+      dhuhr: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0, 0),
+      asr: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 15, 0, 0, 0),
+      maghrib: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 18, 0, 0, 0),
+      isha: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 20, 0, 0, 0),
+    })),
     CalculationMethod: {
       MuslimWorldLeague: jest.fn(() => ({ fajrAngle: 18, ishaAngle: 17 })),
       Egyptian: jest.fn(() => ({ fajrAngle: 19.5, ishaAngle: 17.5 })),
@@ -55,11 +60,26 @@ jest.mock("adhan", () => {
 
 const mockGetItem = AsyncStorage.getItem as jest.Mock;
 const mockSetItem = AsyncStorage.setItem as jest.Mock;
-const mockGetPermissions = Notifications.getPermissionsAsync as jest.Mock;
-const mockRequestPermissions = Notifications.requestPermissionsAsync as jest.Mock;
-const mockCancelNotif = Notifications.cancelScheduledNotificationAsync as jest.Mock;
-const mockScheduleNotif = Notifications.scheduleNotificationAsync as jest.Mock;
-const mockSetChannel = Notifications.setNotificationChannelAsync as jest.Mock;
+const mockGetPermissions = LocalNotifications.getPermissionsAsync as jest.Mock;
+const mockRequestPermissions = LocalNotifications.requestPermissionsAsync as jest.Mock;
+const mockCancelNotif = LocalNotifications.cancelScheduledNotificationAsync as jest.Mock;
+const mockScheduleNotif = LocalNotifications.scheduleNotificationAsync as jest.Mock;
+const mockSetChannel = LocalNotifications.setNotificationChannelAsync as jest.Mock;
+
+function withEnabledNotificationModes() {
+  const schedule = defaultPrayerScheduleConfig();
+
+  return Object.fromEntries(
+    Object.entries(schedule).map(([prayer, config]) => [
+      prayer,
+      {
+        ...config,
+        adhanNotificationMode: "sound",
+        iqamahNotificationMode: "vibrate",
+      },
+    ])
+  ) as typeof schedule;
+}
 
 const baseInput = {
   enabled: true,
@@ -73,9 +93,12 @@ const baseInput = {
   },
   timezone: "Asia/Riyadh" as any,
   calculationMethod: "MoonsightingCommittee" as const,
+  prayerSchedule: withEnabledNotificationModes(),
 };
 
 beforeEach(() => {
+  jest.useFakeTimers();
+  jest.setSystemTime(new Date(2026, 2, 29, 0, 0, 0, 0));
   jest.clearAllMocks();
   mockGetItem.mockResolvedValue(null);
   mockSetItem.mockResolvedValue(undefined);
@@ -84,6 +107,10 @@ beforeEach(() => {
   mockCancelNotif.mockResolvedValue(undefined);
   mockScheduleNotif.mockResolvedValue("notif-id-1");
   mockSetChannel.mockResolvedValue(undefined);
+});
+
+afterEach(() => {
+  jest.useRealTimers();
 });
 
 describe("getSolahNotificationChannelId", () => {
@@ -198,8 +225,8 @@ describe("syncSolahNotifications", () => {
     const result = await syncSolahNotifications({
       ...baseInput,
       location: {
-        latitude: 0,
-        longitude: 0,
+        latitude: null as any,
+        longitude: null as any,
         city: null,
         region: null,
         country: null,
@@ -215,6 +242,21 @@ describe("syncSolahNotifications", () => {
       location: {
         latitude: null as any,
         longitude: 39.8,
+        city: null,
+        region: null,
+        country: null,
+      } as any,
+    });
+    expect(result).toEqual({ permissionOk: true });
+    expect(mockScheduleNotif).not.toHaveBeenCalled();
+  });
+
+  it("cancels and returns permissionOk: true when longitude is undefined", async () => {
+    const result = await syncSolahNotifications({
+      ...baseInput,
+      location: {
+        latitude: 21.4,
+        longitude: undefined as any,
         city: null,
         region: null,
         country: null,
@@ -248,6 +290,63 @@ describe("syncSolahNotifications", () => {
     expect(mockScheduleNotif).toHaveBeenCalled();
   });
 
+  it("does not import the expo-notifications package root for local scheduling", async () => {
+    const deriveAdhanTime = jest.fn((date: Date) => date);
+    const deriveIqamahTime = jest.fn((date: Date) => date);
+
+    jest.resetModules();
+    jest.doMock("expo-notifications", () => {
+      throw new Error("expo-notifications root import should not be used");
+    });
+    jest.doMock("./localNotifications", () => ({
+      LocalNotifications: {
+        getPermissionsAsync: jest.fn().mockResolvedValue({ granted: true }),
+        requestPermissionsAsync: jest.fn().mockResolvedValue({ granted: true }),
+        cancelScheduledNotificationAsync: jest.fn().mockResolvedValue(undefined),
+        scheduleNotificationAsync: jest.fn().mockResolvedValue("notif-id-1"),
+        setNotificationChannelAsync: jest.fn().mockResolvedValue(undefined),
+        AndroidImportance: { MAX: 5 },
+        SchedulableTriggerInputTypes: { DATE: "date" },
+      },
+    }));
+    jest.doMock("@react-native-async-storage/async-storage", () => ({
+      __esModule: true,
+      default: {
+        getItem: jest.fn().mockResolvedValue(null),
+        setItem: jest.fn().mockResolvedValue(undefined),
+        removeItem: jest.fn(),
+        clear: jest.fn(),
+      },
+    }));
+    jest.doMock("adhan", () => ({
+      Coordinates: jest.fn().mockImplementation(() => ({})),
+      PrayerTimes: jest.fn().mockImplementation((_: unknown, date: Date) => ({
+        fajr: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 5, 0, 0, 0),
+        dhuhr: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0, 0),
+        asr: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 15, 0, 0, 0),
+        maghrib: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 18, 0, 0, 0),
+        isha: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 20, 0, 0, 0),
+      })),
+    }));
+    jest.doMock("@/features-solah/utils", () => ({
+      getAdhanParams: jest.fn(() => ({ mocked: true })),
+      deriveAdhanTime,
+      deriveIqamahTime,
+    }));
+
+    let isolatedSyncSolahNotifications!: typeof syncSolahNotifications;
+
+    jest.isolateModules(() => {
+      ({
+        syncSolahNotifications: isolatedSyncSolahNotifications,
+      } = require("./solahNotifications"));
+    });
+
+    await expect(isolatedSyncSolahNotifications(baseInput)).resolves.toEqual({
+      permissionOk: true,
+    });
+  });
+
   it("creates notification channel before scheduling", async () => {
     await syncSolahNotifications(baseInput);
     expect(mockSetChannel).toHaveBeenCalledWith(
@@ -261,18 +360,31 @@ describe("syncSolahNotifications", () => {
 
     await syncSolahNotifications(baseInput);
 
-    expect(mockSetItem).toHaveBeenLastCalledWith(
+    expect(mockSetItem).toHaveBeenCalledWith(
       "solah-notification-ids-v1",
       expect.stringContaining("sched-id")
     );
   });
 
-  it("caps scheduled notifications at 10", async () => {
+  it("saves sync metadata after a successful schedule refresh", async () => {
+    await syncSolahNotifications(baseInput);
+
+    expect(mockSetItem).toHaveBeenCalledWith(
+      "solah-notification-sync-input-v1",
+      expect.any(String)
+    );
+    expect(mockSetItem).toHaveBeenCalledWith(
+      "solah-notification-last-synced-at-v1",
+      expect.any(String)
+    );
+  });
+
+  it("caps scheduled notifications at 64", async () => {
     mockScheduleNotif.mockResolvedValue("id");
 
     await syncSolahNotifications(baseInput);
 
-    expect(mockScheduleNotif.mock.calls.length).toBeLessThanOrEqual(10);
+    expect(mockScheduleNotif.mock.calls.length).toBeLessThanOrEqual(64);
   });
 
   it("handles permission check throwing an error", async () => {
@@ -297,6 +409,53 @@ describe("syncSolahNotifications", () => {
   it("uses correct channel ID for non-default sound", async () => {
     await syncSolahNotifications({ ...baseInput, sound: "Adhan Makkah" });
     expect(mockSetChannel).toHaveBeenCalledWith("solah-times-adhan_makkah", expect.any(Object));
+  });
+
+  it("uses the bundled short adhan sound for sound-mode channels and payloads", async () => {
+    await syncSolahNotifications({ ...baseInput, sound: "Short Adhan" as any });
+
+    expect(mockSetChannel).toHaveBeenCalledWith(
+      "solah-times-default",
+      expect.objectContaining({ sound: "takbir-only.mp3" })
+    );
+    expect(mockScheduleNotif).toHaveBeenCalledWith(
+      expect.objectContaining({
+        content: expect.objectContaining({ sound: "takbir-only.mp3" }),
+      })
+    );
+  });
+
+  it("uses the bundled full adhan sound for sound-mode channels and payloads", async () => {
+    await syncSolahNotifications({ ...baseInput, sound: "Full Adhan" as any });
+
+    expect(mockSetChannel).toHaveBeenCalledWith(
+      "solah-times-full_adhan",
+      expect.objectContaining({ sound: "full-adhan.mp3" })
+    );
+    expect(mockScheduleNotif).toHaveBeenCalledWith(
+      expect.objectContaining({
+        content: expect.objectContaining({ sound: "full-adhan.mp3" }),
+      })
+    );
+  });
+
+  it("uses muted android channels for mute delivery mode", async () => {
+    await syncSolahNotifications({
+      ...baseInput,
+      prayerSchedule: {
+        ...withEnabledNotificationModes(),
+        Dhuhr: {
+          ...withEnabledNotificationModes().Dhuhr,
+          adhanNotificationMode: "mute",
+          iqamahNotificationMode: "mute",
+        },
+      },
+    });
+
+    expect(mockSetChannel).toHaveBeenCalledWith(
+      "solah-times-vibrate",
+      expect.objectContaining({ enableVibrate: true, sound: null })
+    );
   });
 
   it.each([
@@ -325,5 +484,304 @@ describe("syncSolahNotifications", () => {
     });
 
     expect(CalculationMethod.MoonsightingCommittee).toHaveBeenCalled();
+  });
+
+  it("schedules notifications using the derived adhan time rather than the raw prayer time", async () => {
+    await syncSolahNotifications({
+      ...baseInput,
+      timezone: "Africa/Abidjan" as any,
+      prayerSchedule: {
+        ...defaultPrayerScheduleConfig(),
+        Dhuhr: {
+          adhan: { mode: "relative_after_solah", offsetMinutes: 15 },
+          iqamahDelayMinutes: 15,
+          adhanNotificationMode: "sound",
+          iqamahNotificationMode: "mute",
+        },
+      },
+    });
+
+    expect(mockScheduleNotif).toHaveBeenCalledWith(
+      expect.objectContaining({
+        trigger: expect.objectContaining({
+          date: expect.any(Date),
+        }),
+      })
+    );
+
+    const dhuhrAdhanCall = mockScheduleNotif.mock.calls.find(
+      ([payload]) => payload.content.body === "It's time for Dhuhr."
+    );
+
+    expect(dhuhrAdhanCall?.[0].trigger.date.getTime()).toBe(
+      new Date(2026, 2, 29, 12, 15, 0, 0).getTime()
+    );
+  });
+
+  it("passes the active timezone through to deriveAdhanTime", async () => {
+    const deriveAdhanTimeSpy = jest.fn((date: Date) => date);
+    const deriveIqamahTimeSpy = jest.fn((date: Date) => date);
+    const mockIsolatedGetPermissions = jest.fn().mockResolvedValue({ granted: true });
+    const mockIsolatedRequestPermissions = jest.fn().mockResolvedValue({ granted: true });
+    const mockIsolatedCancel = jest.fn().mockResolvedValue(undefined);
+    const mockIsolatedSchedule = jest.fn().mockResolvedValue("notif-id-1");
+    const mockIsolatedSetChannel = jest.fn().mockResolvedValue(undefined);
+
+    jest.resetModules();
+    jest.doMock("@react-native-async-storage/async-storage", () => ({
+      __esModule: true,
+      default: {
+        getItem: jest.fn().mockResolvedValue(null),
+        setItem: jest.fn().mockResolvedValue(undefined),
+        removeItem: jest.fn(),
+        clear: jest.fn(),
+      },
+    }));
+    jest.doMock("./localNotifications", () => ({
+      LocalNotifications: {
+        getPermissionsAsync: mockIsolatedGetPermissions,
+        requestPermissionsAsync: mockIsolatedRequestPermissions,
+        cancelScheduledNotificationAsync: mockIsolatedCancel,
+        scheduleNotificationAsync: mockIsolatedSchedule,
+        setNotificationChannelAsync: mockIsolatedSetChannel,
+        AndroidImportance: { MAX: 5 },
+        SchedulableTriggerInputTypes: { DATE: "date" },
+      },
+    }));
+    jest.doMock("adhan", () => ({
+      Coordinates: jest.fn().mockImplementation(() => ({})),
+      PrayerTimes: jest.fn().mockImplementation((_: unknown, date: Date) => ({
+        fajr: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 5, 0, 0, 0),
+        dhuhr: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0, 0),
+        asr: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 15, 0, 0, 0),
+        maghrib: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 18, 0, 0, 0),
+        isha: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 20, 0, 0, 0),
+      })),
+    }));
+    jest.doMock("@/features-solah/utils", () => ({
+      getAdhanParams: jest.fn(() => ({ mocked: true })),
+      deriveAdhanTime: deriveAdhanTimeSpy,
+      deriveIqamahTime: deriveIqamahTimeSpy,
+    }));
+
+    let isolatedSyncSolahNotifications!: typeof syncSolahNotifications;
+
+    jest.isolateModules(() => {
+      ({
+        syncSolahNotifications: isolatedSyncSolahNotifications,
+      } = require("./solahNotifications"));
+    });
+
+    await isolatedSyncSolahNotifications({
+      ...baseInput,
+      timezone: "Africa/Abidjan" as any,
+    });
+
+    expect(deriveAdhanTimeSpy).toHaveBeenCalledWith(
+      expect.any(Date),
+      expect.any(Object),
+      "Africa/Abidjan"
+    );
+    expect(deriveIqamahTimeSpy).toHaveBeenCalled();
+  });
+
+  it("does not schedule adhan notifications for prayers with adhan notifications disabled", async () => {
+    await syncSolahNotifications({
+      ...baseInput,
+      prayerSchedule: {
+        ...defaultPrayerScheduleConfig(),
+        Asr: {
+          adhan: { mode: "at_solah_time" },
+          iqamahDelayMinutes: 15,
+          adhanNotificationMode: "mute",
+          iqamahNotificationMode: "mute",
+        },
+      },
+    });
+
+    expect(
+      mockScheduleNotif.mock.calls.some(
+        ([payload]) => payload.content.body === "It's time for Asr."
+      )
+    ).toBe(false);
+  });
+
+  it("schedules iqamah notifications when enabled", async () => {
+    await syncSolahNotifications({
+      ...baseInput,
+      prayerSchedule: {
+        ...defaultPrayerScheduleConfig(),
+        Maghrib: {
+          adhan: { mode: "at_solah_time" },
+          iqamahDelayMinutes: 10,
+          adhanNotificationMode: "mute",
+          iqamahNotificationMode: "vibrate",
+        },
+      },
+    });
+
+    expect(
+      mockScheduleNotif.mock.calls.some(
+        ([payload]) => payload.content.body === "Iqamah for Maghrib is starting now."
+      )
+    ).toBe(true);
+  });
+
+  it("uses silent content for vibrate-only notifications", async () => {
+    await syncSolahNotifications({
+      ...baseInput,
+      prayerSchedule: {
+        ...defaultPrayerScheduleConfig(),
+        Dhuhr: {
+          adhan: { mode: "at_solah_time" },
+          iqamahDelayMinutes: 20,
+          adhanNotificationMode: "vibrate",
+          iqamahNotificationMode: "mute",
+        },
+      },
+    });
+
+    const dhuhrAdhanCall = mockScheduleNotif.mock.calls.find(
+      ([payload]) => payload.content.body === "It's time for Dhuhr."
+    );
+
+    expect(dhuhrAdhanCall?.[0].content.sound).toBeUndefined();
+  });
+
+  it("skips a prayer/day when adhan derivation throws and continues scheduling others", async () => {
+    await syncSolahNotifications({
+      ...baseInput,
+      prayerSchedule: {
+        ...withEnabledNotificationModes(),
+        Dhuhr: {
+          ...withEnabledNotificationModes().Dhuhr,
+          adhan: { mode: "fixed_time", fixedTime: "99:99" },
+        },
+      },
+    });
+
+    expect(mockScheduleNotif).toHaveBeenCalled();
+    expect(
+      mockScheduleNotif.mock.calls.some(
+        ([payload]) => payload.content.body === "It's time for Dhuhr."
+      )
+    ).toBe(false);
+  });
+
+  it("skips a day when prayer time construction throws and continues other days", async () => {
+    const PrayerTimesMock = require("adhan").PrayerTimes as jest.Mock;
+    let callCount = 0;
+    PrayerTimesMock.mockImplementation((_: unknown, date: Date) => {
+      callCount += 1;
+      if (callCount === 1) {
+        throw new Error("bad day");
+      }
+      return {
+        fajr: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 5, 0, 0, 0),
+        dhuhr: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0, 0),
+        asr: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 15, 0, 0, 0),
+        maghrib: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 18, 0, 0, 0),
+        isha: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 20, 0, 0, 0),
+      };
+    });
+
+    await syncSolahNotifications(baseInput);
+
+    expect(mockScheduleNotif).toHaveBeenCalled();
+  });
+});
+
+describe("getAdhanParams deduplication", () => {
+  afterEach(() => {
+    jest.resetModules();
+  });
+
+  it("uses the shared getAdhanParams helper", async () => {
+    const sharedGetAdhanParams = jest.fn(() => ({ mocked: true }));
+    const deriveAdhanTime = jest.fn((date: Date) => date);
+    const deriveIqamahTime = jest.fn((date: Date) => date);
+
+    jest.doMock("@/features-solah/utils", () => ({
+      getAdhanParams: sharedGetAdhanParams,
+      deriveAdhanTime,
+      deriveIqamahTime,
+    }));
+
+    jest.doMock("@react-native-async-storage/async-storage", () => ({
+      __esModule: true,
+      default: {
+        getItem: jest.fn().mockResolvedValue(null),
+        setItem: jest.fn().mockResolvedValue(undefined),
+        removeItem: jest.fn(),
+        clear: jest.fn(),
+      },
+    }));
+
+    jest.doMock("./localNotifications", () => ({
+      LocalNotifications: {
+        getPermissionsAsync: jest.fn().mockResolvedValue({ granted: true }),
+        requestPermissionsAsync: jest.fn().mockResolvedValue({ granted: true }),
+        cancelScheduledNotificationAsync: jest.fn().mockResolvedValue(undefined),
+        scheduleNotificationAsync: jest.fn().mockResolvedValue("notif-id-1"),
+        setNotificationChannelAsync: jest.fn().mockResolvedValue(undefined),
+        AndroidImportance: { MAX: 5 },
+        SchedulableTriggerInputTypes: { DATE: "date" },
+      },
+    }));
+
+    jest.doMock("adhan", () => ({
+      Coordinates: jest.fn().mockImplementation(() => ({})),
+      PrayerTimes: jest.fn().mockImplementation(() => ({
+        fajr: new Date(Date.now() + 1 * 3600_000),
+        dhuhr: new Date(Date.now() + 2 * 3600_000),
+        asr: new Date(Date.now() + 3 * 3600_000),
+        maghrib: new Date(Date.now() + 4 * 3600_000),
+        isha: new Date(Date.now() + 5 * 3600_000),
+      })),
+      CalculationMethod: {
+        MoonsightingCommittee: jest.fn(() => ({ mocked: "fallback" })),
+      },
+    }));
+
+    let isolatedSyncSolahNotifications!: typeof syncSolahNotifications;
+
+    jest.isolateModules(() => {
+      ({
+        syncSolahNotifications: isolatedSyncSolahNotifications,
+      } = require("./solahNotifications"));
+    });
+
+    await isolatedSyncSolahNotifications(baseInput);
+
+    expect(sharedGetAdhanParams).toHaveBeenCalledWith(baseInput.calculationMethod);
+  });
+});
+
+describe("loadLastSyncedAt", () => {
+  it("returns null when storage is empty", async () => {
+    mockGetItem.mockResolvedValue(null);
+    await expect(loadLastSyncedAt()).resolves.toBeNull();
+  });
+
+  it("returns null when storage contains a non-numeric timestamp", async () => {
+    mockGetItem.mockResolvedValue("not-a-number");
+    await expect(loadLastSyncedAt()).resolves.toBeNull();
+  });
+
+  it("returns null when reading the timestamp throws", async () => {
+    mockGetItem.mockRejectedValue(new Error("storage failed"));
+    await expect(loadLastSyncedAt()).resolves.toBeNull();
+  });
+});
+
+describe("loadSyncInput", () => {
+  it("returns null when storage is empty", async () => {
+    mockGetItem.mockResolvedValue(null);
+    await expect(loadSyncInput()).resolves.toBeNull();
+  });
+
+  it("returns null when stored sync input is invalid json", async () => {
+    mockGetItem.mockResolvedValue("{bad-json");
+    await expect(loadSyncInput()).resolves.toBeNull();
   });
 });

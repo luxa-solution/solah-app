@@ -1,14 +1,6 @@
 import { SoundOptions } from "@/features-settings/types";
 
-export const sounds: SoundOptions[] = [
-  "Default",
-  "80's phone",
-  "Asteroid",
-  "Atomic bell",
-  "Basic tone",
-  "Chime",
-  "Icecubes",
-];
+export const sounds: SoundOptions[] = ["Short Adhan", "Full Adhan", "Beep"];
 
 export type NotificationOption = {
   label: "On" | "Off";

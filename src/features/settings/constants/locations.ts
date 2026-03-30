@@ -4,7 +4,7 @@ import { TimeZoneOption } from "./timeZone";
 
 export type LocationOption = {
   name: string;
-  location: LocationData;
+  location: LocationData | null;
   timezone: TimeZoneOption;
   isDefault?: boolean;
 };

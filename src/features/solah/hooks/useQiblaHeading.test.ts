@@ -22,6 +22,7 @@ jest.mock("react-native-reanimated", () => ({
 }));
 
 jest.mock("@/features-solah/utils", () => ({
+  ...jest.requireActual("@/features-solah/utils"),
   magnetometerToHeading: (_x: number, _y: number) => 100,
   smoothAngle: (_prev: number, next: number, rate: number) => _prev + rate * (next - _prev),
   calculateQiblaOffset: (bearing: number, heading: number) => bearing - heading,

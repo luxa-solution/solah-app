@@ -1,4 +1,4 @@
-import { render } from "@testing-library/react-native";
+import { fireEvent, render } from "@testing-library/react-native";
 import React from "react";
 
 import { useSettingsStore } from "@/features-settings/store";
@@ -79,6 +79,45 @@ describe("SheetBody", () => {
     );
     expect(getByText("On")).toBeTruthy();
     expect(getByText("Off")).toBeTruthy();
+  });
+
+  it("renders notification customization controls for customizenotifications", () => {
+    const { getByText, getByTestId } = render(
+      <SheetBody settings_type="customizenotifications" onClose={mockOnClose} />
+    );
+
+    expect(getByText("Solah")).toBeTruthy();
+    expect(getByText("Adhan")).toBeTruthy();
+    expect(getByText("Iqamah")).toBeTruthy();
+    expect(getByTestId("notification-mode-subhi-adhan")).toBeTruthy();
+    expect(getByTestId("notification-mode-isha-iqamah")).toBeTruthy();
+  });
+
+  it("renders the adhan and iqamah settings sheets", () => {
+    const adhanSettings = render(<SheetBody settings_type="adhansettings" onClose={mockOnClose} />);
+    expect(adhanSettings.getByText("Dhuhr adhan")).toBeTruthy();
+
+    const iqamahSettings = render(
+      <SheetBody settings_type="iqamahsettings" onClose={mockOnClose} />
+    );
+    expect(iqamahSettings.getByText("Maghrib iqamah")).toBeTruthy();
+
+    const adhan = render(<SheetBody settings_type="adhan_dhuhr" onClose={mockOnClose} />);
+    expect(adhan.getByText("At solah time")).toBeTruthy();
+
+    const iqamah = render(<SheetBody settings_type="iqamah_maghrib" onClose={mockOnClose} />);
+    expect(iqamah.getByTestId("iqamah-minute-dial")).toBeTruthy();
+  });
+
+  it("navigates from prayer settings menus to the prayer-specific editor", () => {
+    const onNavigate = jest.fn();
+    const { getByText } = render(
+      <SheetBody settings_type="adhansettings" onClose={mockOnClose} onNavigate={onNavigate} />
+    );
+
+    fireEvent.press(getByText("Dhuhr adhan"));
+
+    expect(onNavigate).toHaveBeenCalledWith("adhan_dhuhr");
   });
 
   it("returns null for unknown settings type", () => {

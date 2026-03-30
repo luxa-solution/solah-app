@@ -1,27 +1,51 @@
 import { useEffect } from "react";
 
-import { useDefaultStore } from "@/features-settings/store";
+import { useDefaultStore, useSettingsStore } from "@/features-settings/store";
+import { createAutomaticLocationOption, resolveAutomaticTimeZone } from "@/features-settings/utils";
 import { useCurrentLocation } from "@/features-solah/hooks";
 
 export function useSyncDefaultLocation() {
   const { location, loading, error } = useCurrentLocation();
-  const { setDefaultLocation } = useDefaultStore();
+  const activeLocation = useSettingsStore((state) => state.location);
+  const autoTimezoneEnabled = useSettingsStore((state) => state.autoTimezoneEnabled);
+  const setLocation = useSettingsStore((state) => state.setLocation);
+  const setTimeZone = useSettingsStore((state) => state.setTimeZone);
+  const setDefaultLocation = useDefaultStore((state) => state.setDefaultLocation);
+  const setDefaultTimeZone = useDefaultStore((state) => state.setDefaultTimeZone);
 
   useEffect(() => {
-    if (loading) return;
-    if (error) return;
-    if (!location) return;
+    if (loading || error || !location) {
+      return;
+    }
 
-    // Always sync latest GPS location
-    setDefaultLocation({
-      name: "Default (Current Location)",
-      location,
-      timezone: {
-        name: "Default (System Timezone)",
-        timezone: "Asia/Riyadh",
-        isDefault: true,
-      },
-      isDefault: true,
-    });
-  }, [loading, error, location, setDefaultLocation]);
+    const automaticTimeZone = resolveAutomaticTimeZone();
+    const automaticLocation = createAutomaticLocationOption(location);
+
+    setDefaultLocation(automaticLocation);
+    setDefaultTimeZone(automaticTimeZone);
+
+    if (!activeLocation.isDefault) {
+      if (autoTimezoneEnabled) {
+        setTimeZone(activeLocation.timezone);
+      }
+      return;
+    }
+
+    setLocation(automaticLocation);
+
+    if (autoTimezoneEnabled) {
+      setTimeZone(automaticTimeZone);
+    }
+  }, [
+    activeLocation.isDefault,
+    activeLocation.timezone,
+    autoTimezoneEnabled,
+    error,
+    loading,
+    location,
+    setDefaultLocation,
+    setDefaultTimeZone,
+    setLocation,
+    setTimeZone,
+  ]);
 }

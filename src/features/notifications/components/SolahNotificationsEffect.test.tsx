@@ -1,5 +1,7 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { act, render, waitFor } from "@testing-library/react-native";
 import React from "react";
+import { AppState } from "react-native";
 
 import { useSettingsStore } from "@/features-settings/store";
 
@@ -10,10 +12,17 @@ jest.mock("@react-native-async-storage/async-storage", () => {
   return createAsyncStorageMock();
 });
 
+const mockAppStateAddEventListener = jest.fn();
+
 const mockSyncSolahNotifications = jest.fn();
+const mockLoadLastSyncedAt = jest.fn();
+const mockRegisterNotificationBackgroundTaskAsync = jest.fn();
 
 jest.mock("../utils", () => ({
   syncSolahNotifications: (...args: any[]) => mockSyncSolahNotifications(...args),
+  loadLastSyncedAt: (...args: any[]) => mockLoadLastSyncedAt(...args),
+  registerNotificationBackgroundTaskAsync: (...args: any[]) =>
+    mockRegisterNotificationBackgroundTaskAsync(...args),
 }));
 
 const defaultStoreState = useSettingsStore.getState();
@@ -21,9 +30,38 @@ const defaultStoreState = useSettingsStore.getState();
 beforeEach(() => {
   useSettingsStore.setState(defaultStoreState, true);
   jest.clearAllMocks();
+  (AsyncStorage.getItem as jest.Mock).mockResolvedValue(null);
+  mockAppStateAddEventListener.mockReturnValue({ remove: jest.fn() });
+  jest
+    .spyOn(AppState, "addEventListener")
+    .mockImplementation((...args: any[]) => mockAppStateAddEventListener(...args));
+  mockLoadLastSyncedAt.mockResolvedValue(null);
+  mockRegisterNotificationBackgroundTaskAsync.mockResolvedValue(undefined);
+});
+
+afterEach(() => {
+  jest.restoreAllMocks();
 });
 
 describe("SolahNotificationsEffect", () => {
+  it("subscribes to app foreground changes through the public AppState API", () => {
+    mockSyncSolahNotifications.mockResolvedValue({ permissionOk: true });
+
+    render(<SolahNotificationsEffect />);
+
+    expect(mockAppStateAddEventListener).toHaveBeenCalledWith("change", expect.any(Function));
+  });
+
+  it("registers the notification background task on mount", async () => {
+    mockSyncSolahNotifications.mockResolvedValue({ permissionOk: true });
+
+    render(<SolahNotificationsEffect />);
+
+    await waitFor(() => {
+      expect(mockRegisterNotificationBackgroundTaskAsync).toHaveBeenCalledTimes(1);
+    });
+  });
+
   it("returns null (renders nothing)", () => {
     mockSyncSolahNotifications.mockResolvedValue({ permissionOk: true });
     const { toJSON } = render(<SolahNotificationsEffect />);
@@ -46,6 +84,7 @@ describe("SolahNotificationsEffect", () => {
     expect(callArg).toMatchObject({
       enabled: defaultStoreState.solahTimeNotification,
       sound: defaultStoreState.sound,
+      prayerSchedule: defaultStoreState.prayerSchedule,
     });
 
     await act(async () => {
@@ -79,6 +118,31 @@ describe("SolahNotificationsEffect", () => {
     });
 
     expect(mockSyncSolahNotifications.mock.calls.length).toBeGreaterThan(callCountAfterMount);
+  });
+
+  it("re-calls syncSolahNotifications when prayerSchedule changes", async () => {
+    mockSyncSolahNotifications.mockResolvedValue({ permissionOk: true });
+
+    render(<SolahNotificationsEffect />);
+    const callCountAfterMount = mockSyncSolahNotifications.mock.calls.length;
+
+    await act(async () => {
+      useSettingsStore.getState().setPrayerSchedule("Dhuhr", {
+        adhan: { mode: "relative_after_solah", offsetMinutes: 10 },
+        iqamahDelayMinutes: 20,
+        adhanNotificationMode: "sound",
+        iqamahNotificationMode: "mute",
+      });
+      await Promise.resolve();
+    });
+
+    expect(mockSyncSolahNotifications.mock.calls.length).toBeGreaterThan(callCountAfterMount);
+    expect(mockSyncSolahNotifications.mock.calls.at(-1)?.[0].prayerSchedule.Dhuhr).toEqual({
+      adhan: { mode: "relative_after_solah", offsetMinutes: 10 },
+      iqamahDelayMinutes: 20,
+      adhanNotificationMode: "sound",
+      iqamahNotificationMode: "mute",
+    });
   });
 
   it("calls setEnabled(false) when enabled=true but permission is denied", async () => {
@@ -146,5 +210,108 @@ describe("SolahNotificationsEffect", () => {
     });
 
     expect(useSettingsStore.getState().solahTimeNotification).toBe(true);
+  });
+
+  it("re-syncs on app foreground when the last sync is older than 24 hours", async () => {
+    const staleSyncTime = Date.now() - 25 * 60 * 60 * 1000;
+    mockLoadLastSyncedAt.mockResolvedValue(staleSyncTime);
+    mockSyncSolahNotifications.mockResolvedValue({ permissionOk: true });
+    useSettingsStore.setState({ solahTimeNotification: true });
+
+    render(<SolahNotificationsEffect />);
+
+    const listener = mockAppStateAddEventListener.mock.calls.find(
+      ([eventName]) => eventName === "change"
+    )?.[1];
+
+    expect(listener).toBeDefined();
+
+    const callCountAfterMount = mockSyncSolahNotifications.mock.calls.length;
+
+    await act(async () => {
+      await listener?.("active");
+    });
+
+    expect(mockSyncSolahNotifications.mock.calls.length).toBeGreaterThan(callCountAfterMount);
+  });
+
+  it("does not re-sync on app foreground when the last sync was within 24 hours", async () => {
+    const freshSyncTime = Date.now() - 60 * 60 * 1000;
+    mockLoadLastSyncedAt.mockResolvedValue(freshSyncTime);
+    mockSyncSolahNotifications.mockResolvedValue({ permissionOk: true });
+    useSettingsStore.setState({ solahTimeNotification: true });
+
+    render(<SolahNotificationsEffect />);
+
+    const listener = mockAppStateAddEventListener.mock.calls.find(
+      ([eventName]) => eventName === "change"
+    )?.[1];
+
+    const callCountAfterMount = mockSyncSolahNotifications.mock.calls.length;
+
+    await act(async () => {
+      await listener?.("active");
+    });
+
+    expect(mockSyncSolahNotifications.mock.calls.length).toBe(callCountAfterMount);
+  });
+
+  it("does not re-sync on non-active app state changes", async () => {
+    mockLoadLastSyncedAt.mockResolvedValue(null);
+    mockSyncSolahNotifications.mockResolvedValue({ permissionOk: true });
+    useSettingsStore.setState({ solahTimeNotification: true });
+
+    render(<SolahNotificationsEffect />);
+
+    const listener = mockAppStateAddEventListener.mock.calls.find(
+      ([eventName]) => eventName === "change"
+    )?.[1];
+
+    const callCountAfterMount = mockSyncSolahNotifications.mock.calls.length;
+
+    await act(async () => {
+      await listener?.("background");
+    });
+
+    expect(mockSyncSolahNotifications.mock.calls.length).toBe(callCountAfterMount);
+  });
+
+  it("does not re-sync on foreground when notifications are disabled", async () => {
+    mockLoadLastSyncedAt.mockResolvedValue(null);
+    mockSyncSolahNotifications.mockResolvedValue({ permissionOk: true });
+    useSettingsStore.setState({ solahTimeNotification: false });
+
+    render(<SolahNotificationsEffect />);
+
+    const listener = mockAppStateAddEventListener.mock.calls.find(
+      ([eventName]) => eventName === "change"
+    )?.[1];
+
+    const callCountAfterMount = mockSyncSolahNotifications.mock.calls.length;
+
+    await act(async () => {
+      await listener?.("active");
+    });
+
+    expect(mockSyncSolahNotifications.mock.calls.length).toBe(callCountAfterMount);
+  });
+
+  it("disables notifications when a foreground renewal sync returns permission denied", async () => {
+    mockLoadLastSyncedAt.mockResolvedValue(null);
+    mockSyncSolahNotifications.mockResolvedValue({ permissionOk: true });
+    useSettingsStore.setState({ solahTimeNotification: true });
+
+    render(<SolahNotificationsEffect />);
+
+    mockSyncSolahNotifications.mockResolvedValue({ permissionOk: false });
+    const listener = mockAppStateAddEventListener.mock.calls.find(
+      ([eventName]) => eventName === "change"
+    )?.[1];
+
+    await act(async () => {
+      await listener?.("active");
+    });
+
+    expect(useSettingsStore.getState().solahTimeNotification).toBe(false);
   });
 });

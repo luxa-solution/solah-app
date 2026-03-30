@@ -2,7 +2,8 @@ import { useEffect } from "react";
 
 import { useSettingsStore } from "@/features-settings/store";
 
-import { syncSolahNotifications } from "../utils";
+import { useNotificationForegroundRenewal } from "../hooks/useNotificationForegroundRenewal";
+import { registerNotificationBackgroundTaskAsync, syncSolahNotifications } from "../utils";
 
 export function SolahNotificationsEffect() {
   const enabled = useSettingsStore((s) => s.solahTimeNotification);
@@ -10,7 +11,14 @@ export function SolahNotificationsEffect() {
   const location = useSettingsStore((s) => s.location.location);
   const timezone = useSettingsStore((s) => s.timezone.timezone);
   const calculationMethod = useSettingsStore((s) => s.calculationMethod.method);
+  const prayerSchedule = useSettingsStore((s) => s.prayerSchedule);
   const setEnabled = useSettingsStore((s) => s.setSolahTimeNotification);
+
+  useNotificationForegroundRenewal();
+
+  useEffect(() => {
+    void registerNotificationBackgroundTaskAsync();
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -22,6 +30,7 @@ export function SolahNotificationsEffect() {
         location,
         timezone,
         calculationMethod,
+        prayerSchedule,
       });
 
       if (cancelled) return;
@@ -35,7 +44,7 @@ export function SolahNotificationsEffect() {
     return () => {
       cancelled = true;
     };
-  }, [enabled, sound, location, timezone, calculationMethod, setEnabled]);
+  }, [enabled, sound, location, timezone, calculationMethod, prayerSchedule, setEnabled]);
 
   return null;
 }

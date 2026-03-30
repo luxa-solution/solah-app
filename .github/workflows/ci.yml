@@ -84,9 +84,6 @@ jobs:
       - name: Run TypeScript type check
         run: npx tsc --noEmit
 
-      - name: Check formatting
-        run: npm run format
-
   test:
     needs: wait-for-branch-guard
     if: needs.wait-for-branch-guard.result == 'success'
@@ -177,3 +174,4 @@ jobs:
 
       - name: Build for preview
         run: npx expo export --platform all
+

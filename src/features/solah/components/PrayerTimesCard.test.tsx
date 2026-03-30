@@ -25,7 +25,7 @@ describe("PrayerTimesCard", () => {
     const screen = render(<PrayerTimesCard />);
 
     expect(screen.getByText(/Next/i)).toBeTruthy();
-    expect(screen.getByText("Saudi Arabia")).toBeTruthy();
+    expect(screen.getByText("No location data")).toBeTruthy();
   });
 
   it("renders the home-page variant and navigates when pressed", () => {

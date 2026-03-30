@@ -11,7 +11,7 @@ jest.mock("@react-native-async-storage/async-storage", () => {
 });
 
 jest.mock("@/features-settings/constants", () => ({
-  sounds: ["Default", "Bell", "Birds"],
+  sounds: ["Short Adhan", "Full Adhan", "Beep"],
 }));
 
 const initialSettingsState = useSettingsStore.getState();
@@ -25,18 +25,18 @@ describe("Sound", () => {
   it("renders the list of available sounds", () => {
     const { getByText } = render(<Sound />);
 
-    expect(getByText("Default")).toBeTruthy();
-    expect(getByText("Bell")).toBeTruthy();
-    expect(getByText("Birds")).toBeTruthy();
+    expect(getByText("Short Adhan")).toBeTruthy();
+    expect(getByText("Full Adhan")).toBeTruthy();
+    expect(getByText("Beep")).toBeTruthy();
   });
 
   it("pressing an option sets the sound and closes", () => {
     const onClose = jest.fn();
     const { getByText } = render(<Sound onClose={onClose} />);
 
-    fireEvent.press(getByText("Birds"));
+    fireEvent.press(getByText("Beep"));
 
-    expect(useSettingsStore.getState().sound).toBe("Birds");
+    expect(useSettingsStore.getState().sound).toBe("Beep");
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 });

@@ -20,6 +20,7 @@ jest.mock("@/features-settings/store", () => ({
 }));
 
 jest.mock("@/features-solah/utils", () => ({
+  ...jest.requireActual("@/features-solah/utils"),
   getCurrentMinutes: (tz: any) => mockGetCurrentMinutes(tz),
   parseTimeToMinutes: (t: any) => mockParseTimeToMinutes(t),
 }));

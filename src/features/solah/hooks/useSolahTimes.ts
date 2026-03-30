@@ -25,7 +25,7 @@ export function useSolahTimes(date?: Date) {
   const effectiveDate = useMemo(() => date ?? new Date(), [date]);
 
   const adhanTimes = useMemo(() => {
-    if (!location?.latitude || !location?.longitude) {
+    if (!location) {
       return null;
     }
     try {
@@ -75,7 +75,7 @@ export function useSolahTimes(date?: Date) {
   }, [formattedTimes, effectiveDate, setLastKnownTimes]);
 
   const times = formattedTimes ?? lastKnownTimes;
-  const loading = !times;
+  const loading = !formattedTimes && times.length === 0;
 
   return { times, loading };
 }

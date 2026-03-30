@@ -8,9 +8,9 @@ import Animated, {
   withSpring,
   Extrapolation,
 } from "react-native-reanimated";
-import { scheduleOnRN } from "react-native-worklets";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
+const CLOSE_ANIMATION_MS = 220;
 
 type SnapPoint = "25%" | "50%" | "75%";
 
@@ -24,25 +24,39 @@ export const clampBottomSheetTranslateY = (
   currentY: number,
   translationY: number,
   sheetHeight: number,
-  screenHeight: number = SCREEN_HEIGHT
+  _screenHeight: number = SCREEN_HEIGHT
 ) => {
-  return Math.min(screenHeight, Math.max(sheetHeight, currentY + translationY));
+  return Math.min(sheetHeight, Math.max(0, currentY + translationY));
 };
 
 export const shouldCloseBottomSheet = (translateY: number, sheetHeight: number) => {
   return translateY > sheetHeight * 0.2;
 };
 
+export const shouldExpandBottomSheet = (translateY: number, collapsedPosition: number) => {
+  return translateY < collapsedPosition * 0.5;
+};
+
 type SharedTranslateY = { value: number };
+
+export const createBottomSheetPanStartHandler = (
+  translateY: SharedTranslateY,
+  startY: SharedTranslateY
+) => {
+  return () => {
+    startY.value = translateY.value;
+  };
+};
 
 export const updateBottomSheetPosition = (
   translateY: SharedTranslateY,
+  startY: SharedTranslateY,
   translationY: number,
   sheetHeight: number,
   screenHeight: number = SCREEN_HEIGHT
 ) => {
   translateY.value = clampBottomSheetTranslateY(
-    translateY.value,
+    startY.value,
     translationY,
     sheetHeight,
     screenHeight
@@ -52,39 +66,47 @@ export const updateBottomSheetPosition = (
 
 export const settleBottomSheetPosition = (
   translateY: SharedTranslateY,
-  sheetHeight: number,
-  animateTo: (value: number, onFinished?: (finished?: boolean) => void) => number,
+  collapsedPosition: number,
+  closedPosition: number,
+  animateTo: (value: number) => number,
   onClose: () => void
 ) => {
-  if (shouldCloseBottomSheet(translateY.value, sheetHeight)) {
-    translateY.value = animateTo(sheetHeight, (finished) => {
-      finishBottomSheetClose(finished, onClose);
-    });
+  if (
+    shouldCloseBottomSheet(translateY.value - collapsedPosition, closedPosition - collapsedPosition)
+  ) {
+    onClose();
     return "closed";
   }
 
-  translateY.value = animateTo(0);
-  return "open";
+  if (shouldExpandBottomSheet(translateY.value, collapsedPosition)) {
+    translateY.value = animateTo(0);
+    return "expanded";
+  }
+
+  translateY.value = animateTo(collapsedPosition);
+  return "collapsed";
 };
 
 export const createBottomSheetPanUpdateHandler = (
   translateY: SharedTranslateY,
+  startY: SharedTranslateY,
   sheetHeight: number,
   screenHeight: number = SCREEN_HEIGHT
 ) => {
   return (event: { translationY: number }) => {
-    updateBottomSheetPosition(translateY, event.translationY, sheetHeight, screenHeight);
+    updateBottomSheetPosition(translateY, startY, event.translationY, sheetHeight, screenHeight);
   };
 };
 
 export const createBottomSheetPanEndHandler = (
   translateY: SharedTranslateY,
-  sheetHeight: number,
-  animateTo: (value: number, onFinished?: (finished?: boolean) => void) => number,
+  collapsedPosition: number,
+  closedPosition: number,
+  animateTo: (value: number) => number,
   onClose: () => void
 ) => {
   return () => {
-    settleBottomSheetPosition(translateY, sheetHeight, animateTo, onClose);
+    settleBottomSheetPosition(translateY, collapsedPosition, closedPosition, animateTo, onClose);
   };
 };
 
@@ -95,34 +117,16 @@ export const finishBottomSheetClose = (finished: boolean | undefined, onClose: (
 };
 
 export const animateBottomSheetWithSpring = (
-  spring: (value: number, config: object, callback?: (finished?: boolean) => void) => number,
-  value: number,
-  onFinished?: (finished?: boolean) => void
+  spring: (value: number, config: object) => number,
+  value: number
 ) => {
-  return spring(value, {}, (finished) => {
-    onFinished?.(finished);
-  });
-};
-
-export const scheduleBottomSheetClose = (
-  scheduler: (fn: () => void) => void,
-  onClose: () => void
-) => {
-  scheduler(onClose);
+  return spring(value, {});
 };
 
 export const createBottomSheetSpringAnimator = (
-  spring: (value: number, config: object, callback?: (finished?: boolean) => void) => number
+  spring: (value: number, config: object) => number
 ) => {
-  return (value: number, onFinished?: (finished?: boolean) => void) =>
-    animateBottomSheetWithSpring(spring, value, onFinished);
-};
-
-export const createBottomSheetCloseScheduler = (
-  scheduler: (fn: () => void) => void,
-  onClose: () => void
-) => {
-  return () => scheduleBottomSheetClose(scheduler, onClose);
+  return (value: number) => animateBottomSheetWithSpring(spring, value);
 };
 
 export interface BottomSheetProps {
@@ -133,42 +137,58 @@ export interface BottomSheetProps {
 }
 
 export function BottomSheet({ isOpen, onClose, children, snapPoint = "50%" }: BottomSheetProps) {
-  const sheetHeight = SNAP_HEIGHT_MAP[snapPoint];
-  const translateY = useSharedValue(sheetHeight);
+  const minHeight = SNAP_HEIGHT_MAP[snapPoint];
+  const maxHeight = SCREEN_HEIGHT * 0.9;
+  const collapsedPosition = maxHeight - minHeight;
+  const closedPosition = maxHeight;
+  const translateY = useSharedValue(closedPosition);
+  const panStartY = useSharedValue(0);
   const [mounted, setMounted] = useState(isOpen);
 
   useEffect(() => {
     if (isOpen) {
       setMounted(true);
-      translateY.value = withSpring(0, {});
-    } else {
-      translateY.value = withSpring(sheetHeight, {}, (finished) => {
-        finishBottomSheetClose(finished, () => scheduleOnRN(setMounted, false));
-      });
+      translateY.value = withSpring(collapsedPosition, {});
+      return;
     }
-  }, [isOpen, sheetHeight, translateY]);
 
-  const handlePanUpdate = createBottomSheetPanUpdateHandler(translateY, sheetHeight);
+    translateY.value = withSpring(closedPosition, {});
+    const timer = setTimeout(() => {
+      setMounted(false);
+    }, CLOSE_ANIMATION_MS);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [collapsedPosition, closedPosition, isOpen, translateY]);
+
+  const handlePanStart = createBottomSheetPanStartHandler(translateY, panStartY);
+  const handlePanUpdate = createBottomSheetPanUpdateHandler(translateY, panStartY, closedPosition);
   const handlePanEnd = createBottomSheetPanEndHandler(
     translateY,
-    sheetHeight,
+    collapsedPosition,
+    closedPosition,
     createBottomSheetSpringAnimator(withSpring),
-    createBottomSheetCloseScheduler(scheduleOnRN, onClose)
+    onClose
   );
 
-  const panGesture = Gesture.Pan().onUpdate(handlePanUpdate).onEnd(handlePanEnd);
+  const panGesture = Gesture.Pan()
+    .runOnJS(true)
+    .onBegin(handlePanStart)
+    .onUpdate(handlePanUpdate)
+    .onEnd(handlePanEnd);
 
   const sheetStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: translateY.value }],
-    height: sheetHeight,
-    top: SCREEN_HEIGHT - sheetHeight, // Position at bottom of screen
+    height: maxHeight,
+    top: SCREEN_HEIGHT - maxHeight,
   }));
 
   const backdropStyle = useAnimatedStyle(() => ({
     opacity: interpolate(
       translateY.value,
-      [sheetHeight, 0], // Input: Closed -> Open
-      [0, 0.4], // Output: Transparent -> Dark
+      [closedPosition, collapsedPosition, 0],
+      [0, 0.2, 0.4],
       Extrapolation.CLAMP
     ),
   }));

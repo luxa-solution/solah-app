@@ -8,6 +8,7 @@ import type {
   LocationOption,
   LanguageOption,
 } from "@/features-settings/constants";
+import { createAutomaticLocationOption, resolveAutomaticTimeZone } from "@/features-settings/utils";
 
 type DefaultDataState = {
   defaultCalculationMethod: CalculationMethodOptions;
@@ -24,64 +25,41 @@ type DefaultDataState = {
 export const useDefaultStore = create<DefaultDataState>()(
   subscribeWithSelector(
     persist(
-      (set) => ({
-        // App state
-        defaultCalculationMethod: {
-          name: "Default",
-          method: "MoonsightingCommittee",
-          isDefault: true,
-        },
+      (set) => {
+        const automaticTimeZone = resolveAutomaticTimeZone();
 
-        defaultTimezone: {
-          name: "Default (System Timezone)",
-          timezone: "Asia/Riyadh",
-          isDefault: true,
-        },
-
-        defaultLocation: {
-          name: "Default (Current Location)",
-          location: {
-            longitude: 0,
-            latitude: 0,
-            city: "Riyadh",
-            region: "Riyadh",
-            country: "Saudi Arabia",
-          },
-          timezone: {
-            name: "Default (System Timezone)",
-            timezone: "Asia/Riyadh",
+        return {
+          // Seed/fallback store for the last successful automatic GPS resolution.
+          // Active app behavior reads from useSettingsStore; this store exists so the
+          // app can restore automatic defaults after settings reset or rehydration.
+          defaultCalculationMethod: {
+            name: "Default",
+            method: "MoonsightingCommittee",
             isDefault: true,
           },
-          isDefault: true,
-        },
-
-        defaultLanguage: {
-          name: "Default",
-          value: "Default",
-          isDefault: true,
-        },
-
-        // Set onboarding status
-        setDefaultCalculationMethod: (calculationMethod) => {
-          set({ defaultCalculationMethod: calculationMethod });
-        },
-
-        setDefaultTimeZone: (timezone) => {
-          set({ defaultTimezone: timezone });
-        },
-
-        setDefaultLocation: (location) => {
-          set({ defaultLocation: location });
-        },
-
-        setDefaultLanguage: (language) => {
-          set({ defaultLanguage: language });
-        },
-
-        // Add more above as needed
-      }),
+          defaultTimezone: automaticTimeZone,
+          defaultLocation: createAutomaticLocationOption(null),
+          defaultLanguage: {
+            name: "Default",
+            value: "Default",
+            isDefault: true,
+          },
+          setDefaultCalculationMethod: (defaultCalculationMethod) => {
+            set({ defaultCalculationMethod });
+          },
+          setDefaultTimeZone: (defaultTimezone) => {
+            set({ defaultTimezone });
+          },
+          setDefaultLocation: (defaultLocation) => {
+            set({ defaultLocation });
+          },
+          setDefaultLanguage: (defaultLanguage) => {
+            set({ defaultLanguage });
+          },
+        };
+      },
       {
-        name: "settings-storage",
+        name: "defaults-storage",
         storage: createJSONStorage(() => AsyncStorage),
       }
     )

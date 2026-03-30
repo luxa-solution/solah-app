@@ -28,6 +28,10 @@ const SPLASH_ICON = {
   darkImage: "./assets/appIcons/splash-icon.png", // Not setup currently.
   darkBgColor: appIcons.darkBg,
 };
+const NOTIFICATION_AUDIOS = {
+  short: "./assets/notification/takbir-only.mp3",
+  full: "./assets/notification/full-adhan.mp3",
+} as const;
 
 // Environment-specific overrides
 function getDynamicAppConfig(
@@ -89,6 +93,8 @@ export default ( { config }: ConfigContext ): ExpoConfig => {
     },
     "plugins": [
       "expo-router",
+      "expo-background-task",
+      "expo-task-manager",
       "expo-font",
       "expo-localization",
       "expo-web-browser",
@@ -103,6 +109,19 @@ export default ( { config }: ConfigContext ): ExpoConfig => {
           "dark": {
             "backgroundColor": SPLASH_ICON.darkBgColor,
           }
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/appIcons/android-icon-monochrome.png",
+          "color": "#ffffff",
+          "defaultChannel": "solah-times-default",
+          "sounds": [
+            NOTIFICATION_AUDIOS.short,
+            NOTIFICATION_AUDIOS.full
+          ],
+          "enableBackgroundRemoteNotifications": false
         }
       ]
     ],

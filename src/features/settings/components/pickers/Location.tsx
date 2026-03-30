@@ -22,9 +22,9 @@ export function Location({ onClose }: LocationProps) {
 
     return locations.filter((item) => {
       const name = item.name.toLowerCase();
-      const city = item.location.city?.toLowerCase();
-      const country = item.location.country?.toLowerCase();
-      const region = (item.location.region ?? "").toLowerCase();
+      const city = item.location?.city?.toLowerCase();
+      const country = item.location?.country?.toLowerCase();
+      const region = (item.location?.region ?? "").toLowerCase();
       return name.includes(q) || city?.includes(q) || country?.includes(q) || region?.includes(q);
     });
   }, [query]);
