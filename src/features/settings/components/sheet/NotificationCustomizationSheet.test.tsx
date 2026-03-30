@@ -1,4 +1,4 @@
-import { render } from "@testing-library/react-native";
+import { fireEvent, render } from "@testing-library/react-native";
 import React from "react";
 
 import { useSettingsStore } from "@/features-settings/store";
@@ -33,5 +33,16 @@ describe("NotificationCustomizationSheet", () => {
     const { getByTestId } = render(<NotificationCustomizationSheet />);
 
     expect(getByTestId("notification-row-subhi")).toHaveStyle({ borderBottomWidth: 0 });
+  });
+
+  it("cycles notification delivery modes when a cell is pressed", () => {
+    const { getByTestId, getByLabelText } = render(<NotificationCustomizationSheet />);
+
+    expect(getByLabelText("Sound")).toBeTruthy();
+    fireEvent.press(getByTestId("notification-mode-subhi-adhan"));
+    expect(useSettingsStore.getState().prayerSchedule.Subhi.adhanNotificationMode).toBe("mute");
+
+    fireEvent.press(getByTestId("notification-mode-subhi-iqamah"));
+    expect(useSettingsStore.getState().prayerSchedule.Subhi.iqamahNotificationMode).toBe("sound");
   });
 });

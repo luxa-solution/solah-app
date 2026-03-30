@@ -255,4 +255,63 @@ describe("SolahNotificationsEffect", () => {
 
     expect(mockSyncSolahNotifications.mock.calls.length).toBe(callCountAfterMount);
   });
+
+  it("does not re-sync on non-active app state changes", async () => {
+    mockLoadLastSyncedAt.mockResolvedValue(null);
+    mockSyncSolahNotifications.mockResolvedValue({ permissionOk: true });
+    useSettingsStore.setState({ solahTimeNotification: true });
+
+    render(<SolahNotificationsEffect />);
+
+    const listener = mockAppStateAddEventListener.mock.calls.find(
+      ([eventName]) => eventName === "change"
+    )?.[1];
+
+    const callCountAfterMount = mockSyncSolahNotifications.mock.calls.length;
+
+    await act(async () => {
+      await listener?.("background");
+    });
+
+    expect(mockSyncSolahNotifications.mock.calls.length).toBe(callCountAfterMount);
+  });
+
+  it("does not re-sync on foreground when notifications are disabled", async () => {
+    mockLoadLastSyncedAt.mockResolvedValue(null);
+    mockSyncSolahNotifications.mockResolvedValue({ permissionOk: true });
+    useSettingsStore.setState({ solahTimeNotification: false });
+
+    render(<SolahNotificationsEffect />);
+
+    const listener = mockAppStateAddEventListener.mock.calls.find(
+      ([eventName]) => eventName === "change"
+    )?.[1];
+
+    const callCountAfterMount = mockSyncSolahNotifications.mock.calls.length;
+
+    await act(async () => {
+      await listener?.("active");
+    });
+
+    expect(mockSyncSolahNotifications.mock.calls.length).toBe(callCountAfterMount);
+  });
+
+  it("disables notifications when a foreground renewal sync returns permission denied", async () => {
+    mockLoadLastSyncedAt.mockResolvedValue(null);
+    mockSyncSolahNotifications.mockResolvedValue({ permissionOk: true });
+    useSettingsStore.setState({ solahTimeNotification: true });
+
+    render(<SolahNotificationsEffect />);
+
+    mockSyncSolahNotifications.mockResolvedValue({ permissionOk: false });
+    const listener = mockAppStateAddEventListener.mock.calls.find(
+      ([eventName]) => eventName === "change"
+    )?.[1];
+
+    await act(async () => {
+      await listener?.("active");
+    });
+
+    expect(useSettingsStore.getState().solahTimeNotification).toBe(false);
+  });
 });

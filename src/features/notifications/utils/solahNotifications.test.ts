@@ -8,6 +8,8 @@ import {
   syncSolahNotifications,
   cancelScheduledSolahNotifications,
   getSolahNotificationChannelId,
+  loadLastSyncedAt,
+  loadSyncInput,
 } from "./solahNotifications";
 
 jest.mock("@react-native-async-storage/async-storage", () => ({
@@ -249,6 +251,21 @@ describe("syncSolahNotifications", () => {
     expect(mockScheduleNotif).not.toHaveBeenCalled();
   });
 
+  it("cancels and returns permissionOk: true when longitude is undefined", async () => {
+    const result = await syncSolahNotifications({
+      ...baseInput,
+      location: {
+        latitude: 21.4,
+        longitude: undefined as any,
+        city: null,
+        region: null,
+        country: null,
+      } as any,
+    });
+    expect(result).toEqual({ permissionOk: true });
+    expect(mockScheduleNotif).not.toHaveBeenCalled();
+  });
+
   it("returns permissionOk: false when permission not granted and cannot request", async () => {
     mockGetPermissions.mockResolvedValue({ granted: false });
     mockRequestPermissions.mockResolvedValue({ granted: false });
@@ -392,6 +409,53 @@ describe("syncSolahNotifications", () => {
   it("uses correct channel ID for non-default sound", async () => {
     await syncSolahNotifications({ ...baseInput, sound: "Adhan Makkah" });
     expect(mockSetChannel).toHaveBeenCalledWith("solah-times-adhan_makkah", expect.any(Object));
+  });
+
+  it("uses the bundled short adhan sound for sound-mode channels and payloads", async () => {
+    await syncSolahNotifications({ ...baseInput, sound: "Short Adhan" as any });
+
+    expect(mockSetChannel).toHaveBeenCalledWith(
+      "solah-times-default",
+      expect.objectContaining({ sound: "takbir-only.mp3" })
+    );
+    expect(mockScheduleNotif).toHaveBeenCalledWith(
+      expect.objectContaining({
+        content: expect.objectContaining({ sound: "takbir-only.mp3" }),
+      })
+    );
+  });
+
+  it("uses the bundled full adhan sound for sound-mode channels and payloads", async () => {
+    await syncSolahNotifications({ ...baseInput, sound: "Full Adhan" as any });
+
+    expect(mockSetChannel).toHaveBeenCalledWith(
+      "solah-times-full_adhan",
+      expect.objectContaining({ sound: "full-adhan.mp3" })
+    );
+    expect(mockScheduleNotif).toHaveBeenCalledWith(
+      expect.objectContaining({
+        content: expect.objectContaining({ sound: "full-adhan.mp3" }),
+      })
+    );
+  });
+
+  it("uses muted android channels for mute delivery mode", async () => {
+    await syncSolahNotifications({
+      ...baseInput,
+      prayerSchedule: {
+        ...withEnabledNotificationModes(),
+        Dhuhr: {
+          ...withEnabledNotificationModes().Dhuhr,
+          adhanNotificationMode: "mute",
+          iqamahNotificationMode: "mute",
+        },
+      },
+    });
+
+    expect(mockSetChannel).toHaveBeenCalledWith(
+      "solah-times-vibrate",
+      expect.objectContaining({ enableVibrate: true, sound: null })
+    );
   });
 
   it.each([
@@ -583,6 +647,48 @@ describe("syncSolahNotifications", () => {
 
     expect(dhuhrAdhanCall?.[0].content.sound).toBeUndefined();
   });
+
+  it("skips a prayer/day when adhan derivation throws and continues scheduling others", async () => {
+    await syncSolahNotifications({
+      ...baseInput,
+      prayerSchedule: {
+        ...withEnabledNotificationModes(),
+        Dhuhr: {
+          ...withEnabledNotificationModes().Dhuhr,
+          adhan: { mode: "fixed_time", fixedTime: "99:99" },
+        },
+      },
+    });
+
+    expect(mockScheduleNotif).toHaveBeenCalled();
+    expect(
+      mockScheduleNotif.mock.calls.some(
+        ([payload]) => payload.content.body === "It's time for Dhuhr."
+      )
+    ).toBe(false);
+  });
+
+  it("skips a day when prayer time construction throws and continues other days", async () => {
+    const PrayerTimesMock = require("adhan").PrayerTimes as jest.Mock;
+    let callCount = 0;
+    PrayerTimesMock.mockImplementation((_: unknown, date: Date) => {
+      callCount += 1;
+      if (callCount === 1) {
+        throw new Error("bad day");
+      }
+      return {
+        fajr: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 5, 0, 0, 0),
+        dhuhr: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0, 0),
+        asr: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 15, 0, 0, 0),
+        maghrib: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 18, 0, 0, 0),
+        isha: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 20, 0, 0, 0),
+      };
+    });
+
+    await syncSolahNotifications(baseInput);
+
+    expect(mockScheduleNotif).toHaveBeenCalled();
+  });
 });
 
 describe("getAdhanParams deduplication", () => {
@@ -648,5 +754,34 @@ describe("getAdhanParams deduplication", () => {
     await isolatedSyncSolahNotifications(baseInput);
 
     expect(sharedGetAdhanParams).toHaveBeenCalledWith(baseInput.calculationMethod);
+  });
+});
+
+describe("loadLastSyncedAt", () => {
+  it("returns null when storage is empty", async () => {
+    mockGetItem.mockResolvedValue(null);
+    await expect(loadLastSyncedAt()).resolves.toBeNull();
+  });
+
+  it("returns null when storage contains a non-numeric timestamp", async () => {
+    mockGetItem.mockResolvedValue("not-a-number");
+    await expect(loadLastSyncedAt()).resolves.toBeNull();
+  });
+
+  it("returns null when reading the timestamp throws", async () => {
+    mockGetItem.mockRejectedValue(new Error("storage failed"));
+    await expect(loadLastSyncedAt()).resolves.toBeNull();
+  });
+});
+
+describe("loadSyncInput", () => {
+  it("returns null when storage is empty", async () => {
+    mockGetItem.mockResolvedValue(null);
+    await expect(loadSyncInput()).resolves.toBeNull();
+  });
+
+  it("returns null when stored sync input is invalid json", async () => {
+    mockGetItem.mockResolvedValue("{bad-json");
+    await expect(loadSyncInput()).resolves.toBeNull();
   });
 });

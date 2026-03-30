@@ -96,6 +96,27 @@ describe("deriveAdhanTime", () => {
       deriveAdhanTime(solahTime, { mode: "fixed_time", fixedTime: "09:30" }, "Africa/Abidjan")
     ).toThrow("Fixed adhan time must be after solah time");
   });
+
+  it("throws when fixed time is malformed", () => {
+    const solahTime = new Date(Date.UTC(2026, 0, 1, 10, 0));
+
+    expect(() =>
+      deriveAdhanTime(solahTime, { mode: "fixed_time", fixedTime: "ab:cd" }, "Africa/Abidjan")
+    ).toThrow("Fixed adhan time is invalid");
+  });
+
+  it("falls back to returning the solah time for unknown modes", () => {
+    const solahTime = new Date(Date.UTC(2026, 0, 1, 10, 0));
+
+    expect(
+      deriveAdhanTime(
+        solahTime,
+        // @ts-expect-error intentional default branch coverage
+        { mode: "unknown_mode" },
+        "Africa/Abidjan"
+      ).toISOString()
+    ).toBe(solahTime.toISOString());
+  });
 });
 
 describe("deriveIqamahTime", () => {
@@ -248,5 +269,15 @@ describe("validateAdhanConfig", () => {
       valid: false,
       reason: "Fixed adhan time is invalid",
     });
+  });
+
+  it("accepts a zero-minute relative offset as valid", () => {
+    const result = validateAdhanConfig(
+      { mode: "relative_after_solah", offsetMinutes: 0 },
+      new Date(Date.UTC(2026, 0, 1, 10, 0)),
+      "Africa/Abidjan"
+    );
+
+    expect(result).toEqual({ valid: true });
   });
 });

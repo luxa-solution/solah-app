@@ -3,3 +3,6 @@ npm run format
 
 echo "🧪 Tests..."
 npm run test:prepush
+
+echo "📊 Coverage..."
+npm run test:cov
