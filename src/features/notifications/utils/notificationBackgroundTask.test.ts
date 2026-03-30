@@ -1,81 +1,53 @@
-jest.mock("@react-native-async-storage/async-storage", () => {
-  const { createAsyncStorageMock } = require("@/shared/test");
-  return createAsyncStorageMock();
-});
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const mockRegisterTaskAsync = jest.fn();
-
-jest.mock(
-  "expo-task-manager",
-  () => ({
-    defineTask: jest.fn(),
-    isTaskRegisteredAsync: jest.fn(),
-  }),
-  { virtual: true }
-);
-
-jest.mock(
-  "expo-background-task",
-  () => ({
-    registerTaskAsync: (...args: any[]) => mockRegisterTaskAsync(...args),
-    BackgroundTaskResult: {
-      Success: "success",
-      Failed: "failed",
-    },
-  }),
-  { virtual: true }
-);
-
-jest.mock("./localNotifications", () => ({
-  LocalNotifications: {
-    getPermissionsAsync: jest.fn(),
-    requestPermissionsAsync: jest.fn(),
-    cancelScheduledNotificationAsync: jest.fn(),
-    scheduleNotificationAsync: jest.fn(),
-    setNotificationChannelAsync: jest.fn(),
-    AndroidImportance: { MAX: 5 },
-    SchedulableTriggerInputTypes: { DATE: "date" },
-  },
-}));
-
+const mockDefineTask = jest.fn();
+const mockIsTaskRegisteredAsync = jest.fn();
 const mockSyncSolahNotifications = jest.fn();
-
-jest.mock("./solahNotifications", () => {
-  const actual = jest.requireActual("./solahNotifications");
-  return {
-    ...actual,
-    syncSolahNotifications: (...args: any[]) => mockSyncSolahNotifications(...args),
-  };
-});
-
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 describe("notificationBackgroundTask", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockDefineTask.mockReset();
+    mockIsTaskRegisteredAsync.mockReset();
+    mockRegisterTaskAsync.mockResolvedValue(undefined);
+    mockIsTaskRegisteredAsync.mockResolvedValue(false);
     (AsyncStorage.getItem as jest.Mock).mockResolvedValue(null);
     (AsyncStorage.setItem as jest.Mock).mockResolvedValue(undefined);
-    mockRegisterTaskAsync.mockResolvedValue(undefined);
   });
 
   function loadModule() {
-    let loaded: typeof import("./notificationBackgroundTask");
+    let loaded!: typeof import("./notificationBackgroundTask");
 
     jest.isolateModules(() => {
+      jest.doMock("expo-task-manager", () => ({
+        defineTask: (...args: any[]) => mockDefineTask(...args),
+        isTaskRegisteredAsync: (...args: any[]) => mockIsTaskRegisteredAsync(...args),
+      }));
+      jest.doMock("expo-background-task", () => ({
+        registerTaskAsync: (...args: any[]) => mockRegisterTaskAsync(...args),
+        BackgroundTaskResult: {
+          Success: "success",
+          Failed: "failed",
+        },
+      }));
+      jest.doMock("./solahNotifications", () => {
+        const actual = jest.requireActual("./solahNotifications");
+        return {
+          ...actual,
+          syncSolahNotifications: (...args: any[]) => mockSyncSolahNotifications(...args),
+        };
+      });
       loaded = require("./notificationBackgroundTask");
     });
 
-    const taskManager = require("expo-task-manager") as typeof import("expo-task-manager");
-
     return {
       module: loaded!,
-      taskManager,
     };
   }
 
   it("registers the periodic background task", async () => {
-    const { module, taskManager } = loadModule();
-    (taskManager.isTaskRegisteredAsync as jest.Mock).mockResolvedValue(false);
+    const { module } = loadModule();
 
     await module.registerNotificationBackgroundTaskAsync();
 
@@ -85,8 +57,8 @@ describe("notificationBackgroundTask", () => {
   });
 
   it("does not re-register when the task is already registered", async () => {
-    const { module, taskManager } = loadModule();
-    (taskManager.isTaskRegisteredAsync as jest.Mock).mockResolvedValue(true);
+    mockIsTaskRegisteredAsync.mockResolvedValue(true);
+    const { module } = loadModule();
 
     await module.registerNotificationBackgroundTaskAsync();
 
@@ -140,6 +112,7 @@ describe("notificationBackgroundTask", () => {
       },
     };
 
+    loadModule();
     (AsyncStorage.getItem as jest.Mock).mockImplementation(async (key: string) => {
       if (key === "solah-notification-sync-input-v1") {
         return JSON.stringify(storedInput);
@@ -147,9 +120,7 @@ describe("notificationBackgroundTask", () => {
       return null;
     });
     mockSyncSolahNotifications.mockResolvedValue({ permissionOk: true });
-
-    const { taskManager } = loadModule();
-    const taskExecutor = (taskManager.defineTask as jest.Mock).mock.calls[0][1];
+    const taskExecutor = mockDefineTask.mock.calls[0][1];
 
     const result = await taskExecutor();
 
@@ -177,6 +148,7 @@ describe("notificationBackgroundTask", () => {
       prayerSchedule: {},
     });
 
+    loadModule();
     (AsyncStorage.getItem as jest.Mock).mockImplementation(async (key: string) => {
       if (key === "solah-notification-sync-input-v1") {
         return storedRaw;
@@ -184,9 +156,7 @@ describe("notificationBackgroundTask", () => {
       return null;
     });
     mockSyncSolahNotifications.mockResolvedValue({ permissionOk: true });
-
-    const { taskManager } = loadModule();
-    const taskExecutor = (taskManager.defineTask as jest.Mock).mock.calls[0][1];
+    const taskExecutor = mockDefineTask.mock.calls[0][1];
 
     await taskExecutor();
 
@@ -194,16 +164,16 @@ describe("notificationBackgroundTask", () => {
   });
 
   it("returns success when no stored input exists", async () => {
+    loadModule();
     (AsyncStorage.getItem as jest.Mock).mockResolvedValue(null);
-
-    const { taskManager } = loadModule();
-    const taskExecutor = (taskManager.defineTask as jest.Mock).mock.calls[0][1];
+    const taskExecutor = mockDefineTask.mock.calls[0][1];
 
     await expect(taskExecutor()).resolves.toBe("success");
     expect(mockSyncSolahNotifications).not.toHaveBeenCalled();
   });
 
   it("returns failed when the background task throws", async () => {
+    loadModule();
     (AsyncStorage.getItem as jest.Mock).mockImplementation(async (key: string) => {
       if (key === "solah-notification-sync-input-v1") {
         return JSON.stringify({ enabled: true });
@@ -211,9 +181,7 @@ describe("notificationBackgroundTask", () => {
       return null;
     });
     mockSyncSolahNotifications.mockRejectedValue(new Error("sync failed"));
-
-    const { taskManager } = loadModule();
-    const taskExecutor = (taskManager.defineTask as jest.Mock).mock.calls[0][1];
+    const taskExecutor = mockDefineTask.mock.calls[0][1];
 
     await expect(taskExecutor()).resolves.toBe("failed");
   });

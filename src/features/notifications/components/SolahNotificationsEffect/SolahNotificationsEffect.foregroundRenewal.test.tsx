@@ -3,7 +3,6 @@ import React from "react";
 
 import { useSettingsStore } from "@/features-settings/store";
 
-import { SolahNotificationsEffect } from "./SolahNotificationsEffect";
 import {
   mockAppStateAddEventListener,
   mockLoadLastSyncedAt,
@@ -11,6 +10,10 @@ import {
   resetSolahNotificationsEffectState,
   restoreSolahNotificationsEffectMocks,
 } from "./SolahNotificationsEffect.testUtils";
+
+function loadComponent() {
+  return require("./SolahNotificationsEffect") as typeof import("./SolahNotificationsEffect");
+}
 
 describe("SolahNotificationsEffect foreground renewal", () => {
   beforeEach(() => {
@@ -26,6 +29,7 @@ describe("SolahNotificationsEffect foreground renewal", () => {
     mockLoadLastSyncedAt.mockResolvedValue(staleSyncTime);
     mockSyncSolahNotifications.mockResolvedValue({ permissionOk: true });
     useSettingsStore.setState({ solahTimeNotification: true });
+    const { SolahNotificationsEffect } = loadComponent();
 
     render(<SolahNotificationsEffect />);
 
@@ -47,6 +51,7 @@ describe("SolahNotificationsEffect foreground renewal", () => {
     mockLoadLastSyncedAt.mockResolvedValue(freshSyncTime);
     mockSyncSolahNotifications.mockResolvedValue({ permissionOk: true });
     useSettingsStore.setState({ solahTimeNotification: true });
+    const { SolahNotificationsEffect } = loadComponent();
 
     render(<SolahNotificationsEffect />);
 
@@ -67,6 +72,7 @@ describe("SolahNotificationsEffect foreground renewal", () => {
     mockLoadLastSyncedAt.mockResolvedValue(null);
     mockSyncSolahNotifications.mockResolvedValue({ permissionOk: true });
     useSettingsStore.setState({ solahTimeNotification: true });
+    const { SolahNotificationsEffect } = loadComponent();
 
     render(<SolahNotificationsEffect />);
 
@@ -87,6 +93,7 @@ describe("SolahNotificationsEffect foreground renewal", () => {
     mockLoadLastSyncedAt.mockResolvedValue(null);
     mockSyncSolahNotifications.mockResolvedValue({ permissionOk: true });
     useSettingsStore.setState({ solahTimeNotification: false });
+    const { SolahNotificationsEffect } = loadComponent();
 
     render(<SolahNotificationsEffect />);
 
@@ -107,6 +114,7 @@ describe("SolahNotificationsEffect foreground renewal", () => {
     mockLoadLastSyncedAt.mockResolvedValue(null);
     mockSyncSolahNotifications.mockResolvedValue({ permissionOk: true });
     useSettingsStore.setState({ solahTimeNotification: true });
+    const { SolahNotificationsEffect } = loadComponent();
 
     render(<SolahNotificationsEffect />);
 

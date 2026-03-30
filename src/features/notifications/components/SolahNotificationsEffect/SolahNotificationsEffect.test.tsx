@@ -3,7 +3,6 @@ import React from "react";
 
 import { useSettingsStore } from "@/features-settings/store";
 
-import { SolahNotificationsEffect } from "./SolahNotificationsEffect";
 import {
   mockAppStateAddEventListener,
   mockRegisterNotificationBackgroundTaskAsync,
@@ -11,6 +10,10 @@ import {
   resetSolahNotificationsEffectState,
   restoreSolahNotificationsEffectMocks,
 } from "./SolahNotificationsEffect.testUtils";
+
+function loadComponent() {
+  return require("./SolahNotificationsEffect") as typeof import("./SolahNotificationsEffect");
+}
 
 describe("SolahNotificationsEffect mount flow", () => {
   beforeEach(() => {
@@ -23,6 +26,7 @@ describe("SolahNotificationsEffect mount flow", () => {
 
   it("subscribes to app foreground changes through the public AppState API", () => {
     mockSyncSolahNotifications.mockResolvedValue({ permissionOk: true });
+    const { SolahNotificationsEffect } = loadComponent();
 
     render(<SolahNotificationsEffect />);
 
@@ -31,6 +35,7 @@ describe("SolahNotificationsEffect mount flow", () => {
 
   it("registers the notification background task on mount", async () => {
     mockSyncSolahNotifications.mockResolvedValue({ permissionOk: true });
+    const { SolahNotificationsEffect } = loadComponent();
 
     render(<SolahNotificationsEffect />);
 
@@ -41,6 +46,7 @@ describe("SolahNotificationsEffect mount flow", () => {
 
   it("returns null (renders nothing)", () => {
     mockSyncSolahNotifications.mockResolvedValue({ permissionOk: true });
+    const { SolahNotificationsEffect } = loadComponent();
     const { toJSON } = render(<SolahNotificationsEffect />);
     expect(toJSON()).toBeNull();
   });
@@ -53,6 +59,7 @@ describe("SolahNotificationsEffect mount flow", () => {
           resolveFn = () => res({ permissionOk: true });
         })
     );
+    const { SolahNotificationsEffect } = loadComponent();
 
     render(<SolahNotificationsEffect />);
 
@@ -78,6 +85,7 @@ describe("SolahNotificationsEffect mount flow", () => {
           resolveFn = res;
         })
     );
+    const { SolahNotificationsEffect } = loadComponent();
 
     render(<SolahNotificationsEffect />);
     const callCountAfterMount = mockSyncSolahNotifications.mock.calls.length;
@@ -99,6 +107,7 @@ describe("SolahNotificationsEffect mount flow", () => {
 
   it("re-calls syncSolahNotifications when prayerSchedule changes", async () => {
     mockSyncSolahNotifications.mockResolvedValue({ permissionOk: true });
+    const { SolahNotificationsEffect } = loadComponent();
 
     render(<SolahNotificationsEffect />);
     const callCountAfterMount = mockSyncSolahNotifications.mock.calls.length;
@@ -130,6 +139,7 @@ describe("SolahNotificationsEffect mount flow", () => {
           resolveFn = resolve;
         })
     );
+    const { SolahNotificationsEffect } = loadComponent();
 
     await act(async () => {
       useSettingsStore.setState({ solahTimeNotification: true });

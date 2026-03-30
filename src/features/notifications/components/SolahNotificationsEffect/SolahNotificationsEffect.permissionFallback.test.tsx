@@ -3,12 +3,15 @@ import React from "react";
 
 import { useSettingsStore } from "@/features-settings/store";
 
-import { SolahNotificationsEffect } from "./SolahNotificationsEffect";
 import {
   mockSyncSolahNotifications,
   resetSolahNotificationsEffectState,
   restoreSolahNotificationsEffectMocks,
 } from "./SolahNotificationsEffect.testUtils";
+
+function loadComponent() {
+  return require("./SolahNotificationsEffect") as typeof import("./SolahNotificationsEffect");
+}
 
 describe("SolahNotificationsEffect permission fallback", () => {
   beforeEach(() => {
@@ -21,6 +24,7 @@ describe("SolahNotificationsEffect permission fallback", () => {
 
   it("calls setEnabled(false) when enabled=true but permission is denied", async () => {
     mockSyncSolahNotifications.mockResolvedValue({ permissionOk: false });
+    const { SolahNotificationsEffect } = loadComponent();
     await act(async () => {
       useSettingsStore.setState({ solahTimeNotification: true });
       await Promise.resolve();
@@ -35,6 +39,7 @@ describe("SolahNotificationsEffect permission fallback", () => {
 
   it("does NOT revert enabled when already false and permission is denied", async () => {
     mockSyncSolahNotifications.mockResolvedValue({ permissionOk: false });
+    const { SolahNotificationsEffect } = loadComponent();
     await act(async () => {
       useSettingsStore.setState({ solahTimeNotification: false });
       await Promise.resolve();
@@ -49,6 +54,7 @@ describe("SolahNotificationsEffect permission fallback", () => {
 
   it("leaves enabled=true unchanged when permission is OK", async () => {
     mockSyncSolahNotifications.mockResolvedValue({ permissionOk: true });
+    const { SolahNotificationsEffect } = loadComponent();
     await act(async () => {
       useSettingsStore.setState({ solahTimeNotification: true });
       await Promise.resolve();
