@@ -1,0 +1,1 @@
+export { ArabicFontStyle } from "./ArabicFontStyle";

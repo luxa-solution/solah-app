@@ -1,0 +1,1 @@
+export { SolahButton } from "./SolahButton";

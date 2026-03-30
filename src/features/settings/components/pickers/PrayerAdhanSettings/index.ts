@@ -1,0 +1,1 @@
+export { PrayerAdhanSettings } from "./PrayerAdhanSettings";

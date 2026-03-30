@@ -1,0 +1,1 @@
+export { BearingText } from "./BearingText";
