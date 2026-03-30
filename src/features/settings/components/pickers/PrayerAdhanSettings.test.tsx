@@ -51,9 +51,7 @@ describe("PrayerAdhanSettings", () => {
       timeFormat: { name: "24-hour", value: "24hr" },
     });
 
-    const { getByLabelText, getByPlaceholderText } = render(
-      <PrayerAdhanSettings prayer="Dhuhr" />
-    );
+    const { getByLabelText, getByPlaceholderText } = render(<PrayerAdhanSettings prayer="Dhuhr" />);
 
     fireEvent.press(getByLabelText("Fixed time"));
 

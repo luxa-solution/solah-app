@@ -36,8 +36,6 @@ describe("PrayerNotificationToggleRows", () => {
     expect(useSettingsStore.getState().prayerSchedule.Subhi.iqamahNotificationMode).toBe("mute");
 
     fireEvent(getAllByRole("switch")[5], "valueChange", true);
-    expect(useSettingsStore.getState().prayerSchedule.Subhi.iqamahNotificationMode).toBe(
-      "vibrate"
-    );
+    expect(useSettingsStore.getState().prayerSchedule.Subhi.iqamahNotificationMode).toBe("vibrate");
   });
 });

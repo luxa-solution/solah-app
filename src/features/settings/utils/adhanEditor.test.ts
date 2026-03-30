@@ -110,9 +110,9 @@ describe("adhanEditor", () => {
   });
 
   it("returns null prayer windows when location is unavailable and computes valid windows otherwise", () => {
-    expect(getPrayerWindow("Dhuhr", null, "MoonsightingCommittee", 15, new Date("2026-01-01"))).toBe(
-      null
-    );
+    expect(
+      getPrayerWindow("Dhuhr", null, "MoonsightingCommittee", 15, new Date("2026-01-01"))
+    ).toBe(null);
 
     const window = getPrayerWindow(
       "Dhuhr",

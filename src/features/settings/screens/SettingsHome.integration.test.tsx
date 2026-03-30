@@ -132,6 +132,11 @@ describe("SettingsHome integration", () => {
 
   it("rejects a fixed adhan time that is before the prayer time", async () => {
     useSettingsStore.setState({
+      autoTimezoneEnabled: false,
+      timezone: {
+        name: "Riyadh",
+        timezone: "Asia/Riyadh",
+      },
       location: {
         name: "Riyadh",
         location: {
@@ -163,8 +168,8 @@ describe("SettingsHome integration", () => {
       jest.runOnlyPendingTimers();
     });
 
-    fireEvent.changeText(screen.getByPlaceholderText("Hour"), "10");
-    fireEvent.changeText(screen.getByPlaceholderText("Minute"), "00");
+    fireEvent.changeText(screen.getByPlaceholderText("Hour"), "12");
+    fireEvent.changeText(screen.getByPlaceholderText("Minute"), "01");
     fireEvent.press(screen.getByText("AM"));
 
     act(() => {

@@ -70,7 +70,10 @@ describe("currentLocation utils", () => {
   it("computes zero distance for identical points and positive distance for different points", () => {
     expect(getDistanceMeters({ latitude: 1, longitude: 1 }, { latitude: 1, longitude: 1 })).toBe(0);
     expect(
-      getDistanceMeters({ latitude: 24.7136, longitude: 46.6753 }, { latitude: 6.5244, longitude: 3.3792 })
+      getDistanceMeters(
+        { latitude: 24.7136, longitude: 46.6753 },
+        { latitude: 6.5244, longitude: 3.3792 }
+      )
     ).toBeGreaterThan(0);
   });
 });

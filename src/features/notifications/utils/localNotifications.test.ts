@@ -61,7 +61,9 @@ import { LocalNotifications } from "./localNotifications";
 
 describe("LocalNotifications", () => {
   it("exposes the expo notification wrappers and constants", () => {
-    expect(LocalNotifications.cancelScheduledNotificationAsync).toBe(cancelScheduledNotificationAsync);
+    expect(LocalNotifications.cancelScheduledNotificationAsync).toBe(
+      cancelScheduledNotificationAsync
+    );
     expect(LocalNotifications.getPermissionsAsync).toBe(getPermissionsAsync);
     expect(LocalNotifications.requestPermissionsAsync).toBe(requestPermissionsAsync);
     expect(LocalNotifications.scheduleNotificationAsync).toBe(scheduleNotificationAsync);
