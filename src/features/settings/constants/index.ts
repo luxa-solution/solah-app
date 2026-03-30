@@ -11,6 +11,7 @@ export {
 export { timezones, type TimeZoneOption } from "./timeZone";
 export { locations, LocationOption } from "./locations";
 export { notifications, sounds } from "./notificationsAndSound";
+export { PRAYER_ADHAN_MODE_OPTIONS, type PrayerAdhanModeIconName } from "./prayerAdhan";
 export {
   NOTIFICATION_DELIVERY_MODES,
   NOTIFICATION_DELIVERY_ICON,
