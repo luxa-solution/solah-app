@@ -1,5 +1,5 @@
-import { baseInput } from "./solahNotifications.testData";
 import { syncSolahNotifications } from "./solahNotifications";
+import { baseInput } from "./solahNotifications.testData";
 
 describe("syncSolahNotifications module integration", () => {
   afterEach(() => {
@@ -53,7 +53,9 @@ describe("syncSolahNotifications module integration", () => {
     let isolatedSyncSolahNotifications!: typeof syncSolahNotifications;
 
     jest.isolateModules(() => {
-      ({ syncSolahNotifications: isolatedSyncSolahNotifications } = require("./solahNotifications"));
+      ({
+        syncSolahNotifications: isolatedSyncSolahNotifications,
+      } = require("./solahNotifications"));
     });
 
     await expect(isolatedSyncSolahNotifications(baseInput)).resolves.toEqual({
@@ -110,7 +112,9 @@ describe("syncSolahNotifications module integration", () => {
     let isolatedSyncSolahNotifications!: typeof syncSolahNotifications;
 
     jest.isolateModules(() => {
-      ({ syncSolahNotifications: isolatedSyncSolahNotifications } = require("./solahNotifications"));
+      ({
+        syncSolahNotifications: isolatedSyncSolahNotifications,
+      } = require("./solahNotifications"));
     });
 
     await isolatedSyncSolahNotifications({
@@ -176,7 +180,9 @@ describe("syncSolahNotifications module integration", () => {
     let isolatedSyncSolahNotifications!: typeof syncSolahNotifications;
 
     jest.isolateModules(() => {
-      ({ syncSolahNotifications: isolatedSyncSolahNotifications } = require("./solahNotifications"));
+      ({
+        syncSolahNotifications: isolatedSyncSolahNotifications,
+      } = require("./solahNotifications"));
     });
 
     await isolatedSyncSolahNotifications(baseInput);

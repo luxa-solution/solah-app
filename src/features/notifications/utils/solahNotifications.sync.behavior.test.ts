@@ -34,8 +34,8 @@ jest.mock("adhan", () => ({
 import { defaultPrayerScheduleConfig } from "@/features-solah/utils/prayerScheduleUtils";
 
 import { LocalNotifications } from "./localNotifications";
-import { baseInput, withEnabledNotificationModes } from "./solahNotifications.testData";
 import { syncSolahNotifications } from "./solahNotifications";
+import { baseInput, withEnabledNotificationModes } from "./solahNotifications.testData";
 
 const mockScheduleNotif = LocalNotifications.scheduleNotificationAsync as jest.Mock;
 

@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CalculationMethod } from "adhan";
 
 jest.mock("@react-native-async-storage/async-storage", () => ({
@@ -44,11 +45,9 @@ jest.mock("adhan", () => ({
   },
 }));
 
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
 import { LocalNotifications } from "./localNotifications";
-import { baseInput, withEnabledNotificationModes } from "./solahNotifications.testData";
 import { syncSolahNotifications } from "./solahNotifications";
+import { baseInput, withEnabledNotificationModes } from "./solahNotifications.testData";
 
 const mockGetItem = AsyncStorage.getItem as jest.Mock;
 const mockSetItem = AsyncStorage.setItem as jest.Mock;
