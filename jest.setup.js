@@ -64,6 +64,55 @@ jest.mock("lucide-react-native", () => {
   };
 });
 
+jest.mock(
+  "expo-notifications/build/cancelScheduledNotificationAsync",
+  () => ({
+    cancelScheduledNotificationAsync: jest.fn(),
+  }),
+  { virtual: true }
+);
+
+jest.mock(
+  "expo-notifications/build/NotificationChannelManager.types",
+  () => ({
+    AndroidImportance: { MAX: 5 },
+  }),
+  { virtual: true }
+);
+
+jest.mock(
+  "expo-notifications/build/NotificationPermissions",
+  () => ({
+    getPermissionsAsync: jest.fn(),
+    requestPermissionsAsync: jest.fn(),
+  }),
+  { virtual: true }
+);
+
+jest.mock(
+  "expo-notifications/build/Notifications.types",
+  () => ({
+    SchedulableTriggerInputTypes: { DATE: "date" },
+  }),
+  { virtual: true }
+);
+
+jest.mock(
+  "expo-notifications/build/scheduleNotificationAsync",
+  () => ({
+    scheduleNotificationAsync: jest.fn(),
+  }),
+  { virtual: true }
+);
+
+jest.mock(
+  "expo-notifications/build/setNotificationChannelAsync",
+  () => ({
+    setNotificationChannelAsync: jest.fn(),
+  }),
+  { virtual: true }
+);
+
 jest.mock("react-native-paper", () => {
   const React = require("react");
   const { Pressable, Text, View } = require("react-native");
