@@ -7,6 +7,14 @@ function exists(relativePath: string): boolean {
   return fs.existsSync(path.join(repoRoot, relativePath));
 }
 
+function flatFiles(relativeDir: string): string[] {
+  return fs
+    .readdirSync(path.join(repoRoot, relativeDir), { withFileTypes: true })
+    .filter((entry) => entry.isFile())
+    .map((entry) => entry.name)
+    .sort();
+}
+
 describe("component colocation tooling", () => {
   it("folderizes the shared BottomSheet component family", () => {
     expect(exists("src/shared/components/BottomSheet/BottomSheet.tsx")).toBe(true);
@@ -39,6 +47,28 @@ describe("component colocation tooling", () => {
     expect(exists("src/shared/components/ProgressBar/index.ts")).toBe(true);
     expect(exists("src/shared/components/ProgressBar.tsx")).toBe(false);
     expect(exists("src/shared/components/ProgressBar.test.tsx")).toBe(false);
+  });
+
+  it("removes remaining flat component files from collection folders", () => {
+    expect(flatFiles("src/features/adhkar/components")).toEqual(["index.tsx"]);
+    expect(flatFiles("src/features/adhkar/components/details-comps")).toEqual(["index.tsx"]);
+    expect(flatFiles("src/features/guide/components")).toEqual(["index.tsx"]);
+    expect(flatFiles("src/features/home/components")).toEqual(["index.tsx"]);
+    expect(flatFiles("src/features/notifications/components")).toEqual(["index.ts"]);
+    expect(flatFiles("src/features/onboarding/components")).toEqual(["index.tsx"]);
+    expect(flatFiles("src/features/settings/components/pickers")).toEqual(["index.ts"]);
+    expect(flatFiles("src/features/settings/components/pickers/shared")).toEqual([
+      "index.ts",
+      "styles.ts",
+    ]);
+    expect(flatFiles("src/features/settings/components/sheet")).toEqual(["index.ts"]);
+    expect(flatFiles("src/features/settings/components/ui")).toEqual(["index.ts"]);
+    expect(flatFiles("src/features/solah/components")).toEqual(["index.tsx"]);
+    expect(flatFiles("src/features/solah/components/QiblaCompass")).toEqual([
+      "constants.ts",
+      "index.ts",
+    ]);
+    expect(flatFiles("src/shared/components")).toEqual(["index.tsx"]);
   });
 
   it("folderizes PrayerAdhanSettings with colocated parts and tests", () => {

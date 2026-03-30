@@ -49,16 +49,18 @@ describe("test structure tooling", () => {
 
   it("splits notification effect tests by concern", () => {
     expect(
-      exists("src/features/notifications/components/SolahNotificationsEffect.mount.test.tsx")
-    ).toBe(true);
-    expect(
       exists(
-        "src/features/notifications/components/SolahNotificationsEffect.foregroundRenewal.test.tsx"
+        "src/features/notifications/components/SolahNotificationsEffect/SolahNotificationsEffect.test.tsx"
       )
     ).toBe(true);
     expect(
       exists(
-        "src/features/notifications/components/SolahNotificationsEffect.permissionFallback.test.tsx"
+        "src/features/notifications/components/SolahNotificationsEffect/SolahNotificationsEffect.foregroundRenewal.test.tsx"
+      )
+    ).toBe(true);
+    expect(
+      exists(
+        "src/features/notifications/components/SolahNotificationsEffect/SolahNotificationsEffect.permissionFallback.test.tsx"
       )
     ).toBe(true);
     expect(exists("src/features/notifications/components/SolahNotificationsEffect.test.tsx")).toBe(

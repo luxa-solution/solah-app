@@ -1,0 +1,1 @@
+export { DetailsActionBar } from "./DetailsActionBar";
