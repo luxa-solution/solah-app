@@ -256,7 +256,7 @@ jobs:
           NODE
 
       - name: Download baseline from target branch
-        uses: dawidd6/action-download-artifact@v19
+        uses: dawidd6/action-download-artifact@v21
         continue-on-error: true
         with:
           workflow: performance.yml
