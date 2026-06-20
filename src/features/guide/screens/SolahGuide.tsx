@@ -127,8 +127,9 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   header: {
-    width: "90%",
+    width: "100%",
     alignSelf: "center",
+    marginBottom: spacing.md,
   },
   stepText: {
     ...font.label.medium,

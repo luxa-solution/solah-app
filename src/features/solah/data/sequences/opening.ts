@@ -6,40 +6,80 @@ export type SequenceItemInput = Omit<SolahItem, "id" | "solah">;
 
 export const openingSequence: SequenceItemInput[] = [
   {
-    title: "Standing Facing the Qiblah",
-    instruction: { en: "Stand facing the Qiblah with calm focus." },
+    title: "Facing the Qiblah & Intention",
+    instruction: {
+      en: "Stand facing the Qiblah. Make the intention for the prayer in your heart.",
+    },
     entries: [
       {
         arabicText: "لا يوجد شيء لتلاوته",
         transliteration: "Nothing to recite",
-        translation: { en: "Intend the prayer in your heart and stand upright." },
-        media: { image: stepImages.qiyam },
+        translation: {
+          en: "The intention is in the heart. Do not pronounce it with the tongue.",
+        },
+        media: {
+          image: stepImages.qiyam,
+        },
       },
     ],
   },
+
   {
-    title: "Opening Takbir (Takbirat al-Ihram)",
-    instruction: { en: "Raise hands to shoulder/ear level and say the takbir." },
+    title: "Opening Takbir",
+    instruction: {
+      en: "Raise your hands to shoulder level and say Takbir.",
+    },
     entries: [
       {
-        arabicText: "ٱللّٰهُ أَكْبَر",
+        arabicText: "اللّٰهُ أَكْبَر",
         transliteration: "Allāhu Akbar",
-        translation: { en: "Allah is the Greatest." },
-        media: { image: stepImages.qiyam, audio: commonAudios.takbir },
+        translation: {
+          en: "Allah is the Greatest.",
+        },
+        media: {
+          image: stepImages.qiyam,
+          audio: commonAudios.takbir,
+        },
+      },
+    ],
+  },
+
+  {
+    title: "Placing the Hands",
+    instruction: {
+      en: "Place the right hand over the left hand on the chest.",
+    },
+    entries: [
+      {
+        arabicText: "لا يوجد شيء لتلاوته",
+        transliteration: "Nothing to recite",
+        translation: {
+          en: "Remain calm and focused while standing.",
+        },
+        media: {
+          image: stepImages.qiyam,
+        },
       },
     ],
   },
   {
     title: "Opening Supplication",
-    instruction: { en: "Place right hand over left on the chest and recite." },
+    instruction: {
+      en: "Recite the opening supplication.",
+    },
     entries: [
       {
         arabicText:
-          "سُبْحَانَكَ ٱللَّهُمَّ وَبِحَمْدِكَ، وَتَبَارَكَ ٱسْمُكَ، وَتَعَالَىٰ جَدُّكَ، وَلَا إِلَٰهَ غَيْرُكَ",
+          "سُبْحَانَكَ اللَّهُمَّ وَبِحَمْدِكَ وَتَبَارَكَ اسْمُكَ وَتَعَالَىٰ جَدُّكَ وَلَا إِلَٰهَ غَيْرُكَ",
         transliteration:
-          "Subḥānakallāhumma wa biḥamdik, wa tabārakasmuk, wa taʿālā jadduk, wa lā ilāha ghayruk",
-        translation: { en: "Opening supplication." },
-        media: { image: stepImages.qiyam, audio: commonAudios.openingDua },
+          "Subḥānaka Allāhumma wa biḥamdik, wa tabārakasmuk, wa taʿālā jadduk, wa lā ilāha ghayruk",
+        translation: {
+          en: "Glory is to You, O Allah, and praise is Yours. Blessed is Your Name, Exalted is Your Majesty, and there is no god except You.",
+        },
+        media: {
+          image: stepImages.qiyam,
+          audio: commonAudios.openingDua,
+        },
       },
     ],
   },

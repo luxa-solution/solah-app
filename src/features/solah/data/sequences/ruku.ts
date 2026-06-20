@@ -16,20 +16,21 @@ export const rukuSequence: SequenceItemInput[] = [
     ],
   },
   {
-    title: "Rukuʿ (Bowing)",
-    instruction: { en: "Hands on knees, back straight; relax in this position." },
+    title: "Ruku Position",
+    instruction: {
+      en: "Bow with your back straight and place your hands on your knees.",
+    },
     entries: [
       {
-        arabicText: "سُبْحَانَ رَبِّيَ ٱلْعَظِيمِ",
-        transliteration: "Subḥāna rabbiyal-ʿAẓīm (×3 or more)",
-        translation: { en: "Glory be to my Lord, the Magnificent." },
-        media: { image: stepImages.ruku, audio: commonAudios.ruku },
-      },
-      {
-        arabicText: "سُبْحَانَكَ ٱللَّهُمَّ رَبَّنَا وَبِحَمْدِكَ، ٱللَّهُمَّ ٱغْفِرْ لِي",
-        transliteration: "Subḥānakallāhumma rabbanā wa biḥamdik, Allāhumma’ghfir lī",
-        translation: { en: "Optional: O Allah forgive me." },
-        media: { image: stepImages.ruku, audio: commonAudios.rukuExtra },
+        arabicText: "سُبْحَانَ رَبِّيَ الْعَظِيمِ",
+        transliteration: "Subḥāna Rabbiyal-ʿAẓīm",
+        translation: {
+          en: "Glory be to my Lord, the Most Great.",
+        },
+        media: {
+          image: stepImages.ruku,
+          audio: commonAudios.ruku,
+        },
       },
     ],
   },

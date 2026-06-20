@@ -23,6 +23,7 @@ export const commonAudios = {
   rukuExtra: "/audio/solah/common/ruku-extra.mp3",
   sujudExtra: "/audio/solah/common/sujud-extra.mp3",
   qawmahHamd: "/audio/solah/common/qawmah-hamd.mp3",
+  shortSurah: "/audio/solah/common/qawmah-hamd.mp3",
 } as const;
 
 // Per-solah recitation files (you already have these paths in your current guides)
