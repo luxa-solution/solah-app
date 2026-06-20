@@ -32,7 +32,7 @@ export const firstTashahhud: SequenceItemInput[] = [
 
 export const finalSitting: SequenceItemInput[] = [
   {
-    title: "Final Tashahhud",
+    title: "Final Sitting (Tashahhud)",
     instruction: {
       en: "Sit and recite the final tashahhud.",
     },

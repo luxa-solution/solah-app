@@ -32,7 +32,7 @@ export function SolahGuide({ solahName }: SolahGuideProps) {
 
   const progressPercent = ((GuideIndex + 1) / totalSteps) * 100;
 
-  const currentRakah = items.rakahNumber;
+  const currentRakah = items.rakahNumber ?? 1;
 
   const handleNext = () => {
     if (GuideIndex < totalSteps - 1) {
@@ -60,11 +60,11 @@ export function SolahGuide({ solahName }: SolahGuideProps) {
       <View style={styles.header}>
         <View style={styles.progressHeader}>
           <Text style={styles.stepText}>
-            Step {GuideIndex + 1} / {totalSteps}
+            Step {GuideIndex + 1}/{totalSteps}
           </Text>
 
           <Text style={styles.stepText}>
-            Rakʿah {currentRakah} / {solahGuides[solahName].rakaat}
+            Rakʿah {currentRakah}/{solahGuides[solahName].rakaat}
           </Text>
         </View>
         <ProgressBar percent={progressPercent} />
