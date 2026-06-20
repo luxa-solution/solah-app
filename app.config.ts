@@ -123,6 +123,12 @@ export default ( { config }: ConfigContext ): ExpoConfig => {
           ],
           "enableBackgroundRemoteNotifications": false
         }
+      ],
+      [
+        "expo-audio",
+        {
+          "enableBackgroundPlayback": true,
+        }
       ]
     ],
     experiments: {

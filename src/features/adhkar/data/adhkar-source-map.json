@@ -1,0 +1,623 @@
+{
+  "before": {
+    "1": {
+      "appTitle": "When performing ablution (Wudu)",
+      "status": "confirmed",
+      "confirmedMatches": [
+        {
+          "sourceId": 169,
+          "title": "Dua Before Wudu (Ablution Dua)",
+          "arabic": "بِسْمِ اللَّهِ",
+          "transliteration": "Bismillaah",
+          "translation": "In the Name of Allah",
+          "audio": "/audio/dua/169.mp3",
+          "reference": "Irwa'ul-Ghalil 1/122 ,Ibn Majah No. 397"
+        }
+      ],
+      "alternateCandidates": []
+    },
+    "2": {
+      "appTitle": "After completing ablution",
+      "status": "confirmed",
+      "confirmedMatches": [
+        {
+          "sourceId": 170,
+          "title": "Dua After Wudu (Ablution)",
+          "arabic": "أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيْكَ لَهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُوْلُهُ",
+          "transliteration": "Ash-hadu 'an laa 'ilaaha 'illAllahu wahdahu laa shareeka lahu wa 'ash-hadu 'anna Muhammadan 'abduhu wa Rasooluhu",
+          "translation": "I bear witness that none has the right to be worshipped but Allah alone, Who has no partner; and I bear witness that Muhammad is His slave and His Messenger (ﷺ).",
+          "audio": "/audio/dua/170.mp3",
+          "reference": "Muslim: 234 , 576"
+        },
+        {
+          "sourceId": 171,
+          "title": "After Wudu Dua (Ablution)",
+          "arabic": "اَللَّهُمَّ اجْعَلْنِيْ مِنَ التَّوَّابِيْنَ وَاجْعَلْنِي مِنَ الْمُتَطَهِّرِيْنَ",
+          "transliteration": "Allaahummaj'alnee minat-tawwaabeena waj'alnee minal-mutatahhireen",
+          "translation": "O Allah, make me among those who turn to You in repentance, and make me among those who are purified.",
+          "audio": "/audio/dua/171.mp3",
+          "reference": "Sahih (Albani). Tirmidhi: 55"
+        }
+      ],
+      "alternateCandidates": [
+        {
+          "sourceId": 172,
+          "title": "Dua After Ablution (Wudu Dua)",
+          "arabic": "سُبْحَانَكَ اَللَّهُمَّ وَبِحَمْدِكَ، أَشْهَدُ أَنْ لَا إِلَهَ إِلاَّ أَنْتَ، أَسْتَغْفِرُكَ وَأَتُوْبُ إِلَيْكَ",
+          "transliteration": "Subhaanaka Allaahumma wa bihamdika, 'ash-hadu 'an laa 'ilaaha 'illaa 'Anta, 'astaghfiruka wa 'atoobu 'ilayk",
+          "translation": "Glory is to You, O Allah, and praise; I bear witness that there is none worthy of worship but You. I seek Your forgiveness and turn to You in repentance.",
+          "audio": "/audio/dua/172.mp3",
+          "reference": "An-Nasa'i, 'Amalul-Yawm wal-Laylah, p. 173. See also Al-Albani, 'Irwa'ul-Ghalil 1/135 and 2/94."
+        }
+      ]
+    },
+    "3": {
+      "appTitle": "When leaving for the mosque",
+      "status": "confirmed",
+      "confirmedMatches": [
+        {
+          "sourceId": 173,
+          "title": "Dua for going to the Mosque (Dua e noor)",
+          "arabic": "اَللَّهُمَّ اجْعَلْ فِي قَلْبِيْ نُوْرًا وَّفِي لِسَانِىْ نُوْرًا وَّاجْعَلْ فِي سَمْعِىْ نُوْرًا وَّاجْعَلْ فِي بَصَرِىْ نُوْرًا وَّاجْعَلْ مِنْ خَلْفِي نُوْرًا وَّمِنْ أَمَامِيْ نُوْرًا وَّاجْعَلْ مِنْ فَوْقِىْ نُوْرًا وَّمِنْ تَحْتِىْ نُوْرًا اَللَّهُمَّ أَعْطِنِىْ نُوْرًا",
+          "transliteration": "Allaahumma-j‛al fee qalbee noor-an, wa fee lisaanee noor-an, waj‛al fee sam‛ee noor-an, waj‛al fee basaree noor-an, waj‛al min khalfee noor-an, wamin amaamee noor-an, waj‛al min fawqee noor-an, wa min t'ahtee noor-an, Allaahumma a‛tinee noor-an",
+          "translation": "O Allah, place within my heart light, and upon my tongue light, and within my ears light, and within my eyes light, and place behind me light, and in front of me light, and above me light, and beneath me light. O Allah, bestow upon me light.",
+          "audio": "/audio/dua/173.mp3",
+          "reference": "Bukhari: 6316"
+        }
+      ],
+      "alternateCandidates": [
+        {
+          "sourceId": 174,
+          "title": "Dua For Going To The Masjid",
+          "arabic": "اَللَّهُمَّ اجْعَلْ فِي قَلْبِي نُورًا، وَفِي لِسَانِي نُورًا، وَفِي سَمْعِي نُورًا، وَفِي بَصَرِي نُورًا، وَمِنْ فَوْقِي نُورًا، وَمِنْ تَحْتِي نُورًا، وَعَنْ يَمِينِي نُورًا، وَعَنْ شِمَالِي نُورًا، وَمِنْ أَمَامِي نُورًا، وَمِنْ خَلْفِي نُورًا، وَاجْعَلْ فِي نَفْسِي نُورًا، وَأَعْظِمْ لِي نُورًا، وَعَظِّمْ لِي نُورًا، وَاجْعَلْ لِي نُورًا، وَاجْعَلْنِي نُورًا، اَللَّهُمَّ أَعْطِنِي نُورًا، وَاجْعَلْ فِي عَصَبِي نُورًا، وَفِي لَحْمِي نُورًا، وَفِي دَمِي نُورا، وَفِي شَعْرِي نُورًا، وَفِي بَشَرِي نُورًا",
+          "transliteration": "Allaahummaj'al fee qalbee nooran, wa fee lisaaanee nooran, wa fee sam'ee nooran, wa fee basaree nooran, wa min fawqee nooran, wa min tahtee nooran, wa 'an yameenee nooran, wa 'an shimaalee nooran, wa min 'amaamee nooran, wa min khalfee nooran, waj'al fee nafsee nooran, wa 'a'dhim lee nooran, wa 'adhdhim lee nooran, waj'al lee nooran, waj'alnee nooran, Allaahumma 'a'tinee nooran, waj'al fee 'asabee nooran, wafee lahmee nooran, wafee damee nooran, wa fee sha'ree nooran, wa fee basharee nooran.",
+          "translation": "O Allah, place light in my heart, and on my tongue light, and in my ears light and in my sight light, and above me light, and below me light, and to my right light, and to my left light, and before me light and behind me light. Place in my soul light. Magnify for me light, and amplify for me light. Make for me light and make me a light. O Allah, grant me light, and place light in my nerves, and in my body light and in my blood light and in my hair light and in my skin light.",
+          "audio": "/audio/dua/174.mp3",
+          "reference": "Bukhari: 6316"
+        }
+      ]
+    },
+    "4": {
+      "appTitle": "Upon entering the mosque",
+      "status": "confirmed",
+      "confirmedMatches": [
+        {
+          "sourceId": 175,
+          "title": "Dua When Entering Masjid (Wassalatu Wassalamu)",
+          "arabic": "بِسْمِ اللَّهِ، وَالصَّلَاةُ وَالسَّلَامُ عَلَى رَسُوْلِ اللَّهِ، اَللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ",
+          "transliteration": "Bismillaahi, Wassalaatu Wassalaamu 'alaa Rasoolillaah. Allahum-maftah lee 'abwaaba rahmatik.",
+          "translation": "In the Name of Allah, And blessings and peace be upon the Messenger of Allah (ﷺ). O Allah, open before me the doors of Your mercy.",
+          "audio": "/audio/dua/175.mp3",
+          "reference": "Sahih (Albani). Abu Dawud: 465, Muslim: 713"
+        }
+      ],
+      "alternateCandidates": [
+        {
+          "sourceId": 176,
+          "title": "Dua For Entering Mosque (Allahumma Salli Ala Muhammad)",
+          "arabic": "بِسْمِ اللَّهِ اَللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ، اَللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ",
+          "transliteration": "Bismillaahi, Allaahumma salli 'ala muhammad, Allaahummaf ta'hlii abwaba ra'hmatik",
+          "translation": "In the Name of Allah, Ya Allah please send blessings and peace upon the Messenger of Allah (ﷺ). O Allah, open before me the doors of Your mercy.",
+          "audio": "/audio/dua/176.mp3",
+          "reference": "Hasan (Albani). Ibn Sunni: 88, Muslim: 713"
+        },
+        {
+          "sourceId": 177,
+          "title": "Dua To Enter Mosque (Rabbighfirli dhunubi)",
+          "arabic": "اَللَّهُمَّ اغْفِرْ لِي ذُنُوْبِي وَافْتَحْ لِي أَبْوَابَ رَحْمَتِكَ",
+          "transliteration": "Rabbig-firli dhunubi waftah li abwaaba rahmatik",
+          "translation": "O Allah, forgive me my sins and open to me the gates of Your mercy.",
+          "audio": "/audio/dua/177.mp3",
+          "reference": "Sahih (Albani). Ibn Majah: 771"
+        },
+        {
+          "sourceId": 178,
+          "title": "Dua Before Entering The Mosque (Auzubillah)",
+          "arabic": "أَعُوْذُ بِاللَّهِ الْعَظِيمِ وَبِوَجْهِهِ الْكَرِيمِ وَسُلْطَانِهِ الْقَدِيْمِ مِنَ الشَّيْطَانِ الرَّجِيْمِ، بِسْمِ اللَّهِ وَالصَّلَاةُ وَالسَّلَامُ عَلَى رَسُوْلِ اللَّهِ اَللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ",
+          "transliteration": "A'oodhu billahil-Aatheem wa bi wajhihil-kareem wa sultanihil-qadeem minash-shaytanir-rajeem, bismil-lahi, wassalatu wassalamu 'Aala rasoolil-lah, Allaahumma iftah lee abwaaba rahmatik",
+          "translation": "I take refuge with Allah, The Supreme and with His Noble Face, and His eternal authority from the accursed devil. In the name of Allah, and prayers and peace be upon the Messenger of Allah (ﷺ). O Allah, open the gates of Your mercy for me.",
+          "audio": "/audio/dua/178.mp3",
+          "reference": "Sahih (Albani). Abu Dawud: 465, 466"
+        }
+      ]
+    },
+    "5": {
+      "appTitle": "After the Adhaan",
+      "status": "confirmed",
+      "confirmedMatches": [
+        {
+          "sourceId": 165,
+          "title": "Dua After Adhan (Azan Dua)",
+          "arabic": "اَللَّهُمَّ رَبَّ هَذِهِ الدَّعْوَةِ التَّامَّةِ، وَالصَّلَاةِ الْقَائِمَةِ، آتِ مُحَمَّدًا وَالْوَسِيْلَةَ وَالْفَضِيْلَةَ، وَابْعَثْهُ مَقَامًا مَحْمُوْدًا الَّذِيْ وَعَدْتَهُ",
+          "transliteration": "Allaahumma rabba haadhi-hid-da watit-taammah, wassalaatil-qaa’imah, aati mu'hammadan-il- waseelata wal-fadeelah, wab‛ath-hu maqaaman ma'hmoodan-illadhee wa‛adtah",
+          "translation": "O Allah, Owner of this perfect call and Owner of this prayer to be performed, bestow upon Muhammad (ﷺ) al-waseelah and al-fadeelah and raise him upon a praised platform which You have promised him.",
+          "audio": "/audio/dua/165.mp3",
+          "reference": "Bukhari: 614"
+        }
+      ],
+      "alternateCandidates": [
+        {
+          "sourceId": 162,
+          "title": "Reply of Azan (Azan Dua)",
+          "arabic": "",
+          "transliteration": "",
+          "translation": "",
+          "audio": null,
+          "reference": "Muslim: 385"
+        },
+        {
+          "sourceId": 163,
+          "title": "Dua after hearing Adhan (Azan dua)",
+          "arabic": "أَشْهَدُ أَنْ لَا إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ وَأَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ رَضِيتُ بِاللَّهِ رَبًّا وَبِمُحَمَّدٍ رَسُولًا وَبِالْإِسْلَامِ دِينًا",
+          "transliteration": "Ash-hadu an laa ilaaha ill-Allahu wa'hdahu laa shareeka lahu wa anna mu'hammadan ‛abduhu wa rasooluhu, radeetu billaahi rabban wa bimu'hammadin rasoolan wa bil -islaami deen-an",
+          "translation": "I bear witness that none has the right to be worshipped except Allah, alone, without partner, and that Muhammad is His slave and Messenger (ﷺ). I am pleased with Allah as a Lord, and Muhammad as a Messenger and Islam as a religion.",
+          "audio": "/audio/dua/163.mp3",
+          "reference": "Muslim: 386"
+        },
+        {
+          "sourceId": 164,
+          "title": "Dua After Adhan (Durood Sharif)",
+          "arabic": "اَللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ كَمَا صَلَّيْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ، إِنَّكَ حَمِيدٌ مَجِيدٌ، اَللَّهُمَّ بَارِكَ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ كَمَا بَارَكْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ، إِنَّكَ حَمِيدٌ مَجِيدٌ",
+          "transliteration": "Allaahumma salli 'alaa Mu'hammadin wa 'alaa 'aali Mu'hammadin, kamaa sallayta 'alaa 'Ibraaheema wa 'alaa 'aali 'Ibraaheema, 'innaka Hameedun Majeed. Allaahumma baarik 'alaa Mu'hammadin wa 'alaa 'aali Mu'hammadin, kamaa baarakta 'alaa 'Ibraaheema wa 'alaa 'aali 'Ibraaheema, 'innaka Hameedun Majeed",
+          "translation": "O Allah, bestow Your favor on Muhammad (ﷺ) and on the family of Muhammad (ﷺ) as You have bestowed Your favor on Ibrahim (Ah) and on the family of Ibrahim (Ah), You are Praiseworthy, Most Glorious. O Allah, bless Muhammad (ﷺ) and the family of Muhammad (ﷺ) as You have blessed Ibrahim and the family of Ibrahim (Ah), You are Praiseworthy, Most Glorious.",
+          "audio": "/audio/dua/164.mp3",
+          "reference": "Muslim: 384"
+        }
+      ]
+    },
+    "6": {
+      "appTitle": "When leaving the house",
+      "status": "confirmed",
+      "confirmedMatches": [
+        {
+          "sourceId": 154,
+          "title": "Dua for leaving home",
+          "arabic": "بِسْمِ اللَّهِ تَوَكَّلْتُ عَلَى اللَّهِ لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ",
+          "transliteration": "bismillaahi, tawakkaltu 'alal-laahi, laa hawla wa laa quwwata illaa billaah",
+          "translation": "In the name of Allah, I place my trust in Allah and there is no might nor power except with Allah.",
+          "audio": "/audio/dua/154.mp3",
+          "reference": "Sahih (Albani). Abu Dawud: 5095"
+        }
+      ],
+      "alternateCandidates": [
+        {
+          "sourceId": 155,
+          "title": "Dua before leaving house",
+          "arabic": "بِسْمِ اللَّهِ تَوَكَّلْتُ عَلَى اللَّهِ اَللَّـهُمَّ إِنَّا نَعُوذُ بِكَ مِنْ أَنْ نَزِلَّ أَوْ نَضِلَّ أَوْ نَظْلِمَ أَوْ نُظْلَمَ أَوْ نَجْهَلَ أَوْ يُجْهَلَ عَلَيْنَا",
+          "transliteration": "Bismillaahi, tawakkaltu 'alal-laahi. Allaahumma, inna na`udhu bika min an nazilla aw nadilla, aw nazlima aw nuzlama, aw najhala aw yujhala 'alaina",
+          "translation": "In the Name of Allah, I place my trust in Allah. O Allah! We seek refuge in You from slipping unintentionally or becoming misguided, or committing oppression or being oppressed, or acting ignorantly or being treated ignorantly.",
+          "audio": "/audio/dua/155.mp3",
+          "reference": "Sahih (Albani). Tirmidhi: 3427"
+        },
+        {
+          "sourceId": 156,
+          "title": "Dua when leaving the house",
+          "arabic": "اَللَّـهُمَّ إِنِّي أَعُوْذُ بِكَ أَنْ أَضِلَّ، أَوْ أُضَلَّ، أَوْ أَزِلَّ، أَوْ أُزَلَّ، أَوْ أَظْلِمَ، أَوْ أُظْلَمَ، أَوْ أَجْهَلَ، أَوْ يُجْهَلَ عَلَيَّ",
+          "transliteration": "Allaahumma innee a‛oodhu bika an adilla aw udalla, aw azilla aw uzalla, aw azlima aw uzlama, aw adhala aw yudhala ‛alayya",
+          "translation": "O Allah, I seek refuge with You lest I should stray or be led astray, or slip (i.e. to commit a sin unintentionally) or be tripped, or oppress or be oppressed, or behave foolishly or be treated foolishly.",
+          "audio": "/audio/dua/156.mp3",
+          "reference": "Sahih (Albani). Abu Dawud: 5094"
+        }
+      ]
+    }
+  },
+  "during": {
+    "1": {
+      "appTitle": "Opening supplication (Istiftah)",
+      "status": "confirmed",
+      "confirmedMatches": [
+        {
+          "sourceId": 872,
+          "title": "Sana Dua (Subhanaka Allahumma Wa Bihamdika)",
+          "arabic": "سُبْحَانَكَ اللَّهُمَّ وَبِحَمْدِكَ، وَتَبَارَكَ اسْمُكَ، وَتَعَالَى جَدُّكَ، وَلَا إِلٰهَ غَيْرُكَ",
+          "transliteration": "Subhaanaka Allaahumma wa bihamdika, wa tabaarakasmuka, wa ta'aalaa jadduka, wa laa 'ilaaha ghayruk.",
+          "translation": "Glory is to You O Allah, and praise. Blessed is Your Name and Exalted is Your Majesty. There is none worthy of worship but You.",
+          "audio": null,
+          "reference": "Muslim: 399"
+        }
+      ],
+      "alternateCandidates": [
+        {
+          "sourceId": 186,
+          "title": "Dua for Salah (At the beginning of the prayer)",
+          "arabic": "وَجَّهْتُ وَجْهِيَ لِلَّذِي فَطَرَ السَّمَوَاتِ وَالْأَرْضَ حَنِيفًا وَمَا أَنَا مِنَ الْمُشْرِكِينَ، إِنَّ صَلَاتِي، وَنُسُكِي، وَمَحْيَايَ، وَمَمَاتِي لِلَّهِ رَبِّ الْعَالَمِينَ، لَا شَرِيكَ لَهُ وَبِذَلِكَ أُمِرْتُ وَأَنَا مِنَ الْمُسْلِمِينَ اَللَّهُمَّ أَنْتَ الْمَلِكُ لَا إِلَهَ إِلَّا أَنْتَ، أَنْتَ رَبِّي وَأَنَا عَبْدُكَ، ظَلَمْتُ نَفْسِي وَاعْتَرَفْتُ بِذَنْبِي فَاغْفِرْ لِي ذُنُوبِي جَمِيعًا إِنَّهُ لَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ، وَاهْدِنِي لِأَحْسَنِ الْأَخْلَاقِ لَا يَهْدِي لِأَحْسَنِهَا إِلَّا أَنْتَ، وَاصْرِفْ عَنِّي سَيِّئَهَا، لَا يَصْرِفُ عَنِّي سَيِّئَهَا إِلَّا أَنْتَ لَبَّيْكَ وَسَعْدَيْكَ، وَالْخَيْرُ كُلُّهُ بِيَـدَيْكَ، وَالشَّـرُّ لَيْسَ إِلَيْـكَ، أَنَا بِكَ وَإِلَيْكَ، تَبارَكْتَ وَتَعَالَيْتَ، أَسْتَغْفِرُكَ وَأَتوبُ إِلَيْكَ",
+          "transliteration": "Wajjahtu wajhiya lilladhee fataras-samawaati wal-arda haneefan wa maa ana minal-mushrikeen, inna salaatee wa nusukee wa mahyaaya wa mamaatee lillaahi rabbil-’alameen, laa shareeka lahu wabi dhaalika umirtu wa-ana minal-muslimeen. Allaahumma antal-maliku laa ilaaha illaa anta. anta rabbee wa-anaa ‘abduka, dhalamtu nafsee wa’taraftu bidhanbee faghfir lee dhunoobee jamee’an innahu laa yaghfirudh-dhunooba illaa anta. wahdinee li-ahsanil-akhlaaqi laa yahdee li-ahsaniha illaa anta, wasrif ‘annee sayyiaha laa yasrifu ‘annee sayyiaha illaa anta, Labbayka wa sa’dayka, wal-khayru kulluhu biyadayka, washsharru laysa ilayka, ana bika wa-ilayka, tabarakta wa ta’alayta, astaghfiruka wa atoobu ilayk",
+          "translation": "I have turned my face sincerely towards He who has brought forth the heavens and the Earth and I am not of those who associate (others with Allah). Indeed my prayer, my sacrifice, my life and my death are for Allah, Lord of the worlds, no partner has He, with this I am commanded and I am of the Muslims. O Allah, You are the Sovereign, none has the right to be worshipped except You. You are my Lord and I am Your servant, I have wronged my own soul and have acknowledged my sin, so forgive me all my sins for no one forgives sins except You. Guide me to the best of characters for none can guide to it other than You, and deliver me from the worst of characters for none can deliver me from it other than You. Here I am, in answer to Your call, happy to serve you. All good is within Your hands and evil does not stem from You. I exist by your will and will return to you. Blessed and High are You, I seek Your forgiveness and repent unto You.",
+          "audio": null,
+          "reference": "Muslim: 771"
+        }
+      ]
+    },
+    "2": {
+      "appTitle": "While bowing (Ruku)",
+      "status": "confirmed",
+      "confirmedMatches": [
+        {
+          "sourceId": 195,
+          "title": "Dua in Ruku (Subhana Rabbiyal Azeem)",
+          "arabic": "سُبْحَانَ رَبِّيَ الْعَظِيمِ",
+          "transliteration": "Subhaana Rabbiyal-'Adheem",
+          "translation": "Glory to my Lord the Exalted.",
+          "audio": "/audio/dua/195.mp3",
+          "reference": "Sahih (Albani). Tirmidhi: 262"
+        }
+      ],
+      "alternateCandidates": [
+        {
+          "sourceId": 196,
+          "title": "Dua For Ruku (Subhana Rabbiyal Adheem Wa Bihamdihi)",
+          "arabic": "سُبْحَانَ رَبِّيَ الْعَظِيمِ وَبِحَمْدِهِ",
+          "transliteration": "Subhaana Rabbiyal-'Adheem wa bihamdihi",
+          "translation": "Glory and praise be to my mighty Lord.",
+          "audio": "/audio/dua/196.mp3",
+          "reference": "Hasan Sanad (Shu'aib Al-Arnaut). Abu Dawud: 870"
+        },
+        {
+          "sourceId": 197,
+          "title": "Dua in Ruku (Subbuhun Quddusun Rabbul Mala Ikati War Ruh)",
+          "arabic": "سُبُّوْحٌ قُدُّوْسٌ رَبُّ الْمَلَائِكَةِ وَالرُّوْحِ",
+          "transliteration": "Subboohun, Quddoosun, Rabbul-malaa'ikati warrooh",
+          "translation": "Glory (to You), Most Holy (are You), Lord of the angels and the Spirit.",
+          "audio": "/audio/dua/197.mp3",
+          "reference": "Sahih (Albani). Abu Dawud: 872"
+        },
+        {
+          "sourceId": 198,
+          "title": "Dua For Ruku (Allahumma Laka Rakatu Wa Bika Amantu)",
+          "arabic": "اَللَّهُمَّ لَكَ رَكَعْتُ وَبِكَ آمَنْتُ وَلَكَ أَسْلَمْتُ خَشَعَ لَكَ سَمْعِيْ وَبَصَرِيْ وَمُخِّيْ وَعِظَامِيْ وَعَصَبِيْ",
+          "transliteration": "Allaahumma laka raka'tu, wa bika 'aamantu, wa laka 'aslamtu khasha'a laka sam'ee, wa basaree, wa mukhkhee, wa 'idhaamee, wa 'asabee",
+          "translation": "O Allah, to You I bow (in prayer) and in You I believe and to You I have submitted. Before You my hearing is humbled, as is my sight, my mind, my bones, my nerves.",
+          "audio": "/audio/dua/198.mp3",
+          "reference": "Sahih (Albani). Abu Dawud: 760"
+        },
+        {
+          "sourceId": 199,
+          "title": "Dua at Ruku",
+          "arabic": "سُبْحَانَ ذِي الْجَبَرُوْتِ وَالْمَلَكُوْتِ وَالْكِبْرِيَاءِ وَالْعَظَمَةِ",
+          "transliteration": "Subhaana dhil-jabarooti, wal-malakooti, wal-kibriyaa'i, wal-'adhamah",
+          "translation": "Glory is to You, Master of power, of dominion, of majesty and greatness.",
+          "audio": "/audio/dua/199.mp3",
+          "reference": "Sahih (Albani). Abu Dawud: 873"
+        },
+        {
+          "sourceId": 200,
+          "title": "Dua in Rukoo (Subhanaka wa Bihamdika Astaghfiruka)",
+          "arabic": "سُبْحَانَكَ وَبِحَمْدِكَ أَسْتَغْفِرُكَ وَأَتُوْبُ اِلَيْكَ",
+          "transliteration": "Subhaanaka wa bihamdika, 'astaghfiruka wa 'atoobu 'ilayk",
+          "translation": "Glory is to You O Allah, and praise. I ask you for forgiveness and I turn to you (from sinning).",
+          "audio": "/audio/dua/200.mp3",
+          "reference": "Hasan (Albani). Silsila Sahiha: 3032"
+        },
+        {
+          "sourceId": 201,
+          "title": "Dua in Ruku (Dua for forgiveness)",
+          "arabic": "سُبْحَانَكَ اَللَّهُمَّ رَبَّنَا وَبِحَمْدِكَ، اَللَّهُمَّ اغْفِرْ لِي",
+          "transliteration": "Subhaanaka Allaahumma Rabbanaa wa bihamdika Allahum-maghfir lee",
+          "translation": "Glory is to You, O Allah, our Lord, and praise is Yours. O Allah, forgive me. [1]",
+          "audio": "/audio/dua/201.mp3",
+          "reference": "[1] Bukhari: 794 [2] Sura Nasr 110:3"
+        }
+      ]
+    },
+    "3": {
+      "appTitle": "Rising from Ruku",
+      "status": "confirmed",
+      "confirmedMatches": [
+        {
+          "sourceId": 202,
+          "title": "Dua After Ruku (Sami Allahu Liman Hamidah)",
+          "arabic": "سَمِعَ اللَّهُ لِمَنْ حَمِدَهُ",
+          "transliteration": "Sami'Allahu liman hamidah",
+          "translation": "Allah hears whoever praises Him.",
+          "audio": null,
+          "reference": "Bukhari: 796"
+        },
+        {
+          "sourceId": 203,
+          "title": "Dua After Ruku (Allahumma Rabbana Wa Lakal-Hamd)",
+          "arabic": "اَللَّهُمَّ رَبَّنَا لَكَ الْحَمْدُ، مِلْءَ السَّمَوَاتِ وَمِلْءَ الْأَرْضِ، وَمِلْءَ مَا شِئْتَ مِنْ شَيْءٍ بَعْدُ، أَهْلَ الثَّنَاءِ وَالْمَجْدِ، أَحَقُّ مَا قَالَ الْعَبْدُ، وَكُلُّنَا لَكَ عَبْدٌ، اَللَّهُمَّ لَا مَانِعَ لِمَا أَعْطَيْتَ، وَلَا مُعْطِيَ لِمَا مَنَعْتَ، وَلَا يَنْفَعُ ذَا الْجَدِّ مِنْكَ الْجَدُّ",
+          "transliteration": "Allaahumma Rabbanaa lakal-hamdu mil'as-samawaati wa mil’al-ardi, wa mil'a maa shi'ta min shay'in ba'du, ahlath-thanaa'i wal-majdi, ahaqqu maa qaalal 'abdu, wa kullunaa laka 'abdun. Allaahumma laa maani'a limaa a'taita, wa laa mu'tiya limaa mana'ta, wa laa yanfa'u dhal-jaddi minkal-jaddu",
+          "translation": "O Allah, our Rabb (Lord), to You is praise in all the heavens and all the earth, and all that You Will (to create) afterwards, O You, Who are worthy of praise and glory, the most worthy of what a slave says - and we are all Your slaves: no one can withhold what You give, or give what You withhold, and riches cannot avail a wealthy person against You.",
+          "audio": "/audio/dua/203.mp3",
+          "reference": "Muslim: 477"
+        }
+      ],
+      "alternateCandidates": []
+    },
+    "4": {
+      "appTitle": "While prostrating (Sujud)",
+      "status": "confirmed",
+      "confirmedMatches": [
+        {
+          "sourceId": 213,
+          "title": "Dua in Sujood (Subhana Rabbiyal Ala)",
+          "arabic": "سُبْحَانَ رَبِّيَ الْأَعْلَى",
+          "transliteration": "Subhaana Rabbiyal-A'laa",
+          "translation": "Glory is to my Lord, the Most High.",
+          "audio": "/audio/dua/213.mp3",
+          "reference": "Muslim: 772"
+        }
+      ],
+      "alternateCandidates": [
+        {
+          "sourceId": 210,
+          "title": "Dua during Sujood (Hadith)",
+          "arabic": "",
+          "transliteration": "",
+          "translation": "",
+          "audio": null,
+          "reference": "Muslim: 482"
+        },
+        {
+          "sourceId": 211,
+          "title": "Sujood Dua (Hadith)",
+          "arabic": "",
+          "transliteration": "",
+          "translation": "",
+          "audio": null,
+          "reference": "Muslim: 479"
+        },
+        {
+          "sourceId": 214,
+          "title": "Dua for Sajdah (Sajda Dua)",
+          "arabic": "سُبْحَانَ رَبِّيَ الْأَعْلَى وَبِحَمْدِهِ",
+          "transliteration": "Subhaana Rabbiyal-A'laa wa bihamdihi",
+          "translation": "Glory and praise be to my most high Lord.",
+          "audio": "/audio/dua/214.mp3",
+          "reference": "Hasan Sanad (Shu'aib Al-Arnaut). Abu Dawud: 870"
+        }
+      ]
+    },
+    "5": {
+      "appTitle": "Between the two prostrations",
+      "status": "confirmed",
+      "confirmedMatches": [
+        {
+          "sourceId": 222,
+          "title": "Dua between two Sujood",
+          "arabic": "رَبِّ اغْفِرْ لِي، رَبِّ اغْفِرْ لِي",
+          "transliteration": "Rabbighfir lee, Rabbighfir lee",
+          "translation": "O My Lord, forgive me. My Lord, forgive me.",
+          "audio": "/audio/dua/222.mp3",
+          "reference": "Sahih (Albani). Abu Dawud: 874"
+        },
+        {
+          "sourceId": 223,
+          "title": "Dua between Sujood (Allahummaghfirli Warhamni Wahdini Warzuqni)",
+          "arabic": "اَللَّهُمَّ اغْفِرْ لِي وَارْحَمْنِي وَعَافِنِي وَاهْدِنِي وَارْزُقْنِي",
+          "transliteration": "Allahum-maghfir lee, warhamnee, wa 'aafinee, wahdinee, warzuqnee",
+          "translation": "O Allah! Pardon me, have mercy on me, guide me, and grant me sustenance.",
+          "audio": "/audio/dua/223.mp3",
+          "reference": "Sahih (Albani). Tirmidhi: 284, Hasan (Albani). Abu Dawud: 850"
+        }
+      ],
+      "alternateCandidates": []
+    },
+    "6": {
+      "appTitle": "After Tashahhud (before Taslim)",
+      "status": "confirmed",
+      "confirmedMatches": [
+        {
+          "sourceId": 232,
+          "title": "Dua e Masura #2 (Dua For Protection From Hellfire)",
+          "arabic": "اَللَّهُمَّ إِنِّي أَعُوْذُ بِكَ مِنْ عَذَابِ جَهَنَّمَ وَمِنْ عَذَابِ الْقَبْرِ وَمِنْ فِتْنَةِ الْمَحْيَا وَالْمَمَاتِ وَمِنْ شَرِّ فِتْنَةِ الْمَسِيحِ الدَّجَّالِ",
+          "transliteration": "Allaahumma 'innee 'a'oodhu bika min 'adhaabi jahannam, wa min 'adhaabil-qabr, wa min fitnatil-mahyaa wal-mamaati, wa min sharri fitnatil-maseehid-dajjaal",
+          "translation": "O Allah! I seek refuge with Thee from the torment of the Hell, from the torment of the grave, from the trial of life and death and from the evil of the trial of Masih al-Dajjal.",
+          "audio": "/audio/dua/232.mp3",
+          "reference": "Muslim: 588"
+        }
+      ],
+      "alternateCandidates": [
+        {
+          "sourceId": 231,
+          "title": "Dua Masura #1 (Allahumma Allif Baina Qulubina)",
+          "arabic": "اَللَّهُمَّ أَلِّفْ بَيْنَ قُلُوبِنَا وَأَصْلِحْ ذَاتَ بَيْنِنَا وَاهْدِنَا سُبُلَ السَّلَامِ وَنَجِّنَا مِنَ الظُّلُمَاتِ إِلَى النُّوْرِ وَجَنِّبْنَا الْفَوَاحِشَ مَا ظَهَرَ مِنْهَا وَمَا بَطَنَ وَبَارِكْ لَنَا فِي أَسْمَاعِنَا وَأَبْصَارِنَا وَقُلُوبِنَا وَأَزْوَاجِنَا وَذُرِّيَّاتِنَا وَتُبْ عَلَيْنَا إِنَّكَ أَنْتَ التَّوَّابُ الرَّحِيْمُ وَاجْعَلْنَا شَاكِرِيْنَ لِنِعْمَتِكَ مُثْنِيْنَ بِهَا قَابِلِيْهَا وَأَتِمَّهَا عَلَيْنَا",
+          "transliteration": "Allaahumma allif bayna quloobinaa wa aslih dhaata bayninaa wahdinaa subulas salaam, wa najjinaa minaz zulumaati ilan noor, wa jannibnal fawaa-hisha maa zahara minhaa wa maa batan, wa baarik lanaa fi asmaa’inaa wa absaarinaa wa quloobinaa wa azwaajinaa wa dhurri yaatinaa wa tub alaynaa innaka antat tawwaabur raheem waj’alnaa shaakireena lini’matika muth-neena bihaa qaabileehaa wa atimmahaa 'alaynaa",
+          "translation": "O Allah, join our hearts, mend our social relationship, guide us to the path of peace, bring us from darkness to light, save us from obscenities, outward or inward, and bless our ears, our eyes, our hearts, our wives, our children, and relent toward us; Thou art the Relenting, the Merciful. And make us grateful for Thy blessing and make us praise it while accepting it and give it to us in full.",
+          "audio": "/audio/dua/231.mp3",
+          "reference": "Daif (Albani). Abu Dawud: 969"
+        },
+        {
+          "sourceId": 233,
+          "title": "Dua Masura #3 (Allahummaghfirli Ma Qaddamtu)",
+          "arabic": "اَللَّهُمَّ اغْفِرْ لِي مَا قَدَّمْتُ وَمَا أَخَّرْتُ وَمَا أَسْرَرْتُ وَمَا أَعْلَنْتُ وَمَا أَسْرَفْتُ وَمَا أَنْتَ أَعْلَمُ بِهِ مِنِّي أَنْتَ الْمُقَدِّمُ وَأَنْتَ الْمُؤَخِّرُ لَا إِلَهَ إِلَّا أَنْتَ",
+          "transliteration": "Allahum-maghfir lee maa qaddamtu, wa maa 'akhkhartu, wa maa 'asrartu, wa maa 'a'lantu, wa maa 'asraftu, wa maa 'Anta 'a'lamu bihi minnee. 'Antal-Muqaddimu, wa 'Antal-Mu'akhkhiru laa 'ilaaha 'illaa 'Anta",
+          "translation": "O Allah, forgive me what I have sent before me and what I have left behind me, what I have concealed and what I have done openly, what I have done in excess, and what You are better aware of than I. You are the One Who sends forth and You are the One Who delays. There is none worthy of worship but You.",
+          "audio": "/audio/dua/233.mp3",
+          "reference": "Muslim: 771"
+        },
+        {
+          "sourceId": 234,
+          "title": "Dua e Masura #4 (Allahumma Inni Zalamtu Nafsi)",
+          "arabic": "اَللَّهُمَّ إِنِّي ظَلَمْتُ نَفْسِيْ ظُلْمًا كَثِيْرًا وَلَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ فَاغْفِرْ لِي مَغْفِرَةً مِنْ عِنْدِكَ وَارْحَمْنِيْ إِنَّكَ أَنْتَ الْغَفُوْرُ الرَّحِيْمُ",
+          "transliteration": "Allaahumma 'innee dhalamtu nafsee dhulman katheeran, wa laa yaghfirudh-dhunooba 'illaa 'Anta, faghfir lee maghfiratan min 'indika warhamnee 'innaka 'Antal-Ghafoorur-Raheem",
+          "translation": "O Allah, I have greatly wronged myself and no one forgives sins but You. So, grant me forgiveness and have mercy on me. Surely, you are Forgiving, Merciful.",
+          "audio": "/audio/dua/234.mp3",
+          "reference": "Bukhari: 834"
+        },
+        {
+          "sourceId": 235,
+          "title": "Dua Mashura #5 (Allahumma Bi Ilmika Al Ghaib)",
+          "arabic": "اَللَّهُمَّ بِعِلْمِكَ الْغَيْبَ وَقُدْرَتِكَ عَلَى الْخَلْقِ أَحْيِنِيْ مَا عَلِمْتَ الْحَيَاةَ خَيْرًا لِي وَتَوَفَّنِيْ إِذَا عَلِمْتَ الْوَفَاةَ خَيْرًا لِي اَللَّهُمَّ وَأَسْأَلُكَ خَشْيَتَكَ فِي الْغَيْبِ وَالشَّهَادَةِ وَأَسْأَلُكَ كَلِمَةَ الْحَقِّ فِي الرِّضَا وَالْغَضَبِ وَأَسْأَلُكَ الْقَصْدَ فِي الْفَقْرِ وَالْغِنَى وَأَسْأَلُكَ نَعِيْمًا لَا يَنْفَدُ وَأَسْأَلُكَ قُرَّةَ عَيْنٍ لَا تَنْقَطِعُ وَأَسْأَلُكَ الرِّضَا بَعْدَ الْقَضَاءِ وَأَسْأَلُكَ بَرْدَ الْعَيْشِ بَعْدَ الْمَوْتِ وَأَسْأَلُكَ لَذَّةَ النَّظَرِ إِلَى وَجْهِكَ وَالشَّوْقَ إِلَى لِقَائِكَ فِي غَيْرِ ضَرَّاءَ مُضِرَّةٍ وَلَا فِتْنَةٍ مُضِلَّةٍ اَللَّهُمَّ زَيِّنَا بِزِيْنَةِ الْإِيْمَانِ وَاجْعَلْنَا هُدَاةً مُهْتَدِيْنَ",
+          "transliteration": "Allaahumma bi'ilmikal-ghayba wa qudratika 'alal-khalq, 'ahyinee maa 'alimtal-hayaata khayran lee wa tawaffanee 'idhaa 'alimtal-wafaata khayran lee, Allaahumma wa 'as'aluka khashyataka fil-ghaybi wash-shahaadati, wa 'as'aluka kalimatal-haqqi fir-ridhaa wal-ghadhabi, wa 'as'alukal-qasda fil-faqri walghinaa, wa 'as'aluka na'eeman laa yanfadu, wa 'as'aluka qurrata 'aynin laa tanqati'u, wa 'as'alukar-ridhaa ba'dal-qadhaa, wa 'as'aluka bardal-'ayshi ba'dal-mawti, wa 'as'aluka ladh-dhatan-nadhari 'ilaa wajhika wash-shawqa 'ilaa liqaa'ika fee ghayri darraa'a mudirratin wa laa fitnatin mudillatin, Allaahumma zayyinnaa bizeenatil-'eemaani waj'alnaa hudaatan muhtadeen",
+          "translation": "O Allah, by Your Knowledge of the unseen and by Your Power over creation, let me live if You know that life is good for me, and let me die if You know that death is good for me. O Allah, I ask You to grant me fear of You in private and in public. I ask you for the word of truth in times of contentment and anger. I ask You for moderation in wealth and in poverty. I ask you for blessings never ceasing and the coolness of my eye (i .e . pleasure) that never ends. I ask You for pleasure after Your Judgment and I ask You for a life of coolness after death. I ask You for the delight of gazing upon Your Face and the joy of meeting You without any harm and misleading trials befalling me. O Allah, dress us with the beauty of Faith, and make us guides who are upon (correct) guidance.",
+          "audio": "/audio/dua/235.mp3",
+          "reference": "Sahih (Albani). Nasai: 1305"
+        },
+        {
+          "sourceId": 236,
+          "title": "Dua Masurah #6 (Allahumma Inni As Aluka Min Khairi)",
+          "arabic": "اَللَّهُمَّ إِنِّي أَسْأَلُكَ مِنَ الْخَيْرِ كُلِّهِ عَاجِلِهِ وَآجِلِهِ، مَا عَلِمْتُ مِنْهُ وَمَا لَمْ أَعْلَمْ، وَأَعُوْذُ بِكَ مِنَ الشَّرِّ كُلِّهِ عَاجِلِهِ وَآجِلِهِ، مَا عَلِمْتُ مِنْهُ وَمَا لَمْ أَعْلَمْ، اَللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ خَيْرِ مَا سَأَلَكَ عَبْدُكَ وَنَبِيُّكَ، وَأَعُوْذُ بِكَ مِنْ شَرِّ مَا عَاذَ بِهِ عَبْدُكَ وَنَبِيُّكَ، اَللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ وَمَا قَرَّبَ إِلَيْهَا مِنْ قَوْلٍ أَوْ عَمَلٍ، وَأَعُوْذُ بِكَ مِنَ النَّارِ وَمَا قَرَّبَ إِلَيْهَا مِنْ قَوْلٍ أَوْ عَمَلٍ، وَأَسْأَلُكَ أَنْ تَجْعَلَ كُلَّ قَضَاءٍ قَضَيْتَهُ لِي خَيْرًا",
+          "transliteration": "Allaahumma inni as'aluka minal-khayri kullihi, 'aajilihi wa aajilihi, maa 'alimtu minhu wa maa lam a'lam. Wa A‛oodhu bika minash-sharri kullihi, 'aajilihi wa aajilihi, maa 'alimtu minhu wa maa lam a'lam. Allaahumma inni as'aluka min khayri maa sa'alaka 'abduka wa nabiyyuka, wa A‛oodhu bika min sharri maa 'aadha bihi 'abduka wa nabiyyuka. Allaahumma inni as'alukal-jannata wa maa qarraba ilayhaa min qawlin aw 'amal, wa A‛oodhu bika minan-naari wa maa qarraba ilayhaa min qawlin aw 'amal, wa as'aluka an taj'al kulla qadaa'in qadaytahu li khayra",
+          "translation": "O Allah, I ask You for all that is good, in this world and in the Hereafter, what I know and what I do not know. O Allah, I seek refuge with You from all evil, in this world and in the Hereafter, what I know and what I do not know. O Allah, I ask You for the good that Your slave and Prophet (ﷺ) has asked You for, and I seek refuge with You from the evil from which Your slave and Prophet (ﷺ) sought refuge. O Allah, I ask You for Paradise and for that which brings one closer to it, in word and deed, and I seek refuge in You from Hell and from that which brings one closer to it, in word and deed. And I ask You to make every decree that You decree concerning me good.",
+          "audio": "/audio/dua/236.mp3",
+          "reference": "Sahih (Albani). Ibn Majah: 3846"
+        },
+        {
+          "sourceId": 237,
+          "title": "Dua For Protection From Punishment Of Grave, Hell And Dajjal",
+          "arabic": "اَللَّهُمَّ إِنِّي أَعُوْذُ بِكَ مِنْ عَذَابِ الْقَبْرِ، وَأَعُوْذُ بِكَ مِنْ فِتْنَةِ الْمَسِيحِ الدَّجَّالِ، وَأَعُوْذُ بِكَ مِنْ فِتْنَةِ الْمَحْـيَا وَالْمَمَاتِ. اَللَّهُمَّ إِنِّي أَعُوْذُ بِكَ مِنَ الْمَأْثَمِ وَالْمَغْرَمِ",
+          "transliteration": "Allaahumma 'innee 'a'oodhu bika min 'adhaabil-qabr, wa 'a'oodhu bika min fitnatil-maseehid-dajjaal, wa 'a'oodhu bika min fitnatil-mahyaa wal-mamaat. Allaahumma 'innee 'a'oodhu bika minal-ma'thami wal-maghram",
+          "translation": "O Allah, I seek refuge in You from the punishment of the grave, and I seek refuge in You from the trial of the False Messiah, and I seek refuge in You from the trials of life and death. O Allah, I seek refuge in You from sin and from debt.",
+          "audio": "/audio/dua/237.mp3",
+          "reference": "Bukhari: 832"
+        },
+        {
+          "sourceId": 238,
+          "title": "Dua at the end of Salah (Allahumma Inni A Uzu Bika)",
+          "arabic": "اَللَّهُمَّ إِنِّي أَعُوْذُ بِكَ مِنْ عَذَابِ جَهَنَّمَ وَأَعُوْذُ بِكَ مِنْ عَذَابِ الْقَبْرِ وَأَعُوْذُ بِكَ مِنْ فِتْنَةِ الْمَسِيْحِ الدَّجَّالِ وَأَعُوْذُ بِكَ مِنْ فِتْنَةِ الْمَحْيَا وَالْمَمَاتِ. اَللَّهُمَّ إِنِّي أَعُوْذُ بِكَ مِنَ الْمَأْثَمِ وَمِنَ الْمَغْرَمِ",
+          "transliteration": "Allaahumma inni a`udhu bika min `adhaabi jahannam, wa a`udhu bika min `adhaabil-qabr, wa a`udhu bika min fitnatil-masihid-dajjaal, wa a`udhu bika min fitnatil-mahyaa wal-mamaat, Allaahumma inni a`udhu bika minal-ma'thami wa minal-maghram",
+          "translation": "O Allah, I seek refuge with Thee from the torment of Hell, and I seek refuge with Thee from the torment of the grave, and I seek refuge with Thee from the trial of the Masih al-Dajjal (Antichrist) and I seek refuge with Thee from the trial of life and death. O Allah! I seek refuge with Thee from sin and debt.",
+          "audio": "/audio/dua/238.mp3",
+          "reference": "Muslim: 1/412"
+        }
+      ]
+    }
+  },
+  "after": {
+    "1": {
+      "appTitle": "After finishing the prayer (Tasleem)",
+      "status": "confirmed",
+      "confirmedMatches": [
+        {
+          "sourceId": 250,
+          "title": "Dua After Salah (Astaghfirullah)",
+          "arabic": "أَسْتَغْفِرُ اللَّهَ",
+          "transliteration": "Astaghfirullaah",
+          "translation": "I ask Allah for forgiveness.",
+          "audio": "/audio/dua/250.mp3",
+          "reference": "Sahih Muslim: 591"
+        },
+        {
+          "sourceId": 251,
+          "title": "Dua After Salat (Allahumma Antas Salam Wa Minkas Salam Dua)",
+          "arabic": "اَللَّهُمَّ أَنْتَ السَّلَامُ وَمِنْكَ السَّلَامُ تَبَارَكْتَ يَا ذَا الْجَلَالِ وَالْإِكْرَامِ",
+          "transliteration": "Allaahumma 'Antas-Salaam wa minkas-salaam, tabaarakta yaa Dhal-Jalaali wal-'Ikraam",
+          "translation": "O Allah, You are Peace and from You comes peace. Blessed are You, O Owner of majesty and honor.",
+          "audio": "/audio/dua/251.mp3",
+          "reference": "Muslim: 591"
+        }
+      ],
+      "alternateCandidates": []
+    },
+    "2": {
+      "appTitle": "After every obligatory prayer (tasbih)",
+      "status": "needs_review",
+      "confirmedMatches": [],
+      "alternateCandidates": [
+        {
+          "sourceId": 256,
+          "title": "Subhanallah, Alhamdulillah, Allahu Akbar 33 Times",
+          "arabic": "سُبْحَانَ اللَّهِ",
+          "transliteration": "SubhaanAllah",
+          "translation": "How perfect Allah is.",
+          "audio": "/audio/dua/256.mp3",
+          "reference": "Bukhari: 843"
+        },
+        {
+          "sourceId": 257,
+          "title": "Powerful dhikr after salah",
+          "arabic": "سُبْحَانَ اللَّهِ، وَالْحَمْدُ لِلَّهِ، وَاللَّهُ أَكْبَرُ",
+          "transliteration": "SubhaanAllahi, walhamdu lillaahi wAllahu 'Akbar",
+          "translation": "How perfect Allah is, all praise is for Allah, and Allah is the greatest.",
+          "audio": "/audio/dua/257.mp3",
+          "reference": "Muslim 1/418, no.597"
+        }
+      ]
+    },
+    "3": {
+      "appTitle": "Ayatul Kursi",
+      "status": "confirmed",
+      "confirmedMatches": [
+        {
+          "sourceId": 254,
+          "title": "Ayatul Kursi - Surah Al-Baqarah 2:255",
+          "arabic": "اَللّٰهُ لَآ إِلٰهَ إِلَّا هُوَ الْحَىُّ الْقَيُّومُ ۚ لَا تَأْخُذُهُۥ سِنَةٌ وَلَا نَوْمٌ ۚ لَّهُۥ مَا فِى السَّمٰوٰتِ وَمَا فِى الْأَرْضِ ۗ مَنْ ذَا الَّذِى يَشْفَعُ عِنْدَهُۥٓ إِلَّا بِإِذْنِهِۦ ۚ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ ۖ وَلَا يُحِيطُونَ بِشَىْءٍ مِّنْ عِلْمِهِۦٓ إِلَّا بِمَا شَآءَ ۚ وَسِعَ كُرْسِيُّهُ السَّمٰوٰتِ وَالْأَرْضَ ۖ وَلَا يَـُٔودُهُۥ حِفْظُهُمَا ۚ وَهُوَ الْعَلِىُّ الْعَظِيمُ",
+          "transliteration": "Allahu laa 'ilaaha 'illaa Huwal-Hayyul-Qayyoom, laa ta'khudhuhu sinatun wa laa nawm, lahu maa fis-samaawaati wa maa fil-'ardhi, man dhal-ladhee yashfa'u 'indahu 'illaa bi'idhnihi, ya'lamu maa bayna 'aydeehim wa maa khalfahum, wa laa yuheetoona bishay'im-min 'ilmihi 'illaa bimaa shaa'a, wasi'a kursiyyuhus-samaawaati wal 'ardh, wa laa ya'ooduhu hifdhuhumaa, wa Huwal-'Aliyyul- 'Adheem",
+          "translation": "Allah! There is none worthy of worship but He, the Ever Living, the One Who sustains and protects all that exists. Neither slumber nor sleep overtakes Him. To Him belongs whatever is in the heavens and whatever is on the earth. Who is he that can intercede with Him except with His Permission? He knows what happens to them in this world, and what will happen to them in the Hereafter. And they will never compass anything of His Knowledge except that which He wills. His Throne extends over the heavens and the earth, and He feels no fatigue in guarding and preserving them. And He is the Most High, the Most Great.",
+          "audio": null,
+          "reference": "Silsila Sahiha: 972"
+        }
+      ],
+      "alternateCandidates": []
+    },
+    "4": {
+      "appTitle": "Adhkar after prayer (extra dua)",
+      "status": "confirmed",
+      "confirmedMatches": [
+        {
+          "sourceId": 239,
+          "title": "Dua Masoora #7 (Allahumma A Inni Ala Zikrika)",
+          "arabic": "اَللَّهُمَّ أَعِنِّي عَلَى ذِكْرِكَ، وَشُكْرِكَ، وَحُسْنِ عِبَادَتِكَ",
+          "transliteration": "Allaahumma 'a'innee 'alaa dhikrika, wa shukrika, wahusni 'ibaadatik",
+          "translation": "O Allah, help me to remember You, to give You thanks, and to perform Your worship in the best manner.",
+          "audio": "/audio/dua/239.mp3",
+          "reference": "Sahih (Albani). Abu Dawud: 1522"
+        }
+      ],
+      "alternateCandidates": [
+        {
+          "sourceId": 260,
+          "title": "Dua After Salah (Allahumma a inni ala zikrika wa shukrika)",
+          "arabic": "اَللَّهُمَّ أَعِنِّى عَلَى ذِكْرِكَ وَشُكْرِكَ وَحُسْنِ عِبَادَتِكَ",
+          "transliteration": "Allaahumma 'a'innee 'alaa dhikrika, wa shukrika, wahusni 'ibaadatik",
+          "translation": "O Allah, help me to remember You, to give You thanks, and to perform Your worship in the best manner.",
+          "audio": "/audio/dua/260.mp3",
+          "reference": "Sahih (Albani). Abu Dawud: 1522"
+        }
+      ]
+    },
+    "5": {
+      "appTitle": "Upon leaving the mosque",
+      "status": "needs_review",
+      "confirmedMatches": [],
+      "alternateCandidates": [
+        {
+          "sourceId": 179,
+          "title": "Dua For Leaving Masjid (Allahumma Inni As Aluka)",
+          "arabic": "بِسْمِ اللَّهِ اَللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ، اَللَّهُمَّ إِنِّيْ أَسْأَلُكَ مِنْ فَضْلِكَ",
+          "transliteration": "Bismillahi Allaahumma salli 'ala muhammad, Allaahumma inni as-aluka min fadlik",
+          "translation": "In the name of Allah (I am going out).Oh Allah! Please send bessings and peace upon muhammad (ﷺ). Oh Allah! I want from your bounty.",
+          "audio": "/audio/dua/179.mp3",
+          "reference": "Hasan (Albani). Ibn Sunni: 88, Muslim: 713"
+        },
+        {
+          "sourceId": 180,
+          "title": "Dua When Leaving Masjid (Wassalatu Wassalamu)",
+          "arabic": "بِسْمِ اللَّهِ وَالصَّلَاةُ وَالسَّلَامُ عَلَى رَسُوْلِ اللَّهِ، اَللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ فَضْلِكَ، اَللَّهُمَّ اعْصِمْنِي مِنَ الشَّيْطَانِ الرَّجِيمِ",
+          "transliteration": "Bismillaahi wassalaatu wassalaamu 'alaa Rasoolillaah, Allaahumma 'innee 'as'aluka min fadhlik, Allaahumma'simnee minash-Shaytaanir-rajeem.",
+          "translation": "In the Name of Allah, and peace and blessings be upon the Messenger of Allah (ﷺ). O Allah, I ask for Your favor, O Allah, protect me from Satan the outcast.",
+          "audio": "/audio/dua/180.mp3",
+          "reference": "Sahih (Albani). Ibn Majah: 773"
+        },
+        {
+          "sourceId": 181,
+          "title": "Dua Upon Leaving The Mosque (Allahumma Ajirni)",
+          "arabic": "اَللَّهُمَّ أَجِرْنِيْ مِنَ الشَّيْطَانِ الرَّجِيْمِ",
+          "transliteration": "Allaahumma ajirni minash shaitaanir rajeem",
+          "translation": "O Allah, protect me from Satan the outcast.",
+          "audio": "/audio/dua/181.mp3",
+          "reference": "Sahih (Ibn Hibban). Ibn Hibban: 2047"
+        },
+        {
+          "sourceId": 182,
+          "title": "Leaving Mosque Dua",
+          "arabic": "اَللَّهُمَّ اعْصِمْنِى مِنَ الشَّيْطَانِ الرَّجِيْمِ",
+          "transliteration": "Allaahumma aa'simni minash shaitaanir rajeem",
+          "translation": "O Allah, protect me from Satan the outcast.",
+          "audio": "/audio/dua/182.mp3",
+          "reference": "Sahih (Albani). Ibn Majah: 773"
+        },
+        {
+          "sourceId": 183,
+          "title": "Masjid Leaving Dua (Allahummaghfirli)",
+          "arabic": "اَللَّهُمَّ اغْفِرْ لِي ذُنُوْبِي وَافْتَحْ لِي أَبْوَابَ فَضْلِكَ",
+          "transliteration": "Allaahummaghfirli dhunubi, waftahli abwaba fadlik",
+          "translation": "O Lord pardon my sins, and open the gates of Your blessings for me.",
+          "audio": "/audio/dua/183.mp3",
+          "reference": "Sahih (Albani). Ibn Majah: 771"
+        }
+      ]
+    }
+  }
+}
