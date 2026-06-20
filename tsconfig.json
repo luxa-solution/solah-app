@@ -4,6 +4,10 @@
     "strict": true,
     "resolveJsonModule": true,
     "allowImportingTsExtensions": true,
+    "types": [
+      "node",
+      "jest"
+    ],
     "typeRoots": ["./types", "./node_modules/@types"],
     "paths": {
       "@/features-adhkar/*": ["./src/features/adhkar/*"],

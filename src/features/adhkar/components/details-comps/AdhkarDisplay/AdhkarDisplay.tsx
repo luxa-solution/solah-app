@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
 
+import { useAdhkarAudio } from "@/features-adhkar/hooks/useAdhkarAudio";
 import { AdhkarItem } from "@/features-adhkar/types";
 import { colors, font, spacing, borderWidth, fontsize } from "@/shared/styles";
 
@@ -13,33 +14,47 @@ export type AdhkarDisplayProps = {
   onNext?: () => void;
   onShare?: () => void;
   onFavorite?: () => void;
-  onPlay?: () => void;
   showNavigator?: boolean;
 };
 
 export const AdhkarDisplay: React.FC<AdhkarDisplayProps> = ({ item, showNavigator = true }) => {
   const { entries } = item;
+  const { play, activeSourceId, isPlaying, isLoading } = useAdhkarAudio();
+
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {showNavigator && <DetailsNavigator item={item} />}
 
-      {entries.map(({ arabicText, translation, transliteration }, idx) => (
-        <React.Fragment key={idx}>
-          <View style={styles.section}>
-            <View style={styles.arabicTextWrap}>
-              <Text style={styles.arabicText}>{arabicText}</Text>
+      {entries.map((entry, idx) => {
+        const { arabicText, translation, transliteration, sourceId } = entry;
+        const isActiveEntry = sourceId !== null && activeSourceId === sourceId;
+
+        return (
+          <React.Fragment key={idx}>
+            <View style={styles.section}>
+              <View style={styles.arabicTextWrap}>
+                <Text style={styles.arabicText}>{arabicText}</Text>
+              </View>
+
+              {transliteration ? (
+                <Text style={styles.transliteration}>{transliteration}</Text>
+              ) : null}
+
+              {translation?.en ? <Text style={styles.translation}>{translation.en}</Text> : null}
+
+              <DetailsActionBar
+                item={item}
+                entry={entry}
+                onPlay={(e) => play(e.sourceId)}
+                isPlaying={isActiveEntry && isPlaying}
+                isLoading={isActiveEntry && isLoading}
+              />
             </View>
 
-            {transliteration ? <Text style={styles.transliteration}>{transliteration}</Text> : null}
-
-            {translation?.en ? <Text style={styles.translation}>{translation.en}</Text> : null}
-
-            <DetailsActionBar item={item} />
-          </View>
-
-          {idx < entries.length - 1 ? <View style={styles.divider} /> : null}
-        </React.Fragment>
-      ))}
+            {idx < entries.length - 1 ? <View style={styles.divider} /> : null}
+          </React.Fragment>
+        );
+      })}
     </ScrollView>
   );
 };

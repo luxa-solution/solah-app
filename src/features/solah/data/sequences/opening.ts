@@ -13,6 +13,7 @@ export const openingSequence: SequenceItemInput[] = [
         arabicText: "",
         transliteration: "",
         translation: { en: "Intend the prayer in your heart and stand upright." },
+        media: { image: stepImages.qiyam, audio: commonAudios.takbir },
       },
     ],
   },
