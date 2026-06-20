@@ -82,7 +82,7 @@ export function qiyamCore(solah: SolahName): SequenceItemInput[] {
         },
       ],
     },
-    { ...buildShortSurah("Ikhlas") },
+    buildShortSurah("Ikhlas"),
   ];
 }
 

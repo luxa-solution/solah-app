@@ -71,11 +71,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.s,
     borderRadius: borderRadius.sm,
   },
+
   arabic: {
     ...font.arabic.small,
     color: colors.context.brand.primary,
     lineHeight: 40,
   },
+
   transliteration: {
     ...font.body.small,
     color: colors.context.brand.primary,
@@ -86,14 +88,14 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xxs,
   },
   expandText: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: colors.context.brand.secondary || "#888",
+    ...font.label.small,
+    color: colors.context.brand.secondary,
     textAlign: "center",
   },
+
   translation: {
     ...font.body.small,
-    color: colors.context.brand.secondary || "#666",
+    color: colors.context.brand.secondary,
     fontStyle: "italic",
     marginTop: spacing.s,
   },

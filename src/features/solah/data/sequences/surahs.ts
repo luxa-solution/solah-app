@@ -16,13 +16,10 @@ interface ShortSurah {
 export const shortSurahs: Record<SurahKey, ShortSurah> = {
   Ikhlas: {
     title: "Surah Al-Ikhlas",
-
     arabicText:
       "قُلْ هُوَ اللَّهُ أَحَدٌ\nاللَّهُ الصَّمَدُ\nلَمْ يَلِدْ وَلَمْ يُولَدْ\nوَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ",
-
     transliteration:
       "Qul huwa Allāhu aḥad\nAllāhuṣ-Ṣamad\nLam yalid wa lam yūlad\nWa lam yakun lahu kufuwan aḥad",
-
     translation: {
       en: "Say: He is Allah, the One. Allah, the Self-Sufficient. He neither begets nor is born. And there is none comparable to Him.",
     },
