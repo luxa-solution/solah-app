@@ -10,10 +10,10 @@ export const openingSequence: SequenceItemInput[] = [
     instruction: { en: "Stand facing the Qiblah with calm focus." },
     entries: [
       {
-        arabicText: "",
-        transliteration: "",
+        arabicText: "لا يوجد شيء لتلاوته",
+        transliteration: "Nothing to recite",
         translation: { en: "Intend the prayer in your heart and stand upright." },
-        media: { image: stepImages.qiyam, audio: commonAudios.takbir },
+        media: { image: stepImages.qiyam },
       },
     ],
   },

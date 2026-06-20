@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 
 import { SolahGroup } from "@/features-solah/types";
-import { fontsize, colors } from "@/shared/styles";
+import { colors, font } from "@/shared/styles";
 
 interface SolahDescriptionProps {
   items: SolahGroup["items"][number];
@@ -18,8 +18,7 @@ export const StepDescription = ({ items }: SolahDescriptionProps) => {
 
 const styles = StyleSheet.create({
   desc: {
-    fontSize: fontsize.sm,
-    fontWeight: "400", //no defined fontweight in the shared styles
+    ...font.body.small,
     color: colors.context.default.primary,
   },
 });

@@ -1,12 +1,15 @@
 import { useRouter } from "expo-router";
+import { useCallback, useMemo } from "react";
 import { View, Text, Pressable, Image, StyleSheet } from "react-native";
 
 import { totalAdhkarAmt } from "@/features-adhkar/data";
-import { AdhkarItem } from "@/features-adhkar/types";
+import type { AdhkarItem } from "@/features-adhkar/types";
 import { colors, font, spacing, borderRadius } from "@/shared/styles";
 
 const chevronLeft = require("@/assets/adhkar-icons/chev-left.png");
 const chevronRight = require("@/assets/adhkar-icons/chev-right.png");
+
+const ICON_SIZE = 20;
 
 export type DetailsNavigatorProps = {
   item: AdhkarItem;
@@ -15,61 +18,81 @@ export type DetailsNavigatorProps = {
 export const DetailsNavigator = ({ item }: DetailsNavigatorProps) => {
   const router = useRouter();
 
-  const { id, title, type: adhkar_type } = item;
+  const { id, title, type: adhkarType } = item;
 
-  const currentId = Number(id);
-  const total = totalAdhkarAmt[adhkar_type];
+  const { currentId, canPrev, canNext } = useMemo(() => {
+    const current = Number(id);
+    const max = totalAdhkarAmt[adhkarType];
 
-  const canPrev = currentId > 1;
-  const canNext = currentId < total;
+    return {
+      currentId: current,
+      total: max,
+      canPrev: current > 1,
+      canNext: current < max,
+    };
+  }, [id, adhkarType]);
 
-  const goTo = (newId: number) => {
-    router.push({
-      pathname: "/adhkar/details",
-      params: { adhkar_type, id: String(newId) },
-    });
-  };
+  const goTo = useCallback(
+    (newId: number) => {
+      router.push({
+        pathname: "/adhkar/details",
+        params: {
+          adhkar_type: adhkarType,
+          id: String(newId),
+        },
+      });
+    },
+    [router, adhkarType]
+  );
 
   return (
     <View style={styles.container}>
-      <Pressable
-        onPress={() => canPrev && goTo(currentId - 1)}
+      <NavigatorButton
+        icon={chevronLeft}
         disabled={!canPrev}
-        style={styles.chevronLeft}
+        onPress={() => goTo(currentId - 1)}
         accessibilityLabel="previous"
-      >
-        <Image
-          source={chevronLeft}
-          style={{
-            width: 20,
-            height: 20,
-            tintColor: colors.context.default.inverted,
-            opacity: canPrev ? 1 : 0.4,
-          }}
-        />
-      </Pressable>
+      />
 
       <View style={styles.titleWrap}>
         <Text style={styles.title}>{title}</Text>
       </View>
 
-      <Pressable
-        onPress={() => canNext && goTo(currentId + 1)}
-        style={styles.chevronRight}
-        accessibilityLabel="next"
+      <NavigatorButton
+        icon={chevronRight}
         disabled={!canNext}
-      >
-        <Image
-          source={chevronRight}
-          style={{
-            width: 20,
-            height: 20,
-            tintColor: colors.context.default.inverted,
-            opacity: canNext ? 1 : 0.4,
-          }}
-        />
-      </Pressable>
+        onPress={() => goTo(currentId + 1)}
+        accessibilityLabel="next"
+      />
     </View>
+  );
+};
+
+type NavigatorButtonProps = {
+  icon: number;
+  disabled: boolean;
+  onPress: () => void;
+  accessibilityLabel: string;
+};
+
+const NavigatorButton = ({ icon, disabled, onPress, accessibilityLabel }: NavigatorButtonProps) => {
+  return (
+    <Pressable
+      onPress={onPress}
+      disabled={disabled}
+      style={styles.button}
+      accessibilityLabel={accessibilityLabel}
+    >
+      <Image
+        source={icon}
+        style={[
+          styles.icon,
+          {
+            opacity: disabled ? 0.4 : 1,
+          },
+        ]}
+      />
+    </Pressable>
   );
 };
 
@@ -82,26 +105,28 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.md,
   },
-  chevronLeft: {
+
+  button: {
     width: 36,
     height: 36,
-    justifyContent: "center",
     alignItems: "center",
+    justifyContent: "center",
   },
+
+  icon: {
+    width: ICON_SIZE,
+    height: ICON_SIZE,
+    tintColor: colors.context.default.inverted,
+  },
+
   titleWrap: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
   },
+
   title: {
     ...font.heading.xsmall,
     color: colors.background.default.primary,
-    fontWeight: "700",
-  },
-  chevronRight: {
-    width: 36,
-    height: 36,
-    justifyContent: "center",
-    alignItems: "center",
   },
 });

@@ -2,7 +2,7 @@ import { Href, useRouter } from "expo-router";
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 
 import { AdhkarCategory } from "@/features-adhkar/types";
-import { background } from "@/shared/styles";
+import { background, font } from "@/shared/styles";
 
 export interface HomeButtonProps {
   category: AdhkarCategory;
@@ -52,18 +52,13 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   title: {
+    ...font.display.medium,
     color: "white",
-    fontFamily: "Figtree_700Bold",
-    fontWeight: "700",
-    fontSize: 36,
-    lineHeight: 43,
   },
+
   subtitle: {
+    ...font.label.xsmall,
     color: "white",
-    fontFamily: "Figtree_600SemiBold",
-    fontWeight: "600",
-    fontSize: 10,
-    lineHeight: 14,
     marginTop: 4,
     opacity: 0.85,
   },

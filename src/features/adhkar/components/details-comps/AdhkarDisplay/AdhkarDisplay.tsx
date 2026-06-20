@@ -3,7 +3,7 @@ import { View, Text, ScrollView, StyleSheet } from "react-native";
 
 import { useAdhkarAudio } from "@/features-adhkar/hooks/useAdhkarAudio";
 import { AdhkarItem } from "@/features-adhkar/types";
-import { colors, font, spacing, borderWidth, fontsize } from "@/shared/styles";
+import { colors, font, spacing, borderWidth } from "@/shared/styles";
 
 import { DetailsActionBar } from "../DetailsActionBar";
 import { DetailsNavigator } from "../DetailsNavigator";
@@ -64,36 +64,36 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background.default.primary,
   },
+
   section: {
     marginHorizontal: spacing.md,
     marginTop: spacing.lg,
   },
+
   arabicTextWrap: {
     alignItems: "flex-end",
     marginBottom: spacing.sm,
   },
+
   arabicText: {
-    fontSize: fontsize.xxl,
-    fontFamily: font.display.medium.fontFamily ?? font.heading.medium.fontFamily,
-    lineHeight: 38,
+    ...font.arabic.small,
     color: colors.context.brand.primary,
-    textAlign: "right",
-    writingDirection: "rtl",
   },
+
   transliteration: {
-    fontSize: font.body.small.fontSize,
-    fontFamily: font.body.small.fontFamily,
+    ...font.body.small,
     fontStyle: "italic",
     color: colors.context.default.secondary,
     marginBottom: spacing.sm,
   },
+
   translation: {
-    fontSize: font.body.medium.fontSize,
-    fontFamily: font.body.medium.fontFamily,
+    ...font.body.medium,
     color: colors.context.default.primary,
     marginBottom: spacing.sm,
     lineHeight: 22,
   },
+
   divider: {
     height: borderWidth.xs,
     backgroundColor: colors.border.default.tertiary,

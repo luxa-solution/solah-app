@@ -1,8 +1,7 @@
-// import { Image } from "expo-image";
 import { StyleSheet, Text, View, ScrollView } from "react-native";
 
 import { SolahGroup } from "@/features-solah/types";
-import { fontsize, colors, spacing, borderRadius, borderWidth } from "@/shared/styles";
+import { font, colors, spacing, borderRadius, borderWidth } from "@/shared/styles";
 
 import { AudioPlayButton } from "../AudioPlayButton";
 
@@ -16,11 +15,14 @@ export const AdhkarCard = ({ items }: SolahEntriesProps) => {
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
       {entries.map((item, i) => (
-        <View key={i.toString()} style={styles.entryContainer}>
+        <View key={i} style={styles.entryContainer}>
           <Text style={styles.arabic}>{item.arabicText}</Text>
-          <Text style={styles.transliteration}>{item.transliteration}</Text>
 
-          <AudioPlayButton />
+          {item.transliteration ? (
+            <Text style={styles.transliteration}>{item.transliteration}</Text>
+          ) : null}
+
+          {item.media?.audio ? <AudioPlayButton /> : null}
         </View>
       ))}
     </ScrollView>
@@ -33,18 +35,18 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background.brand.inverted,
     borderColor: colors.border.default.secondary,
     borderWidth: borderWidth.sm,
-    paddingBlock: spacing.xs,
-    paddingInline: spacing.s,
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.s,
     borderRadius: borderRadius.sm,
   },
+
   arabic: {
-    fontSize: fontsize.xxl,
-    fontWeight: "400", //no defined fontweight in the shared styles
+    ...font.arabic.small,
     color: colors.context.brand.primary,
-    textAlign: "right",
   },
+
   transliteration: {
-    fontSize: fontsize.sm,
+    ...font.body.small,
     color: colors.context.brand.primary,
     textAlign: "left",
     marginTop: spacing.m,

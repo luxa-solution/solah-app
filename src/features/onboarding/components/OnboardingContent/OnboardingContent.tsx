@@ -1,7 +1,7 @@
 import { Image } from "expo-image";
 import { View, Text, StyleSheet } from "react-native";
 
-import { context } from "@/shared/styles";
+import { context, font } from "@/shared/styles";
 
 export type OnboardingContentProps = {
   imgsrc: any;
@@ -98,25 +98,18 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   title: {
+    ...font.heading.large,
     width: "70%",
-    fontFamily: "Figtree",
-    fontWeight: "700",
-    fontSize: 28,
-    lineHeight: 34,
     textAlign: "left",
-    letterSpacing: 0,
     marginBottom: 16,
     marginTop: 16,
     color: context.brand.primary,
   },
+
   description: {
+    ...font.body.medium,
     width: "75%",
-    fontFamily: "Figtree",
-    fontWeight: "400",
-    fontSize: 16,
-    lineHeight: 24,
     textAlign: "left",
-    letterSpacing: 0,
     color: context.brand.primary,
     paddingHorizontal: 0,
     marginBottom: 25,

@@ -3,7 +3,7 @@ import React, { useCallback } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, LayoutChangeEvent } from "react-native";
 
 import { AdhkarTab } from "@/features-adhkar/types";
-import { colors } from "@/shared/styles";
+import { colors, font } from "@/shared/styles";
 
 type TabLayout = { x: number; width: number };
 
@@ -113,6 +113,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     paddingHorizontal: 8,
   },
+
   row: {
     flexDirection: "row",
     width: "100%",
@@ -120,6 +121,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
+
   tabButton: {
     flexDirection: "row",
     alignItems: "center",
@@ -128,6 +130,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     flex: 1,
   },
+
   iconWrapper: {
     width: 20,
     height: 20,
@@ -135,24 +138,26 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginRight: 6,
   },
+
   tabContent: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 4,
   },
+
   tab: {
-    fontSize: 14,
+    ...font.label.semibold,
     color: colors.context.default.tertiary,
-    fontWeight: "600",
-    fontFamily: "Figtree_600SemiBold",
     includeFontPadding: false,
     textAlign: "center",
     flexShrink: 0,
   },
+
   activeTab: {
     color: colors.context.brand.secondary,
   },
+
   countBadge: {
     backgroundColor: colors.background.brand.primary,
     borderRadius: 10,
@@ -162,16 +167,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginLeft: 2,
   },
+
   countText: {
-    fontSize: 11,
+    ...font.label.xsmall,
     color: colors.context.brand.inverted,
-    fontWeight: "700",
-    fontFamily: "Figtree_700Bold",
+    includeFontPadding: false,
   },
+
   indicatorWrapper: {
     height: 2,
     marginTop: 1,
   },
+
   indicator: {
     height: 2,
     backgroundColor: colors.background.brand.primary,
