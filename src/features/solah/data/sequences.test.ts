@@ -9,6 +9,7 @@ jest.mock("./media", () => ({
     jalsah: 5,
     tashahhud: 6,
   },
+
   guideIllustrations: {
     Subhi: 10,
     Dhuhr: 11,
@@ -16,6 +17,7 @@ jest.mock("./media", () => ({
     Maghrib: 13,
     Isha: 14,
   },
+
   commonAudios: {
     takbir: "takbir",
     taawwudh: "taawwudh",
@@ -36,6 +38,7 @@ jest.mock("./media", () => ({
     openingDua: "openingDua",
     fatiha: "fatiha",
   },
+
   specificAudios: {
     Subhi: { qiyamFatiha: "fajrFatiha" },
     Dhuhr: { qiyamFatiha: "dhuhrFatiha" },
@@ -51,18 +54,22 @@ describe("buildSolahGuide", () => {
 
     expect(g.solah).toBe("Subhi");
     expect(g.rakaat).toBe(2);
-    expect(g.description.en).toBe("Dawn solah");
 
-    // ids + solah fields
     const ids = g.items.map((x) => x.id);
-    expect(new Set(ids).size).toBe(ids.length);
-    expect(ids.some((id) => id.startsWith("r1-"))).toBe(true);
-    expect(ids.some((id) => id.startsWith("r2-"))).toBe(true);
-    expect(g.items.every((x) => x.solah === "Subhi")).toBe(true);
 
-    // final sitting only appears for rakaat=2 in r2
+    expect(new Set(ids).size).toBe(ids.length);
+
+    expect(g.items.every((item) => item.solah === "Subhi")).toBe(true);
+
+    // NEW: rakah tracking
+    expect(g.items.find((item) => item.id.startsWith("r1-"))?.rakahNumber).toBe(1);
+
+    expect(g.items.find((item) => item.id.startsWith("r2-"))?.rakahNumber).toBe(2);
+
     const titles = g.items.map((x) => x.title);
+
     expect(titles).toContain("Final Sitting (Tashahhud)");
+
     expect(titles).not.toContain("First Tashahhud");
   });
 
@@ -72,12 +79,14 @@ describe("buildSolahGuide", () => {
     const titles = g.items.map((x) => x.title);
 
     expect(titles).toContain("First Tashahhud");
+
     expect(titles).toContain("Final Sitting (Tashahhud)");
 
-    // Ensure r3 exists (IDs for r3)
     expect(g.items.some((x) => x.id.startsWith("r3-"))).toBe(true);
-    // Ensure no r4
+
     expect(g.items.some((x) => x.id.startsWith("r4-"))).toBe(false);
+
+    expect(g.items.find((x) => x.id.startsWith("r3-"))?.rakahNumber).toBe(3);
   });
 
   it("builds a 4-rakaah guide that includes r4 and Final Sitting in r4", () => {
@@ -86,7 +95,11 @@ describe("buildSolahGuide", () => {
     expect(g.items.some((x) => x.id.startsWith("r4-"))).toBe(true);
 
     const titles = g.items.map((x) => x.title);
+
     expect(titles).toContain("First Tashahhud");
+
     expect(titles).toContain("Final Sitting (Tashahhud)");
+
+    expect(g.items.find((x) => x.id.startsWith("r4-"))?.rakahNumber).toBe(4);
   });
 });

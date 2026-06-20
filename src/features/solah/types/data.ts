@@ -25,6 +25,7 @@ export type SolahItem = {
   title: string; // step name (e.g., "Qiyām", "Rukūʿ")
   instruction?: Translation;
   entries: SolahEntry[]; // dhikr/adhkar recited in that step
+  rakahNumber?: number;
 };
 
 export type SolahGroup = {
