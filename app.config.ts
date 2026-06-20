@@ -18,9 +18,9 @@ const appIcons = {
 const IOS_ICON = "./assets/appIcons/icon.png";
 const ADAPTIVE_ICON = {
   bgColor: appIcons.lightBg,
-  fgImage: "./assets/appIcons/android-icon-foreground.png",
-  bgImage: "./assets/appIcons/android-icon-background.png",
-  mcImage: "./assets/appIcons/android-icon-monochrome.png",
+  fgImage: "./assets/appIcons/adaptive-icon.png",
+  bgImage: "./assets/appIcons/adaptive-icon.png",
+  mcImage: "./assets/appIcons/adaptive-icon.png",
 };
 const SPLASH_ICON = {
   image: "./assets/appIcons/splash-icon.png",
