@@ -187,11 +187,11 @@ describe("syncSolahNotifications core flow", () => {
 
     expect(mockSetChannel).toHaveBeenCalledWith(
       "solah-times-default",
-      expect.objectContaining({ sound: "takbir-only.mp3" })
+      expect.objectContaining({ sound: "takbirOnly.mp3" })
     );
     expect(mockScheduleNotif).toHaveBeenCalledWith(
       expect.objectContaining({
-        content: expect.objectContaining({ sound: "takbir-only.mp3" }),
+        content: expect.objectContaining({ sound: "takbirOnly.mp3" }),
       })
     );
   });
@@ -201,11 +201,11 @@ describe("syncSolahNotifications core flow", () => {
 
     expect(mockSetChannel).toHaveBeenCalledWith(
       "solah-times-full_adhan",
-      expect.objectContaining({ sound: "full-adhan.mp3" })
+      expect.objectContaining({ sound: "fullAdhan.mp3" })
     );
     expect(mockScheduleNotif).toHaveBeenCalledWith(
       expect.objectContaining({
-        content: expect.objectContaining({ sound: "full-adhan.mp3" }),
+        content: expect.objectContaining({ sound: "fullAdhan.mp3" }),
       })
     );
   });

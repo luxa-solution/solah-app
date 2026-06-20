@@ -7,8 +7,8 @@ export function mapSoundForAndroidChannel(
 ): string | null | undefined {
   if (mode !== "sound") return null;
   if (!sound || sound === "Beep") return undefined;
-  if (sound === "Short Adhan") return "takbir-only.mp3";
-  if (sound === "Full Adhan") return "full-adhan.mp3";
+  if (sound === "Short Adhan") return "takbirOnly.mp3";
+  if (sound === "Full Adhan") return "fullAdhan.mp3";
   return undefined;
 }
 
@@ -18,7 +18,7 @@ export function mapSoundForIOS(
 ): string | undefined {
   if (mode !== "sound") return undefined;
   if (!sound || sound === "Beep") return "default";
-  if (sound === "Short Adhan") return "takbir-only.mp3";
-  if (sound === "Full Adhan") return "full-adhan.mp3";
+  if (sound === "Short Adhan") return "takbirOnly.mp3";
+  if (sound === "Full Adhan") return "fullAdhan.mp3";
   return "default";
 }
