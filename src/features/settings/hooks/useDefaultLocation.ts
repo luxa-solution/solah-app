@@ -22,8 +22,6 @@ export function useSyncDefaultLocation() {
     const automaticLocation = createAutomaticLocationOption(location);
 
     // 1. Only update default store if values actually changed
-    // (Assuming your location objects have something like .latitude / .longitude or an ID)
-    // Adjust these properties to match your `LocationOption` schema
     setDefaultLocation(automaticLocation);
     setDefaultTimeZone(automaticTimeZone);
 
@@ -50,7 +48,6 @@ export function useSyncDefaultLocation() {
   }, [
     activeLocation.isDefault,
     activeLocation.timezone,
-    // Add these so the guard check works reliably
     activeLocation.location?.latitude,
     activeLocation.location?.longitude,
     autoTimezoneEnabled,

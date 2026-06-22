@@ -27,15 +27,12 @@ export const AdhkarCard = ({ items }: SolahEntriesProps) => {
 
         return (
           <View key={i} style={styles.entryContainer}>
-            {/* Arabic Text */}
             <Text style={styles.arabic}>{item.arabicText}</Text>
 
-            {/* Transliteration */}
             {item.transliteration ? (
               <Text style={styles.transliteration}>{item.transliteration}</Text>
             ) : null}
 
-            {/* Small Expand Text with Arrow Trigger */}
             {item.translation?.en ? (
               <TouchableOpacity
                 onPress={() => toggleTranslation(i)}
@@ -48,7 +45,6 @@ export const AdhkarCard = ({ items }: SolahEntriesProps) => {
               </TouchableOpacity>
             ) : null}
 
-            {/* Collapsible Translation Text */}
             {isExpanded && item.translation?.en ? (
               <Text style={styles.translation}>{item.translation.en}</Text>
             ) : null}
