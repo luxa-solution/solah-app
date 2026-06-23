@@ -16,6 +16,10 @@ export type AdhkarEntry = {
   transliteration: string;
   translation: Translation;
   reference?: AdhkarReference;
+  audio?: string | null; // local path or remote URL, e.g. require("@/assets/audio/adhkar/175.mp3")
+  sourceId?: number; // masnun-dua dua_id, lets you re-sync/update from upstream later
+  isCitationOnly?: boolean; // true if this entry is only a citation (no actual dua text)
+  isAlternate?: boolean; // true if this entry is an alternate version of the dua (not the primary version)
 };
 
 export type AdhkarType = "before" | "during" | "after";

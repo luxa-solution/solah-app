@@ -41,7 +41,8 @@ const styles = StyleSheet.create({
     marginTop: ds(10),
   },
   title: {
-    fontSize: fontsize.xxl,
+    fontSize: fontsize.xl,
+    fontFamily: "ReemKufi_400Regular",
     textAlign: "left",
     fontWeight: "bold",
   },

@@ -5,6 +5,7 @@ import { createJSONStorage, persist, subscribeWithSelector } from "zustand/middl
 type OnboardingState = {
   hasOnboarded: boolean;
   setHasOnboarded: (status: boolean) => void;
+  resetOnboarding: () => void;
 };
 
 export const useOnboardingStore = create<OnboardingState>()(
@@ -19,6 +20,9 @@ export const useOnboardingStore = create<OnboardingState>()(
           set({ hasOnboarded: status });
         },
 
+        resetOnboarding: () => {
+          set({ hasOnboarded: false });
+        },
         // Add more above as needed
       }),
       {

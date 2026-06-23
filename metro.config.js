@@ -4,6 +4,10 @@ const {getDefaultConfig} = require('expo/metro-config');
 /** @type {import('expo/metro-config').MetroConfig} */
 const config = getDefaultConfig(__dirname);
 
+if (!config.resolver.assetExts.includes("mp3")) {
+  config.resolver.assetExts.push("mp3");
+}
+
 const defaultBlockList = config.resolver.blockList || [];
 
 config.resolver.blockList = [...defaultBlockList, /.*\.test\.tsx?$/, /.*\.spec\.tsx?$/];

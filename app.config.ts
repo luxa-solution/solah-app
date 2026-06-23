@@ -18,9 +18,9 @@ const appIcons = {
 const IOS_ICON = "./assets/appIcons/icon.png";
 const ADAPTIVE_ICON = {
   bgColor: appIcons.lightBg,
-  fgImage: "./assets/appIcons/android-icon-foreground.png",
-  bgImage: "./assets/appIcons/android-icon-background.png",
-  mcImage: "./assets/appIcons/android-icon-monochrome.png",
+  fgImage: "./assets/appIcons/adaptive-icon.png",
+  bgImage: "./assets/appIcons/adaptive-icon.png",
+  mcImage: "./assets/appIcons/adaptive-icon.png",
 };
 const SPLASH_ICON = {
   image: "./assets/appIcons/splash-icon.png",
@@ -29,8 +29,8 @@ const SPLASH_ICON = {
   darkBgColor: appIcons.darkBg,
 };
 const NOTIFICATION_AUDIOS = {
-  short: "./assets/notification/takbir-only.mp3",
-  full: "./assets/notification/full-adhan.mp3",
+  short: "./assets/notification/takbir_only.mp3",
+  full: "./assets/notification/full_adhan.mp3",
 } as const;
 
 // Environment-specific overrides
@@ -122,6 +122,12 @@ export default ( { config }: ConfigContext ): ExpoConfig => {
             NOTIFICATION_AUDIOS.full
           ],
           "enableBackgroundRemoteNotifications": false
+        }
+      ],
+      [
+        "expo-audio",
+        {
+          "enableBackgroundPlayback": true,
         }
       ]
     ],

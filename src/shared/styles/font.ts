@@ -108,6 +108,12 @@ const label = StyleSheet.create({
     ...label_base,
     fontSize: fontSize(14),
   },
+
+  semibold: {
+    fontFamily: "Figtree_600SemiBold",
+    fontSize: fontSize(14),
+  },
+
   small: {
     ...label_base,
     fontSize: fontSize(12),
@@ -118,9 +124,43 @@ const label = StyleSheet.create({
   },
 });
 
+// -------------------------
+// Arabic / Quran
+// -------------------------
+
+const arabic_base = {
+  fontFamily: "Amiri_400Regular",
+  textAlign: "right",
+  writingDirection: "rtl",
+  letterSpacing: 0,
+} as const;
+
+const arabic = StyleSheet.create({
+  large: {
+    ...arabic_base,
+    fontSize: fontSize(34),
+  },
+
+  medium: {
+    ...arabic_base,
+    fontSize: fontSize(28),
+  },
+
+  small: {
+    ...arabic_base,
+    fontSize: fontSize(22),
+  },
+
+  xsmall: {
+    ...arabic_base,
+    fontSize: fontSize(18),
+  },
+});
+
 export const font = {
   display,
   heading,
   body,
   label,
+  arabic,
 };

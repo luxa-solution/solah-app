@@ -5,6 +5,8 @@ jest.mock("@react-native-async-storage/async-storage", () => {
   return createAsyncStorageMock();
 });
 
+jest.mock("expo-audio");
+
 jest.mock("react-native-reanimated", () => require("react-native-reanimated/mock"));
 
 require("react-native-reanimated").setUpTests();

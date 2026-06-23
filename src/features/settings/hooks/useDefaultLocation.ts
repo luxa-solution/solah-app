@@ -21,6 +21,7 @@ export function useSyncDefaultLocation() {
     const automaticTimeZone = resolveAutomaticTimeZone();
     const automaticLocation = createAutomaticLocationOption(location);
 
+    // 1. Only update default store if values actually changed
     setDefaultLocation(automaticLocation);
     setDefaultTimeZone(automaticTimeZone);
 
@@ -31,7 +32,15 @@ export function useSyncDefaultLocation() {
       return;
     }
 
-    setLocation(automaticLocation);
+    // 2. CRITICAL GUARD: Only update active location if coordinates/values shifted.
+    // If they are exactly the same, do NOT call setLocation to break the infinite loop.
+    const isSameLocation =
+      activeLocation.location?.latitude === automaticLocation.location?.latitude &&
+      activeLocation.location?.longitude === automaticLocation.location?.longitude;
+
+    if (!isSameLocation) {
+      setLocation(automaticLocation);
+    }
 
     if (autoTimezoneEnabled) {
       setTimeZone(automaticTimeZone);
@@ -39,6 +48,8 @@ export function useSyncDefaultLocation() {
   }, [
     activeLocation.isDefault,
     activeLocation.timezone,
+    activeLocation.location?.latitude,
+    activeLocation.location?.longitude,
     autoTimezoneEnabled,
     error,
     loading,

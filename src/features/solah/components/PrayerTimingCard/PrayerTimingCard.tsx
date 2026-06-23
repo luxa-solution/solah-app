@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     color: context.brand.primary,
   },
   time: {
-    ...font.heading.medium,
+    ...font.heading.small,
     fontWeight: "700",
     color: context.brand.primary,
   },

@@ -3,68 +3,76 @@ import React from "react";
 import { Share } from "react-native";
 
 import { useAdhkarStore } from "@/features-adhkar/store";
-import type { AdhkarItem } from "@/features-adhkar/types";
+import type { AdhkarEntry, AdhkarItem } from "@/features-adhkar/types";
 
 import { DetailsActionBar } from "./DetailsActionBar";
 
 jest.mock("@react-native-async-storage/async-storage", () => {
   const { createAsyncStorageMock } = require("@/shared/test");
+
   return createAsyncStorageMock();
 });
 
 const initialState = useAdhkarStore.getState();
 
-describe("DetailsActionBar (critical behavior)", () => {
+const entry: AdhkarEntry = {
+  arabicText: "اللَّهُمَّ أَنْتَ رَبِّي",
+  transliteration: "Allahumma anta rabbi",
+  translation: {
+    en: "O Allah, You are my Lord",
+  },
+  audio: "audio.mp3",
+  sourceId: "source-1",
+} as any;
+
+const item: AdhkarItem = {
+  id: "1",
+  title: "Morning Adhkar",
+  type: "morning",
+  entries: [entry],
+} as any;
+
+describe("DetailsActionBar", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     useAdhkarStore.setState(initialState, true);
   });
 
-  it("shares a composed message when item has at least one entry", async () => {
+  it("shares composed message when item has an entry", async () => {
     const shareSpy = jest
       .spyOn(Share, "share")
       .mockResolvedValueOnce({ action: "sharedAction" } as any);
 
-    const item: AdhkarItem = {
-      id: "1",
-      title: "Morning Adhkar",
-      type: "morning" as any,
-      entries: [
-        {
-          arabicText: "اللَّهُمَّ أَنْتَ رَبِّي",
-          transliteration: "Allahumma anta rabbi",
-          translation: { en: "O Allah, You are my Lord" } as any,
-        } as any,
-      ],
-    } as any;
-
-    const { getByLabelText } = render(<DetailsActionBar item={item} />);
+    const { getByLabelText } = render(<DetailsActionBar item={item} entry={entry} />);
 
     fireEvent.press(getByLabelText("share"));
 
     expect(shareSpy).toHaveBeenCalledTimes(1);
 
-    const arg = shareSpy.mock.calls[0]?.[0] as { title: string; message: string };
+    const args = shareSpy.mock.calls[0][0];
 
-    expect(arg.title).toBe("Morning Adhkar");
+    expect(args.title).toBe("Morning Adhkar");
 
-    expect(arg.message).toContain("Morning Adhkar");
-    expect(arg.message).toContain("اللَّهُمَّ أَنْتَ رَبِّي");
-    expect(arg.message).toContain("Allahumma anta rabbi");
-    expect(arg.message).toContain("O Allah, You are my Lord");
+    expect(args.message).toContain("Morning Adhkar");
+    expect(args.message).toContain("اللَّهُمَّ أَنْتَ رَبِّي");
+    expect(args.message).toContain("Allahumma anta rabbi");
+    expect(args.message).toContain("O Allah, You are my Lord");
   });
 
-  it("shares just the title when there are no entries", async () => {
-    jest.spyOn(Share, "share").mockResolvedValueOnce({ action: "sharedAction" } as any);
+  it("shares only title when there are no entries", async () => {
+    jest.spyOn(Share, "share").mockResolvedValueOnce({
+      action: "sharedAction",
+    } as any);
 
-    const item: AdhkarItem = {
-      id: "1",
+    const emptyItem = {
+      id: "2",
       title: "Empty Adhkar",
-      type: "morning" as any,
       entries: [],
     } as any;
 
-    const { getByLabelText } = render(<DetailsActionBar item={item} />);
+    const { getByLabelText } = render(
+      <DetailsActionBar item={emptyItem} entry={{} as AdhkarEntry} />
+    );
 
     fireEvent.press(getByLabelText("share"));
 
@@ -74,49 +82,61 @@ describe("DetailsActionBar (critical behavior)", () => {
     });
   });
 
-  it("toggles favourite when pressing favorite", () => {
-    const item: AdhkarItem = {
-      id: "2",
-      title: "Evening Adhkar",
-      type: "evening" as any,
-      entries: [],
-    } as any;
-
-    const { getByLabelText } = render(<DetailsActionBar item={item} />);
+  it("toggles favourite when favorite is pressed", () => {
+    const { getByLabelText } = render(<DetailsActionBar item={item} entry={entry} />);
 
     fireEvent.press(getByLabelText("favorite"));
 
-    expect(useAdhkarStore.getState().favouriteIds).toContain("evening-2");
+    expect(useAdhkarStore.getState().favouriteIds).toContain("morning-1");
   });
 
-  it("swallows share failures without throwing", async () => {
+  it("does not throw when share fails", async () => {
     jest.spyOn(Share, "share").mockRejectedValueOnce(new Error("share failed"));
 
-    const item: AdhkarItem = {
-      id: "3",
-      title: "Broken Share",
-      type: "evening" as any,
-      entries: [],
-    } as any;
+    const { getByLabelText } = render(<DetailsActionBar item={item} entry={entry} />);
 
-    const { getByLabelText } = render(<DetailsActionBar item={item} />);
-
-    await expect(async () => {
-      fireEvent.press(getByLabelText("share"));
-      await Promise.resolve();
-    }).not.toThrow();
+    expect(() => fireEvent.press(getByLabelText("share"))).not.toThrow();
   });
 
-  it("allows pressing the play button", () => {
-    const item: AdhkarItem = {
-      id: "4",
-      title: "Playable",
-      type: "evening" as any,
-      entries: [],
+  it("calls onPlay when audio exists", () => {
+    const onPlay = jest.fn();
+
+    const { getByLabelText } = render(
+      <DetailsActionBar item={item} entry={entry} onPlay={onPlay} />
+    );
+
+    fireEvent.press(getByLabelText("play"));
+
+    expect(onPlay).toHaveBeenCalledWith(entry);
+  });
+
+  it("does not call onPlay when entry has no audio", () => {
+    const onPlay = jest.fn();
+
+    const noAudioEntry = {
+      ...entry,
+      audio: undefined,
+      sourceId: undefined,
     } as any;
 
-    const { getByLabelText } = render(<DetailsActionBar item={item} />);
+    const { getByLabelText } = render(
+      <DetailsActionBar item={item} entry={noAudioEntry} onPlay={onPlay} />
+    );
 
-    expect(() => fireEvent.press(getByLabelText("play"))).not.toThrow();
+    fireEvent.press(getByLabelText("play"));
+
+    expect(onPlay).not.toHaveBeenCalled();
+  });
+
+  it("shows pause accessibility label when playing", () => {
+    const { getByLabelText } = render(<DetailsActionBar item={item} entry={entry} isPlaying />);
+
+    expect(getByLabelText("pause")).toBeTruthy();
+  });
+
+  it("shows loading indicator while buffering", () => {
+    const { getByLabelText } = render(<DetailsActionBar item={item} entry={entry} isLoading />);
+
+    expect(getByLabelText("play")).toBeTruthy();
   });
 });

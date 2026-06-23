@@ -91,12 +91,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   rowText: {
+    ...font.label.medium,
     color: colors.context.default.inverted,
     marginLeft: spacing.sm,
-    fontFamily: "Figtree",
-    fontSize: 14,
-    fontWeight: "600",
-    lineHeight: 20,
-    letterSpacing: 0,
   },
 });

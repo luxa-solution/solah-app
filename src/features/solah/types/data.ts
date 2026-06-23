@@ -24,7 +24,8 @@ export type SolahItem = {
   solah: SolahName; // which prayer this step belongs to
   title: string; // step name (e.g., "Qiyām", "Rukūʿ")
   instruction?: Translation;
-  entries: SolahEntry[]; // dhikr/dua recited in that step
+  entries: SolahEntry[]; // dhikr/adhkar recited in that step
+  rakahNumber?: number;
 };
 
 export type SolahGroup = {

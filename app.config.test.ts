@@ -22,8 +22,8 @@ describe("app.config", () => {
         color: "#ffffff",
         defaultChannel: "solah-times-default",
         sounds: [
-          "./assets/notification/takbir-only.mp3",
-          "./assets/notification/full-adhan.mp3",
+          "./assets/notification/takbir_only.mp3",
+          "./assets/notification/full_adhan.mp3",
         ],
         enableBackgroundRemoteNotifications: false,
       },

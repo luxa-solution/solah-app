@@ -2,6 +2,7 @@ import React from "react";
 import { ScrollView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { useOnboardingStore } from "@/features-onboarding/store/onboardingStore";
 import {
   Card,
   CustomizeNotificationsButton,
@@ -20,6 +21,10 @@ import { NotificationToggle } from "../components/ui/NotificationToggle";
 export function SettingsHome() {
   const { bottom } = useSafeAreaInsets();
   const { activeSheet, closeSheet, isOpen, navigateToSheet, openSheet } = useSettingsSheetState();
+
+  const hasOnboarded = useOnboardingStore((s) => s.hasOnboarded);
+  const resetOnboarding = useOnboardingStore((s) => s.resetOnboarding);
+  const setHasOnboarded = useOnboardingStore((s) => s.setHasOnboarded);
 
   const {
     arabicFontSize,
@@ -117,6 +122,24 @@ export function SettingsHome() {
             value={toText("arabicfontstyle", arabicFontStyle)}
             onPress={open("arabicfontstyle")}
           />
+
+          {/* 🛠️ DEVELOPER ONLY SECTION */}
+          {__DEV__ && (
+            <Card title="Developer Settings (Dev Mode Only)">
+              <SettingsToggleRow
+                label="Onboarding Completed"
+                value={hasOnboarded ? "Yes" : "No"}
+                enabled={hasOnboarded}
+                onToggle={(value) => {
+                  if (value) {
+                    setHasOnboarded(true);
+                  } else {
+                    resetOnboarding();
+                  }
+                }}
+              />
+            </Card>
+          )}
         </Card>
       </ScrollView>
       <BottomSheet isOpen={isOpen} onClose={closeSheet}>

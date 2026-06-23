@@ -32,6 +32,8 @@ export function SolahGuide({ solahName }: SolahGuideProps) {
 
   const progressPercent = ((GuideIndex + 1) / totalSteps) * 100;
 
+  const currentRakah = items.rakahNumber ?? 1;
+
   const handleNext = () => {
     if (GuideIndex < totalSteps - 1) {
       setGuideIndex((prev) => prev + 1);
@@ -56,9 +58,15 @@ export function SolahGuide({ solahName }: SolahGuideProps) {
 
       {/*  Header with Progress Bar */}
       <View style={styles.header}>
-        <Text style={styles.stepText}>
-          Step {GuideIndex + 1}/{totalSteps}
-        </Text>
+        <View style={styles.progressHeader}>
+          <Text style={styles.stepText}>
+            Step {GuideIndex + 1}/{totalSteps}
+          </Text>
+
+          <Text style={styles.stepText}>
+            Rakʿah {currentRakah}/{solahGuides[solahName].rakaat}
+          </Text>
+        </View>
         <ProgressBar percent={progressPercent} />
       </View>
 
@@ -127,13 +135,27 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   header: {
-    width: "90%",
-    alignSelf: "center",
+    width: "100%",
+    paddingHorizontal: spacing.xs,
+    marginBottom: spacing.s,
   },
+  stepHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: spacing.s,
+  },
+  progressHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: spacing.xs,
+    marginBottom: spacing.s,
+  },
+
   stepText: {
     ...font.label.medium,
     fontWeight: fontweight.semibold,
-    marginBottom: 8,
     color: colors.context.default.primary,
   },
 });

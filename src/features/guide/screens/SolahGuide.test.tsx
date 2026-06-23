@@ -26,7 +26,10 @@ jest.mock("@/features-solah/data", () => ({
             {
               arabicText: "Arabic One",
               transliteration: "Transliteration One",
-              media: { image: 1 },
+              media: {
+                image: 1,
+                audio: "/audio/solah/common/takbir.mp3",
+              },
             },
           ],
         },
@@ -74,7 +77,7 @@ describe("SolahGuide", () => {
     const { getByText } = render(<SolahGuide solahName={"Fajr" as any} />);
 
     expect(getByText("Fajr")).toBeTruthy();
-    expect(getByText("Step 1/3")).toBeTruthy();
+    expect(getByText(/Step\s*1\s*\/\s*3/)).toBeTruthy();
     expect(getByText("Step One")).toBeTruthy();
     expect(getByText("Do the first thing")).toBeTruthy();
     expect(getByText("Arabic One")).toBeTruthy();
@@ -90,7 +93,7 @@ describe("SolahGuide", () => {
       jest.runOnlyPendingTimers();
     });
 
-    expect(getByText("Step 2/3")).toBeTruthy();
+    expect(getByText(/Step\s*2\s*\/\s*3/)).toBeTruthy();
     expect(getByText("Step Two")).toBeTruthy();
     expect(getByText("Transliteration Two")).toBeTruthy();
 
@@ -99,7 +102,7 @@ describe("SolahGuide", () => {
       jest.runOnlyPendingTimers();
     });
 
-    expect(getByText("Step 3/3")).toBeTruthy();
+    expect(getByText(/Step\s*3\s*\/\s*3/)).toBeTruthy();
     expect(getByText("Step Three")).toBeTruthy();
     expect(getByText("Transliteration Three")).toBeTruthy();
 
@@ -108,7 +111,7 @@ describe("SolahGuide", () => {
       jest.runOnlyPendingTimers();
     });
 
-    expect(getByText("Step 2/3")).toBeTruthy();
+    expect(getByText(/Step\s*2\s*\/\s*3/)).toBeTruthy();
     expect(getByText("Step Two")).toBeTruthy();
   });
 
@@ -120,7 +123,7 @@ describe("SolahGuide", () => {
       jest.runOnlyPendingTimers();
     });
 
-    expect(getByText("Step 1/3")).toBeTruthy();
+    expect(getByText(/Step\s*1\s*\/\s*3/)).toBeTruthy();
 
     act(() => {
       fireEvent.press(getByText("Next"));

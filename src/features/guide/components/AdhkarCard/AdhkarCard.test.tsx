@@ -90,11 +90,17 @@ describe("guide/AdhkarCard", () => {
           arabicText: "اللَّهُ أَكْبَرُ",
           transliteration: "Allāhu Akbar",
           translation: { en: "Allah is the Greatest." },
+          media: {
+            audio: "audio.mp3",
+          },
         },
         {
           arabicText: "سُبْحَانَ اللَّهِ",
           transliteration: "Subḥānallāh",
           translation: { en: "Glory be to Allah." },
+          media: {
+            audio: "audio.mp3",
+          },
         },
       ],
     });
