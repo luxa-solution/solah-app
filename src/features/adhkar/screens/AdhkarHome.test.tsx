@@ -7,11 +7,12 @@ import { useAdhkarStore } from "@/features-adhkar/store";
 import { AdhkarHome } from "./AdhkarHome";
 
 const mockBack = jest.fn();
+const mockPush = jest.fn();
 
 jest.mock("expo-router", () => ({
   useRouter: () => ({
     back: mockBack,
-    push: jest.fn(),
+    push: mockPush,
   }),
 }));
 
@@ -24,14 +25,14 @@ jest.mock("@/features-adhkar/data", () => ({
           id: "b1",
           type: "before",
           title: "Before Item 1",
-          entries: [{ arabicText: "A" }, { arabicText: "B" }],
+          entries: [{ arabicText: "A", transliteration: "Alif", translation: { en: "First" } }],
           illustration: null,
         },
         {
           id: "b2",
           type: "before",
           title: "Before Item 2",
-          entries: [{ arabicText: "C" }],
+          entries: [{ arabicText: "C", transliteration: "Cee", translation: { en: "Third" } }],
           illustration: null,
         },
       ],
@@ -43,7 +44,7 @@ jest.mock("@/features-adhkar/data", () => ({
           id: "d1",
           type: "during",
           title: "During Item 1",
-          entries: [{ arabicText: "D" }],
+          entries: [{ arabicText: "D", transliteration: "Dee", translation: { en: "Fourth" } }],
           illustration: null,
         },
       ],
@@ -55,7 +56,7 @@ jest.mock("@/features-adhkar/data", () => ({
           id: "a1",
           type: "after",
           title: "After Item 1",
-          entries: [{ arabicText: "E" }],
+          entries: [{ arabicText: "E", transliteration: "Ee", translation: { en: "Fifth" } }],
           illustration: null,
         },
       ],
@@ -157,5 +158,70 @@ describe("AdhkarHome", () => {
     expect(getByText("C")).toBeTruthy();
     expect(queryByText("A")).toBeNull();
     expect(queryByText("D")).toBeNull();
+  });
+
+  // ✅ ADDED: Search functionality tests
+  it("toggles search when search icon is pressed", () => {
+    const { getByLabelText, queryByPlaceholderText } = render(<AdhkarHome />);
+
+    expect(queryByPlaceholderText("Search adhkar...")).toBeNull();
+
+    fireEvent.press(getByLabelText("search"));
+
+    expect(queryByPlaceholderText("Search adhkar...")).toBeTruthy();
+  });
+
+  it("closes search when back button is pressed in search mode", () => {
+    const { getByLabelText, queryByPlaceholderText } = render(<AdhkarHome />);
+
+    fireEvent.press(getByLabelText("search"));
+    expect(queryByPlaceholderText("Search adhkar...")).toBeTruthy();
+
+    fireEvent.press(getByLabelText("back"));
+    expect(queryByPlaceholderText("Search adhkar...")).toBeNull();
+  });
+
+  it("shows search results when typing in search", () => {
+    const { getByLabelText, getByPlaceholderText, getByText } = render(<AdhkarHome />);
+
+    fireEvent.press(getByLabelText("search"));
+
+    const searchInput = getByPlaceholderText("Search adhkar...");
+    fireEvent.changeText(searchInput, "Before");
+
+    // ✅ getByText is destructured from render above
+    expect(getByText("Before Item 1")).toBeTruthy();
+    expect(getByText("Before Item 2")).toBeTruthy();
+  });
+
+  it("shows 'No results' when search returns no matches", () => {
+    const { getByLabelText, getByPlaceholderText, getByText } = render(<AdhkarHome />);
+
+    fireEvent.press(getByLabelText("search"));
+
+    const searchInput = getByPlaceholderText("Search adhkar...");
+    fireEvent.changeText(searchInput, "xyzabc");
+
+    // ✅ getByText is destructured from render above
+    expect(getByText("No adhkar found. Try different keywords.")).toBeTruthy();
+  });
+
+  it("clears search when clear button is pressed", () => {
+    const { getByLabelText, getByPlaceholderText, getByTestId, getByText, queryByText } = render(
+      <AdhkarHome />
+    );
+
+    fireEvent.press(getByLabelText("search"));
+
+    const searchInput = getByPlaceholderText("Search adhkar...");
+    fireEvent.changeText(searchInput, "Before");
+
+    // ✅ getByText is destructured from render above
+    expect(getByText("Before Item 1")).toBeTruthy();
+
+    const clearButton = getByTestId("search-clear-button");
+    fireEvent.press(clearButton);
+
+    expect(queryByText("Before Item 1")).toBeNull();
   });
 });
