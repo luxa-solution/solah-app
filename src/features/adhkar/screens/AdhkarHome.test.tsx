@@ -160,6 +160,10 @@ describe("AdhkarHome", () => {
     expect(queryByText("D")).toBeNull();
   });
 
+  // ============================================
+  // SEARCH TESTS
+  // ============================================
+
   it("toggles search when search icon is pressed", () => {
     const { getByLabelText, queryByPlaceholderText } = render(<AdhkarHome />);
 
@@ -201,5 +205,72 @@ describe("AdhkarHome", () => {
     fireEvent.changeText(searchInput, "xyzabc");
 
     expect(getByText("No adhkar found. Try different keywords.")).toBeTruthy();
+  });
+
+  it("shows search suggestions when search is active but not typing", () => {
+    const { getByLabelText, getByText } = render(<AdhkarHome />);
+
+    fireEvent.press(getByLabelText("search"));
+
+    // Should show suggestions from all categories
+    expect(getByText("Before Item 1")).toBeTruthy();
+    expect(getByText("Before Item 2")).toBeTruthy();
+    expect(getByText("During Item 1")).toBeTruthy();
+    expect(getByText("After Item 1")).toBeTruthy();
+  });
+
+  it("navigates to details when search result is pressed", () => {
+    const { getByLabelText, getByPlaceholderText, getByText } = render(<AdhkarHome />);
+
+    fireEvent.press(getByLabelText("search"));
+
+    const searchInput = getByPlaceholderText("Search adhkar...");
+    fireEvent.changeText(searchInput, "Before");
+
+    fireEvent.press(getByText("Before Item 1"));
+
+    expect(mockPush).toHaveBeenCalledWith(
+      expect.stringContaining("/adhkar/details?adhkar_type=before&id=b1")
+    );
+  });
+
+  it("clears search when clear button is pressed", () => {
+    const { getByLabelText, getByPlaceholderText, getByTestId, queryByText } = render(
+      <AdhkarHome />
+    );
+
+    fireEvent.press(getByLabelText("search"));
+
+    const searchInput = getByPlaceholderText("Search adhkar...");
+    fireEvent.changeText(searchInput, "Before");
+
+    expect(queryByText("Before Item 1")).toBeTruthy();
+
+    const clearButton = getByTestId("search-clear-button");
+    fireEvent.press(clearButton);
+
+    // Search results should be cleared
+    expect(queryByText("Before Item 1")).toBeNull();
+    // Search input should be empty
+    expect(searchInput.props.value).toBe("");
+  });
+
+  it("clears search when back button is pressed after typing", () => {
+    const { getByLabelText, getByPlaceholderText, queryByText, queryByPlaceholderText } = render(
+      <AdhkarHome />
+    );
+
+    fireEvent.press(getByLabelText("search"));
+
+    const searchInput = getByPlaceholderText("Search adhkar...");
+    fireEvent.changeText(searchInput, "Before");
+
+    expect(queryByText("Before Item 1")).toBeTruthy();
+
+    fireEvent.press(getByLabelText("back"));
+
+    // Search should close and results should be cleared
+    expect(queryByPlaceholderText("Search adhkar...")).toBeNull();
+    expect(queryByText("Before Item 1")).toBeNull();
   });
 });
