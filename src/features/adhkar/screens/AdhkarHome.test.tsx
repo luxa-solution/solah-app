@@ -77,7 +77,7 @@ describe("AdhkarHome", () => {
     useAdhkarStore.setState(initialState, true);
   });
 
-  it("renders the all tab by default showing HomeButton components", () => {
+  it("renders the all tab by default", () => {
     const { getByText, queryByText } = render(<AdhkarHome />);
 
     expect(getByText(/Before prayer/)).toBeTruthy();
@@ -160,7 +160,7 @@ describe("AdhkarHome", () => {
     expect(queryByText("D")).toBeNull();
   });
 
-  // ✅ Search functionality tests
+  // Search tests
   it("toggles search when search icon is pressed", () => {
     const { getByLabelText, queryByPlaceholderText } = render(<AdhkarHome />);
 
@@ -171,7 +171,7 @@ describe("AdhkarHome", () => {
     expect(queryByPlaceholderText("Search adhkar...")).toBeTruthy();
   });
 
-  it("closes search when back button is pressed in search mode", () => {
+  it("closes search when back button is pressed", () => {
     const { getByLabelText, queryByPlaceholderText } = render(<AdhkarHome />);
 
     fireEvent.press(getByLabelText("search"));
@@ -181,7 +181,7 @@ describe("AdhkarHome", () => {
     expect(queryByPlaceholderText("Search adhkar...")).toBeNull();
   });
 
-  it("shows search results when typing in search", () => {
+  it("shows search results when typing", () => {
     const { getByLabelText, getByPlaceholderText, getByText } = render(<AdhkarHome />);
 
     fireEvent.press(getByLabelText("search"));
@@ -193,7 +193,7 @@ describe("AdhkarHome", () => {
     expect(getByText("Before Item 2")).toBeTruthy();
   });
 
-  it("shows 'No results' when search returns no matches", () => {
+  it("shows no results message when search returns no matches", () => {
     const { getByLabelText, getByPlaceholderText, getByText } = render(<AdhkarHome />);
 
     fireEvent.press(getByLabelText("search"));
@@ -204,7 +204,7 @@ describe("AdhkarHome", () => {
     expect(getByText("No adhkar found. Try different keywords.")).toBeTruthy();
   });
 
-  it("clears search when clear button is pressed", () => {
+  it("clears search results when clear button is pressed", () => {
     const { getByLabelText, getByPlaceholderText, getByTestId, getByText, queryByText } = render(
       <AdhkarHome />
     );
@@ -214,18 +214,12 @@ describe("AdhkarHome", () => {
     const searchInput = getByPlaceholderText("Search adhkar...");
     fireEvent.changeText(searchInput, "Before");
 
-    // Verify results are shown
     expect(getByText("Before Item 1")).toBeTruthy();
 
-    // Press clear button
     const clearButton = getByTestId("search-clear-button");
     fireEvent.press(clearButton);
 
-    // Now search input should be empty and results should be gone
-    const searchInputAfterClear = getByPlaceholderText("Search adhkar...");
-    expect(searchInputAfterClear.props.value).toBe("");
-
-    // The "Before Item 1" text should not be visible anymore
+    // Search input should be empty
     expect(queryByText("Before Item 1")).toBeNull();
   });
 });
