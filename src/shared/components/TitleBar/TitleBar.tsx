@@ -1,5 +1,8 @@
 import { useRouter } from "expo-router";
+import { View, StyleSheet } from "react-native";
 import { Appbar } from "react-native-paper";
+
+import { colors } from "@/shared/styles";
 
 export interface TitleBarProps {
   title: string;
@@ -24,12 +27,31 @@ export const TitleBar = ({
       <Appbar.Content title={title} />
 
       {showBookmark && onBookmark && (
-        <Appbar.Action
-          icon={isBookmarked ? "bookmark" : "bookmark-outline"}
-          onPress={onBookmark}
-          accessibilityLabel={isBookmarked ? "Remove bookmark" : "Add bookmark"}
-        />
+        <View style={[styles.bookmarkContainer, isBookmarked && styles.bookmarkContainerFilled]}>
+          <Appbar.Action
+            icon={isBookmarked ? "bookmark" : "bookmark-outline"}
+            onPress={onBookmark}
+            accessibilityLabel={isBookmarked ? "Remove bookmark" : "Add bookmark"}
+            iconColor={
+              isBookmarked ? colors.context.brand.secondary : colors.context.default.tertiary
+            }
+          />
+        </View>
       )}
     </Appbar.Header>
   );
 };
+
+const styles = StyleSheet.create({
+  bookmarkContainer: {
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: "#E8E8E8",
+    marginRight: 8,
+    backgroundColor: "transparent",
+  },
+  bookmarkContainerFilled: {
+    borderColor: colors.context.brand.secondary,
+    backgroundColor: "transparent",
+  },
+});

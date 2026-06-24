@@ -7,11 +7,12 @@ import { useAdhkarStore } from "@/features-adhkar/store";
 import { AdhkarHome } from "./AdhkarHome";
 
 const mockBack = jest.fn();
+const mockPush = jest.fn();
 
 jest.mock("expo-router", () => ({
   useRouter: () => ({
     back: mockBack,
-    push: jest.fn(),
+    push: mockPush,
   }),
 }));
 
@@ -24,14 +25,14 @@ jest.mock("@/features-adhkar/data", () => ({
           id: "b1",
           type: "before",
           title: "Before Item 1",
-          entries: [{ arabicText: "A" }, { arabicText: "B" }],
+          entries: [{ arabicText: "A", transliteration: "Alif", translation: { en: "First" } }],
           illustration: null,
         },
         {
           id: "b2",
           type: "before",
           title: "Before Item 2",
-          entries: [{ arabicText: "C" }],
+          entries: [{ arabicText: "C", transliteration: "Cee", translation: { en: "Third" } }],
           illustration: null,
         },
       ],
@@ -43,7 +44,7 @@ jest.mock("@/features-adhkar/data", () => ({
           id: "d1",
           type: "during",
           title: "During Item 1",
-          entries: [{ arabicText: "D" }],
+          entries: [{ arabicText: "D", transliteration: "Dee", translation: { en: "Fourth" } }],
           illustration: null,
         },
       ],
@@ -55,7 +56,7 @@ jest.mock("@/features-adhkar/data", () => ({
           id: "a1",
           type: "after",
           title: "After Item 1",
-          entries: [{ arabicText: "E" }],
+          entries: [{ arabicText: "E", transliteration: "Ee", translation: { en: "Fifth" } }],
           illustration: null,
         },
       ],
@@ -76,7 +77,7 @@ describe("AdhkarHome", () => {
     useAdhkarStore.setState(initialState, true);
   });
 
-  it("renders the all tab by default showing HomeButton components", () => {
+  it("renders the all tab by default", () => {
     const { getByText, queryByText } = render(<AdhkarHome />);
 
     expect(getByText(/Before prayer/)).toBeTruthy();
@@ -157,5 +158,78 @@ describe("AdhkarHome", () => {
     expect(getByText("C")).toBeTruthy();
     expect(queryByText("A")).toBeNull();
     expect(queryByText("D")).toBeNull();
+  });
+
+  // ============================================
+  // SEARCH TESTS
+  // ============================================
+
+  it("toggles search when search icon is pressed", () => {
+    const { getByLabelText, queryByPlaceholderText } = render(<AdhkarHome />);
+
+    expect(queryByPlaceholderText("Search adhkar...")).toBeNull();
+
+    fireEvent.press(getByLabelText("search"));
+
+    expect(queryByPlaceholderText("Search adhkar...")).toBeTruthy();
+  });
+
+  it("closes search when back button is pressed", () => {
+    const { getByLabelText, queryByPlaceholderText } = render(<AdhkarHome />);
+
+    fireEvent.press(getByLabelText("search"));
+    expect(queryByPlaceholderText("Search adhkar...")).toBeTruthy();
+
+    fireEvent.press(getByLabelText("back"));
+    expect(queryByPlaceholderText("Search adhkar...")).toBeNull();
+  });
+
+  it("shows search results when typing", () => {
+    const { getByLabelText, getByPlaceholderText, getByText } = render(<AdhkarHome />);
+
+    fireEvent.press(getByLabelText("search"));
+
+    const searchInput = getByPlaceholderText("Search adhkar...");
+    fireEvent.changeText(searchInput, "Before");
+
+    expect(getByText("Before Item 1")).toBeTruthy();
+    expect(getByText("Before Item 2")).toBeTruthy();
+  });
+
+  it("shows no results message when search returns no matches", () => {
+    const { getByLabelText, getByPlaceholderText, getByText } = render(<AdhkarHome />);
+
+    fireEvent.press(getByLabelText("search"));
+
+    const searchInput = getByPlaceholderText("Search adhkar...");
+    fireEvent.changeText(searchInput, "xyzabc");
+
+    expect(getByText("No adhkar found. Try different keywords.")).toBeTruthy();
+  });
+
+  it("shows search suggestions when search is active but not typing", () => {
+    const { getByLabelText, getByText } = render(<AdhkarHome />);
+
+    fireEvent.press(getByLabelText("search"));
+
+    expect(getByText("Before Item 1")).toBeTruthy();
+    expect(getByText("Before Item 2")).toBeTruthy();
+    expect(getByText("During Item 1")).toBeTruthy();
+    expect(getByText("After Item 1")).toBeTruthy();
+  });
+
+  it("navigates to details when search result is pressed", () => {
+    const { getByLabelText, getByPlaceholderText, getByText } = render(<AdhkarHome />);
+
+    fireEvent.press(getByLabelText("search"));
+
+    const searchInput = getByPlaceholderText("Search adhkar...");
+    fireEvent.changeText(searchInput, "Before");
+
+    fireEvent.press(getByText("Before Item 1"));
+
+    expect(mockPush).toHaveBeenCalledWith(
+      expect.stringContaining("/adhkar/details?adhkar_type=before&id=b1")
+    );
   });
 });

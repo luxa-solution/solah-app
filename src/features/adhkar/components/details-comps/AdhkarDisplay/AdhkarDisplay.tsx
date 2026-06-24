@@ -45,6 +45,7 @@ export const AdhkarDisplay: React.FC<AdhkarDisplayProps> = ({ item, showNavigato
               <DetailsActionBar
                 item={item}
                 entry={entry}
+                entryIndex={idx}
                 onPlay={(e) => play(e.sourceId)}
                 isPlaying={isActiveEntry && isPlaying}
                 isLoading={isActiveEntry && isLoading}

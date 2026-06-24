@@ -43,7 +43,10 @@ describe("DetailsActionBar", () => {
       .spyOn(Share, "share")
       .mockResolvedValueOnce({ action: "sharedAction" } as any);
 
-    const { getByLabelText } = render(<DetailsActionBar item={item} entry={entry} />);
+    // ✅ ADDED entryIndex={0}
+    const { getByLabelText } = render(
+      <DetailsActionBar item={item} entry={entry} entryIndex={0} />
+    );
 
     fireEvent.press(getByLabelText("share"));
 
@@ -70,8 +73,9 @@ describe("DetailsActionBar", () => {
       entries: [],
     } as any;
 
+    // ✅ ADDED entryIndex={0}
     const { getByLabelText } = render(
-      <DetailsActionBar item={emptyItem} entry={{} as AdhkarEntry} />
+      <DetailsActionBar item={emptyItem} entry={{} as AdhkarEntry} entryIndex={0} />
     );
 
     fireEvent.press(getByLabelText("share"));
@@ -83,17 +87,24 @@ describe("DetailsActionBar", () => {
   });
 
   it("toggles favourite when favorite is pressed", () => {
-    const { getByLabelText } = render(<DetailsActionBar item={item} entry={entry} />);
+    // ✅ ADDED entryIndex={0}
+    const { getByLabelText } = render(
+      <DetailsActionBar item={item} entry={entry} entryIndex={0} />
+    );
 
     fireEvent.press(getByLabelText("favorite"));
 
-    expect(useAdhkarStore.getState().favouriteIds).toContain("morning-1");
+    // ✅ UPDATED: Now checking entry-level favorite ID
+    expect(useAdhkarStore.getState().favouriteIds).toContain("morning-1-entry-0");
   });
 
   it("does not throw when share fails", async () => {
     jest.spyOn(Share, "share").mockRejectedValueOnce(new Error("share failed"));
 
-    const { getByLabelText } = render(<DetailsActionBar item={item} entry={entry} />);
+    // ✅ ADDED entryIndex={0}
+    const { getByLabelText } = render(
+      <DetailsActionBar item={item} entry={entry} entryIndex={0} />
+    );
 
     expect(() => fireEvent.press(getByLabelText("share"))).not.toThrow();
   });
@@ -101,8 +112,9 @@ describe("DetailsActionBar", () => {
   it("calls onPlay when audio exists", () => {
     const onPlay = jest.fn();
 
+    // ✅ ADDED entryIndex={0}
     const { getByLabelText } = render(
-      <DetailsActionBar item={item} entry={entry} onPlay={onPlay} />
+      <DetailsActionBar item={item} entry={entry} entryIndex={0} onPlay={onPlay} />
     );
 
     fireEvent.press(getByLabelText("play"));
@@ -119,8 +131,9 @@ describe("DetailsActionBar", () => {
       sourceId: undefined,
     } as any;
 
+    // ✅ ADDED entryIndex={0}
     const { getByLabelText } = render(
-      <DetailsActionBar item={item} entry={noAudioEntry} onPlay={onPlay} />
+      <DetailsActionBar item={item} entry={noAudioEntry} entryIndex={0} onPlay={onPlay} />
     );
 
     fireEvent.press(getByLabelText("play"));
@@ -129,13 +142,19 @@ describe("DetailsActionBar", () => {
   });
 
   it("shows pause accessibility label when playing", () => {
-    const { getByLabelText } = render(<DetailsActionBar item={item} entry={entry} isPlaying />);
+    // ✅ ADDED entryIndex={0}
+    const { getByLabelText } = render(
+      <DetailsActionBar item={item} entry={entry} entryIndex={0} isPlaying />
+    );
 
     expect(getByLabelText("pause")).toBeTruthy();
   });
 
   it("shows loading indicator while buffering", () => {
-    const { getByLabelText } = render(<DetailsActionBar item={item} entry={entry} isLoading />);
+    // ✅ ADDED entryIndex={0}
+    const { getByLabelText } = render(
+      <DetailsActionBar item={item} entry={entry} entryIndex={0} isLoading />
+    );
 
     expect(getByLabelText("play")).toBeTruthy();
   });

@@ -53,10 +53,14 @@ jest.mock("expo-router", () => ({
   useRouter: () => ({ push: jest.fn() }),
 }));
 
+// ✅ UPDATED STORE MOCK
 jest.mock("@/features-adhkar/store", () => ({
   useAdhkarStore: () => ({
     toggleFavourite: jest.fn(),
     isFavourite: jest.fn(() => false),
+    // ✅ ADDED NEW FUNCTIONS
+    toggleEntryFavourite: jest.fn(),
+    isEntryFavourite: jest.fn(() => false),
   }),
 }));
 

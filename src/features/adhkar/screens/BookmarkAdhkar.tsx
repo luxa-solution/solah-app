@@ -1,6 +1,6 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
-import { View, Text, FlatList, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image } from "react-native";
 
 import { adhkarData } from "@/features-adhkar/data";
 import { useAdhkarStore } from "@/features-adhkar/store";
@@ -19,7 +19,11 @@ export function BookmarkAdhkar() {
   if (bookmarkedItems.length === 0) {
     return (
       <View style={styles.emptyContainer}>
-        <Ionicons name="bookmark-outline" size={64} color={colors.context.default.tertiary} />
+        <Image
+          source={require("@/assets/images/bookmarkEmptyState.png")}
+          style={styles.emptyIcon}
+          resizeMode="contain"
+        />
         <Text style={styles.emptyTitle}>No bookmarks found</Text>
         <Text style={styles.emptySubtitle}>Tap the bookmark icon on any adhkar to save it</Text>
       </View>
@@ -63,6 +67,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: spacing.xl,
+  },
+  emptyIcon: {
+    width: 220.39,
+    height: 242.52,
+    marginTop: 68.74,
+    marginBottom: spacing.lg,
   },
   emptyTitle: {
     fontSize: font.heading.xsmall.fontSize,
