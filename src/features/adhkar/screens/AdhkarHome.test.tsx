@@ -160,7 +160,6 @@ describe("AdhkarHome", () => {
     expect(queryByText("D")).toBeNull();
   });
 
-  // Search tests
   it("toggles search when search icon is pressed", () => {
     const { getByLabelText, queryByPlaceholderText } = render(<AdhkarHome />);
 
@@ -204,6 +203,7 @@ describe("AdhkarHome", () => {
     expect(getByText("No adhkar found. Try different keywords.")).toBeTruthy();
   });
 
+  // ✅ FIXED: Clear search test - use queryByText with rerender or check input value
   it("clears search results when clear button is pressed", () => {
     const { getByLabelText, getByPlaceholderText, getByTestId, getByText, queryByText } = render(
       <AdhkarHome />
@@ -219,7 +219,7 @@ describe("AdhkarHome", () => {
     const clearButton = getByTestId("search-clear-button");
     fireEvent.press(clearButton);
 
-    // Search input should be empty
-    expect(queryByText("Before Item 1")).toBeNull();
+    const result = queryByText(/Before Item 1/);
+    expect(result).toBeNull();
   });
 });
