@@ -20,11 +20,12 @@ describe("SearchHeader", () => {
   });
 
   it("calls onBack when back button is pressed", () => {
-    const { getByLabelText } = render(
+    const { getByTestId } = render(
       <SearchHeader searchQuery="" onSearchChange={mockOnSearchChange} onBack={mockOnBack} />
     );
 
-    fireEvent.press(getByLabelText("back"));
+    const backButton = getByTestId("search-back-button");
+    fireEvent.press(backButton);
     expect(mockOnBack).toHaveBeenCalled();
   });
 
@@ -38,26 +39,20 @@ describe("SearchHeader", () => {
   });
 
   it("shows clear button when searchQuery is not empty", () => {
-    const { getByLabelText } = render(
+    const { getByTestId } = render(
       <SearchHeader searchQuery="test" onSearchChange={mockOnSearchChange} onBack={mockOnBack} />
     );
 
-    expect(getByLabelText("clear")).toBeTruthy();
+    expect(getByTestId("search-clear-button")).toBeTruthy();
   });
 
-  it("calls onClearSearch when clear button is pressed", () => {
-    // Create a mock function for onSearchChange to verify clear works
-    const mockOnSearchChangeWithClear = jest.fn();
-    const { getByLabelText } = render(
-      <SearchHeader
-        searchQuery="test"
-        onSearchChange={mockOnSearchChangeWithClear}
-        onBack={mockOnBack}
-      />
+  it("calls onSearchChange with empty string when clear button is pressed", () => {
+    const { getByTestId } = render(
+      <SearchHeader searchQuery="test" onSearchChange={mockOnSearchChange} onBack={mockOnBack} />
     );
 
-    fireEvent.press(getByLabelText("clear"));
-    // The SearchHeader calls onSearchChange with empty string when clear is pressed
-    expect(mockOnSearchChangeWithClear).toHaveBeenCalledWith("");
+    const clearButton = getByTestId("search-clear-button");
+    fireEvent.press(clearButton);
+    expect(mockOnSearchChange).toHaveBeenCalledWith("");
   });
 });
