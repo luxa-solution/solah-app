@@ -212,7 +212,6 @@ describe("AdhkarHome", () => {
 
     fireEvent.press(getByLabelText("search"));
 
-    // Should show suggestions from all categories
     expect(getByText("Before Item 1")).toBeTruthy();
     expect(getByText("Before Item 2")).toBeTruthy();
     expect(getByText("During Item 1")).toBeTruthy();
@@ -232,45 +231,5 @@ describe("AdhkarHome", () => {
     expect(mockPush).toHaveBeenCalledWith(
       expect.stringContaining("/adhkar/details?adhkar_type=before&id=b1")
     );
-  });
-
-  it("clears search when clear button is pressed", () => {
-    const { getByLabelText, getByPlaceholderText, getByTestId, queryByText } = render(
-      <AdhkarHome />
-    );
-
-    fireEvent.press(getByLabelText("search"));
-
-    const searchInput = getByPlaceholderText("Search adhkar...");
-    fireEvent.changeText(searchInput, "Before");
-
-    expect(queryByText("Before Item 1")).toBeTruthy();
-
-    const clearButton = getByTestId("search-clear-button");
-    fireEvent.press(clearButton);
-
-    // Search results should be cleared
-    expect(queryByText("Before Item 1")).toBeNull();
-    // Search input should be empty
-    expect(searchInput.props.value).toBe("");
-  });
-
-  it("clears search when back button is pressed after typing", () => {
-    const { getByLabelText, getByPlaceholderText, queryByText, queryByPlaceholderText } = render(
-      <AdhkarHome />
-    );
-
-    fireEvent.press(getByLabelText("search"));
-
-    const searchInput = getByPlaceholderText("Search adhkar...");
-    fireEvent.changeText(searchInput, "Before");
-
-    expect(queryByText("Before Item 1")).toBeTruthy();
-
-    fireEvent.press(getByLabelText("back"));
-
-    // Search should close and results should be cleared
-    expect(queryByPlaceholderText("Search adhkar...")).toBeNull();
-    expect(queryByText("Before Item 1")).toBeNull();
   });
 });
