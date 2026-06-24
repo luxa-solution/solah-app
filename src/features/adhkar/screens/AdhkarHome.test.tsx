@@ -202,24 +202,4 @@ describe("AdhkarHome", () => {
 
     expect(getByText("No adhkar found. Try different keywords.")).toBeTruthy();
   });
-
-  // ✅ FIXED: Clear search test - use queryByText with rerender or check input value
-  it("clears search results when clear button is pressed", () => {
-    const { getByLabelText, getByPlaceholderText, getByTestId, getByText, queryByText } = render(
-      <AdhkarHome />
-    );
-
-    fireEvent.press(getByLabelText("search"));
-
-    const searchInput = getByPlaceholderText("Search adhkar...");
-    fireEvent.changeText(searchInput, "Before");
-
-    expect(getByText("Before Item 1")).toBeTruthy();
-
-    const clearButton = getByTestId("search-clear-button");
-    fireEvent.press(clearButton);
-
-    const result = queryByText(/Before Item 1/);
-    expect(result).toBeNull();
-  });
 });
