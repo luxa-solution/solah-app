@@ -4,7 +4,7 @@ import { useAdhkarStore } from "@/features-adhkar/store";
 import { AdhkarEntry, AdhkarItem } from "@/features-adhkar/types";
 import { colors, spacing, borderRadius } from "@/shared/styles";
 
-const iconPause = require("@/assets/adhkar-icons/pause.png"); // add this asset — see note below
+const iconPause = require("@/assets/adhkar-icons/pause.png");
 const iconPlay = require("@/assets/adhkar-icons/play.png");
 const iconShare = require("@/assets/adhkar-icons/share.png");
 const iconStar = require("@/assets/adhkar-icons/Star.png");
@@ -14,6 +14,7 @@ export type DetailsActionBarProps = {
   item: AdhkarItem;
   /** Which entry within item.entries this action bar instance belongs to. */
   entry: AdhkarEntry;
+  entryIndex: number; // ✅ ADDED - To know which entry to favorite
   /** True while this entry's audio is the one currently loaded+playing. */
   isPlaying?: boolean;
   /** True while this entry's audio is buffering. */
@@ -25,12 +26,14 @@ export type DetailsActionBarProps = {
 export const DetailsActionBar = ({
   item,
   entry,
+  entryIndex, // ✅ ADDED
   isPlaying = false,
   isLoading = false,
   onPlay,
 }: DetailsActionBarProps) => {
-  const { toggleFavourite, isFavourite } = useAdhkarStore();
-  const isFav = isFavourite(item);
+  const { toggleEntryFavourite, isEntryFavourite } = useAdhkarStore();
+
+  const isFav = isEntryFavourite(item, entryIndex);
 
   const onShare = async () => {
     try {
@@ -53,8 +56,9 @@ export const DetailsActionBar = ({
     } catch {}
   };
 
+  // ✅ Use entry-level favorite toggle
   const onFavorite = () => {
-    toggleFavourite(item);
+    toggleEntryFavourite(item, entryIndex);
   };
 
   const hasAudio = Boolean(entry.audio && entry.sourceId);

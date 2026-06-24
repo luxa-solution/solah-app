@@ -10,9 +10,11 @@ interface AdhkarStoreState {
   groupBookmarkIds: string[];
 
   toggleFavourite: (adhkar: AdhkarItem) => void;
+  toggleEntryFavourite: (adhkar: AdhkarItem, entryIndex: number) => void;
   toggleBookmark: (adhkar: AdhkarItem) => void;
   toggleGroupBookmark: (adhkarType: AdhkarType) => void;
   isFavourite: (adhkar: AdhkarItem) => boolean;
+  isEntryFavourite: (adhkar: AdhkarItem, entryIndex: number) => boolean;
   isBookmarked: (adhkar: AdhkarItem) => boolean;
   isGroupBookmarked: (adhkarType: AdhkarType) => boolean;
   getFavourites: () => string[];
@@ -34,6 +36,17 @@ export const useAdhkarStore = create<AdhkarStoreState>()(
         toggleFavourite: (adhkar: AdhkarItem) =>
           set((state) => {
             const id = `${adhkar.type}-${adhkar.id}`;
+            const isCurrentlyFavourite = state.favouriteIds.includes(id);
+            return {
+              favouriteIds: isCurrentlyFavourite
+                ? state.favouriteIds.filter((favId) => favId !== id)
+                : [...state.favouriteIds, id],
+            };
+          }),
+
+        toggleEntryFavourite: (adhkar: AdhkarItem, entryIndex: number) =>
+          set((state) => {
+            const id = `${adhkar.type}-${adhkar.id}-entry-${entryIndex}`;
             const isCurrentlyFavourite = state.favouriteIds.includes(id);
             return {
               favouriteIds: isCurrentlyFavourite
@@ -65,6 +78,11 @@ export const useAdhkarStore = create<AdhkarStoreState>()(
 
         isFavourite: (adhkar: AdhkarItem) => {
           const id = `${adhkar.type}-${adhkar.id}`;
+          return get().favouriteIds.includes(id);
+        },
+
+        isEntryFavourite: (adhkar: AdhkarItem, entryIndex: number) => {
+          const id = `${adhkar.type}-${adhkar.id}-entry-${entryIndex}`;
           return get().favouriteIds.includes(id);
         },
 
