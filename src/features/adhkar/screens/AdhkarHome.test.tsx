@@ -160,7 +160,7 @@ describe("AdhkarHome", () => {
     expect(queryByText("D")).toBeNull();
   });
 
-  // ✅ ADDED: Search functionality tests
+  // ✅ Search functionality tests
   it("toggles search when search icon is pressed", () => {
     const { getByLabelText, queryByPlaceholderText } = render(<AdhkarHome />);
 
@@ -189,7 +189,6 @@ describe("AdhkarHome", () => {
     const searchInput = getByPlaceholderText("Search adhkar...");
     fireEvent.changeText(searchInput, "Before");
 
-    // ✅ getByText is destructured from render above
     expect(getByText("Before Item 1")).toBeTruthy();
     expect(getByText("Before Item 2")).toBeTruthy();
   });
@@ -202,7 +201,6 @@ describe("AdhkarHome", () => {
     const searchInput = getByPlaceholderText("Search adhkar...");
     fireEvent.changeText(searchInput, "xyzabc");
 
-    // ✅ getByText is destructured from render above
     expect(getByText("No adhkar found. Try different keywords.")).toBeTruthy();
   });
 
@@ -216,12 +214,18 @@ describe("AdhkarHome", () => {
     const searchInput = getByPlaceholderText("Search adhkar...");
     fireEvent.changeText(searchInput, "Before");
 
-    // ✅ getByText is destructured from render above
+    // Verify results are shown
     expect(getByText("Before Item 1")).toBeTruthy();
 
+    // Press clear button
     const clearButton = getByTestId("search-clear-button");
     fireEvent.press(clearButton);
 
+    // Now search input should be empty and results should be gone
+    const searchInputAfterClear = getByPlaceholderText("Search adhkar...");
+    expect(searchInputAfterClear.props.value).toBe("");
+
+    // The "Before Item 1" text should not be visible anymore
     expect(queryByText("Before Item 1")).toBeNull();
   });
 });
