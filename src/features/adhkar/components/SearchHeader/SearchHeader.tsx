@@ -18,7 +18,12 @@ export const SearchHeader = ({
 }: SearchHeaderProps) => {
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={onBack} style={styles.backButton} testID="search-back-button">
+      <TouchableOpacity
+        onPress={onBack}
+        style={styles.backButton}
+        testID="search-back-button"
+        accessibilityLabel="back"
+      >
         <Ionicons name="arrow-back" size={25} color={colors.context.brand.primary} />
       </TouchableOpacity>
 
@@ -35,7 +40,11 @@ export const SearchHeader = ({
           testID="search-input"
         />
         {searchQuery ? (
-          <TouchableOpacity onPress={() => onSearchChange("")} testID="search-clear-button">
+          <TouchableOpacity
+            onPress={() => onSearchChange("")}
+            testID="search-clear-button"
+            accessibilityLabel="clear"
+          >
             <Ionicons name="close-circle" size={20} color={colors.context.default.secondary} />
           </TouchableOpacity>
         ) : null}

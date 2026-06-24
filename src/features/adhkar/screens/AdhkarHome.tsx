@@ -118,7 +118,7 @@ export function AdhkarHome() {
                 <Text style={styles.pageTitle}>Adhkar</Text>
               </View>
 
-              <TouchableOpacity onPress={handleToggleSearch}>
+              <TouchableOpacity onPress={handleToggleSearch} accessibilityLabel="search">
                 <Ionicons name="search-outline" size={22} color={colors.context.brand.primary} />
               </TouchableOpacity>
             </>
@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
   favouriteItem: {
     marginBottom: spacing.xl,
   },
-  //search styles
+  // Search styles
   searchContainer: {
     flex: 1,
     marginTop: spacing.md,
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
   resultsScrollView: {
     flex: 1,
   },
-
+  // List item styles (used for both suggestions and results)
   listItem: {
     paddingVertical: spacing.md,
     borderBottomWidth: 1,
@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
     fontFamily: font.body.medium.fontFamily,
     color: colors.context.default.primary,
   },
-
+  // Result styles
   searchResultsText: {
     fontSize: font.body.small.fontSize,
     color: colors.context.default.primary,
